@@ -1,0 +1,20 @@
+@import "tailwindcss";
+
+/* Dark theme defaults matching the old dashboard */
+html {
+  color-scheme: dark;
+}
+
+body {
+  background-color: #09090b; /* zinc-950 */
+  color: #ededed;
+  font-family: var(--font-inter), sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}

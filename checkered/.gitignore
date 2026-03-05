@@ -1,0 +1,33 @@
+# Dependencies
+node_modules/
+
+# Environment variables (NEVER commit these!)
+.env
+backend/.env
+checkered/.env
+
+# Hardhat
+cache/
+artifacts/
+typechain-types/
+
+# Deployment records (may contain sensitive info)
+deployments/
+
+# Next.js
+checkered/.next/
+checkered/out/
+
+# Logs
+*.log
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+
+# Temp files
+*.tmp.*

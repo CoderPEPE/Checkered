@@ -1,0 +1,38 @@
+# Dependencies
+node_modules/
+
+# Environment variables (NEVER commit these!)
+.env
+
+# Hardhat
+cache/
+artifacts/
+typechain-types/
+
+# Deployment records (may contain sensitive info)
+deployments/
+
+# Logs
+*.log
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+
+# Next.js
+.next/
+out/
+
+# Frontend build
+dist/
+build/
+
+# Temp files
+*.tmp.*
+
+# Claude Code local settings
+.claude/
