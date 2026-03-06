@@ -5,6 +5,18 @@ const { ethers } = require("ethers");
 const winston = require("winston");
 const { iRacingAuth, fetchSubsessionResults } = require("./iracing-api");
 
+
+
+// ============================================================
+//  ENV VALIDATION (Milestone 1)
+// ============================================================
+const REQUIRED_ENV = ["ADMIN_API_KEY", "ORACLE_PRIVATE_KEY", "TOURNAMENT_CONTRACT_ADDRESS", "BASE_RPC_URL"];
+const missing = REQUIRED_ENV.filter(k => !process.env[k]);
+if (missing.length > 0) {
+  console.error(`FATAL: Missing required environment variables: ${missing.join(", ")}`);
+  process.exit(1);
+}
+
 // ============================================================
 //  LOGGER
 // ============================================================
@@ -24,8 +36,12 @@ const logger = winston.createLogger({
 //  CONFIG
 // ============================================================
 const PORT = process.env.PORT || 3001;
-const ADMIN_API_KEY = process.env.ADMIN_API_KEY || "dev-api-key";
+const ADMIN_API_KEY = process.env.ADMIN_API_KEY;
 const MOCK_MODE = process.env.IRACING_MOCK_MODE === "true";
+if (!ADMIN_API_KEY) {
+  logger.error("ADMIN_API_KEY is not set in environment variables");
+  process.exit(1);
+}
 
 // ============================================================
 //  BLOCKCHAIN CONNECTION

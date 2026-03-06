@@ -1,9 +1,13 @@
 require("@nomicfoundation/hardhat-toolbox");
 require("dotenv").config();
 
-const DEPLOYER_PRIVATE_KEY = process.env.DEPLOYER_PRIVATE_KEY || "0x0000000000000000000000000000000000000000000000000000000000000001";
+const DEPLOYER_PRIVATE_KEY = process.env.DEPLOYER_PRIVATE_KEY;
 const BASE_RPC_URL = process.env.BASE_RPC_URL || "https://sepolia.base.org";
 const BASESCAN_API_KEY = process.env.BASESCAN_API_KEY || "";
+
+if (!DEPLOYER_PRIVATE_KEY) {
+  throw new Error("Please set your DEPLOYER_PRIVATE_KEY in the .env file");
+}
 
 /** @type import('hardhat/config').HardhatUserConfig */
 module.exports = {
