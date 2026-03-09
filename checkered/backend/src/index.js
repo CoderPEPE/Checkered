@@ -2,9 +2,11 @@ require("dotenv").config();
 const crypto = require("crypto");
 const express = require("express");
 const cors = require("cors");
+const helmet = require("helmet");
 const rateLimit = require("express-rate-limit");
 const { ethers } = require("ethers");
 const winston = require("winston");
+require("winston-daily-rotate-file");
 const { iRacingAuth, fetchSubsessionResults } = require("./iracing-api");
 
 
@@ -30,7 +32,13 @@ const logger = winston.createLogger({
   ),
   transports: [
     new winston.transports.Console(),
-    new winston.transports.File({ filename: "oracle.log" }),
+    // Daily rotation: one file per day, 20 MB max per file, keep 14 days (Milestone 7)
+    new winston.transports.DailyRotateFile({
+      filename: "oracle-%DATE%.log",
+      datePattern: "YYYY-MM-DD",
+      maxSize: "20m",
+      maxFiles: "14d",
+    }),
   ],
 });
 
@@ -172,6 +180,25 @@ function generateMockResults(tournamentId) {
 //  EXPRESS API
 // ============================================================
 const app = express();
+
+// Security headers — explicit config for readability (Milestone 7)
+app.use(helmet({
+  hsts: { maxAge: 31536000, includeSubDomains: true },  // Strict-Transport-Security: 1 year
+  frameguard: { action: "deny" },                        // X-Frame-Options: DENY
+  contentSecurityPolicy: {                               // Content-Security-Policy
+    directives: {
+      defaultSrc: ["'self'"],
+      scriptSrc: ["'self'"],
+      styleSrc: ["'self'", "'unsafe-inline'"],
+      imgSrc: ["'self'", "data:"],
+      connectSrc: ["'self'"],
+    },
+  },
+  referrerPolicy: { policy: "strict-origin-when-cross-origin" },  // Referrer-Policy
+  noSniff: true,                                         // X-Content-Type-Options: nosniff
+  dnsPrefetchControl: { allow: false },                  // X-DNS-Prefetch-Control: off
+  permittedCrossDomainPolicies: { permittedPolicies: "none" },  // X-Permitted-Cross-Domain-Policies
+}));
 
 // CORS allowlist — only your frontend origin can call the API (Milestone 2)
 const ALLOWED_ORIGINS = process.env.ALLOWED_ORIGINS
