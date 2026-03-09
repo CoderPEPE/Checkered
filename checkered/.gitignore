@@ -31,3 +31,7 @@ Thumbs.db
 
 # Temp files
 *.tmp.*
+
+# Claude
+.claude/
+.claude-flow/
