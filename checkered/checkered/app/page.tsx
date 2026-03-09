@@ -4,11 +4,10 @@ import { useState, useEffect, useCallback } from "react";
 import { useAccount } from "wagmi";
 import { useIsAdmin } from "./hooks/useIsAdmin";
 import Header from "./components/Header";
-import OracleStatus from "./components/OracleStatus";
 import CreateTournament from "./components/CreateTournament";
 import TournamentList from "./components/TournamentList";
 import TournamentDetail from "./components/TournamentDetail";
-import type { Tournament, TournamentDetail as TournamentDetailType, OracleData } from "./types";
+import type { Tournament, TournamentDetail as TournamentDetailType } from "./types";
 
 export default function Home() {
   const { isConnected } = useAccount();
@@ -16,14 +15,12 @@ export default function Home() {
 
   // Data state
   const [tournaments, setTournaments] = useState<Tournament[]>([]);
-  const [oracle, setOracle] = useState<OracleData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [selectedTournament, setSelectedTournament] =
     useState<TournamentDetailType | null>(null);
 
   // UI state
-  const [showOracle, setShowOracle] = useState(false);
   const [showCreateTournament, setShowCreateTournament] = useState(false);
 
   // Fetch tournaments from the backend API
@@ -73,7 +70,6 @@ export default function Home() {
   return (
     <div className="min-h-screen bg-zinc-950 text-zinc-100">
       <Header
-        onToggleOracle={() => setShowOracle((v) => !v)}
         onNewTournament={() => setShowCreateTournament(true)}
         showNewTournament={isConnected && isAdmin}
       />
@@ -85,9 +81,6 @@ export default function Home() {
             {error}
           </div>
         )}
-
-        {/* Oracle status — hidden by default, toggled via gear icon */}
-        {showOracle && <OracleStatus oracle={oracle} loading={loading} />}
 
         {/* Tournament card grid */}
         <TournamentList
