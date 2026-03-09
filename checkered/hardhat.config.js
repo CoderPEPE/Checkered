@@ -1,13 +1,17 @@
 require("@nomicfoundation/hardhat-toolbox");
 require("dotenv").config();
 
+// Required env vars — add new keys here as needed
+const REQUIRED_ENV = ["DEPLOYER_PRIVATE_KEY"];
+const missing = REQUIRED_ENV.filter(k => !process.env[k]);
+if (missing.length > 0) {
+  console.error(`FATAL: Missing required environment variables: ${missing.join(", ")}`);
+  process.exit(1);
+}
+
 const DEPLOYER_PRIVATE_KEY = process.env.DEPLOYER_PRIVATE_KEY;
 const BASE_RPC_URL = process.env.BASE_RPC_URL || "https://sepolia.base.org";
 const BASESCAN_API_KEY = process.env.BASESCAN_API_KEY || "";
-
-if (!DEPLOYER_PRIVATE_KEY) {
-  throw new Error("Please set your DEPLOYER_PRIVATE_KEY in the .env file");
-}
 
 /** @type import('hardhat/config').HardhatUserConfig */
 module.exports = {

@@ -38,10 +38,6 @@ const logger = winston.createLogger({
 const PORT = process.env.PORT || 3001;
 const ADMIN_API_KEY = process.env.ADMIN_API_KEY;
 const MOCK_MODE = process.env.IRACING_MOCK_MODE === "true";
-if (!ADMIN_API_KEY) {
-  logger.error("ADMIN_API_KEY is not set in environment variables");
-  process.exit(1);
-}
 
 // ============================================================
 //  BLOCKCHAIN CONNECTION
