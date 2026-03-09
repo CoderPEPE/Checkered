@@ -109,9 +109,34 @@ describe("IRacingTournament", function () {
 
     it("Should reject zero max players", async function () {
       const { tournament, admin } = await loadFixture(deployFixture);
+      // maxPlayers (0) < prizeSplits.length (1) → InvalidSplits
       await expect(
         tournament.connect(admin).createTournament("No Players", 1000000, 0, [10000], 0)
-      ).to.be.revertedWithCustomError(tournament, "InvalidFee");
+      ).to.be.revertedWithCustomError(tournament, "InvalidSplits");
+    });
+
+    it("Should reject empty tournament name", async function () {
+      const { tournament, admin } = await loadFixture(deployFixture);
+      await expect(
+        tournament.connect(admin).createTournament("", 1000000, 10, [10000], 0)
+      ).to.be.revertedWithCustomError(tournament, "InvalidName");
+    });
+
+    it("Should reject prizeSplits with more than 10 entries", async function () {
+      const { tournament, admin } = await loadFixture(deployFixture);
+      // 11 splits of 909 each = 9999, add 1 to first = 10000
+      const splits = [910, 909, 909, 909, 909, 909, 909, 909, 909, 909, 909];
+      await expect(
+        tournament.connect(admin).createTournament("Too Many Splits", 1000000, 20, splits, 0)
+      ).to.be.revertedWithCustomError(tournament, "InvalidSplits");
+    });
+
+    it("Should reject maxPlayers less than prizeSplits length", async function () {
+      const { tournament, admin } = await loadFixture(deployFixture);
+      // 3 prize splits but only 2 max players
+      await expect(
+        tournament.connect(admin).createTournament("Too Few Players", 1000000, 2, [6000, 3000, 1000], 0)
+      ).to.be.revertedWithCustomError(tournament, "InvalidSplits");
     });
 
     it("Should reject non-admin creating tournament", async function () {
@@ -327,6 +352,37 @@ describe("IRacingTournament", function () {
           0, [player1.address, player2.address, nonAdmin.address], resultHash
         )
       ).to.be.revertedWithCustomError(tournament, "NotRegistered");
+    });
+
+    it("Should reject duplicate winner addresses", async function () {
+      const { tournament, oracle, player1, player2 } = await fullTournamentFixture();
+      const resultHash = ethers.keccak256(ethers.toUtf8Bytes("data"));
+      // player1 appears twice — should revert
+      await expect(
+        tournament.connect(oracle).submitResultsAndDistribute(
+          0, [player1.address, player2.address, player1.address], resultHash
+        )
+      ).to.be.revertedWithCustomError(tournament, "DuplicateWinner");
+    });
+
+    it("Should reject results when status is RegistrationClosed (not Racing)", async function () {
+      const { tournament, admin, oracle, player1, player2, player3 } = await loadFixture(deployFixture);
+      const entryFee = ethers.parseUnits("10", 6);
+      await tournament.connect(admin).createTournament("Race", entryFee, 10, [6000, 3000, 1000], 55555);
+
+      await tournament.connect(player1).register(0, 100001);
+      await tournament.connect(player2).register(0, 100002);
+      await tournament.connect(player3).register(0, 100003);
+
+      // Close registration but do NOT start race
+      await tournament.connect(admin).closeRegistration(0);
+
+      const resultHash = ethers.keccak256(ethers.toUtf8Bytes("data"));
+      await expect(
+        tournament.connect(oracle).submitResultsAndDistribute(
+          0, [player1.address, player2.address, player3.address], resultHash
+        )
+      ).to.be.revertedWithCustomError(tournament, "InvalidStatus");
     });
 
     it("Should store result hash", async function () {

@@ -94,6 +94,8 @@ contract IRacingTournament is AccessControl, ReentrancyGuard, Pausable {
     error NotRegistered();
     error RefundAlreadyClaimed();
     error InsufficientAllowance();
+    error InvalidName();
+    error DuplicateWinner();
 
     // ============================================================
     //  CONSTRUCTOR
@@ -130,13 +132,21 @@ contract IRacingTournament is AccessControl, ReentrancyGuard, Pausable {
         uint256[] calldata _prizeSplits,
         uint256 _subsessionId
     ) external onlyRole(ADMIN_ROLE) whenNotPaused returns (uint256) {
+        // Validate name is non-empty (Milestone 5)
+        if (bytes(_name).length == 0) revert InvalidName();
+
+        // Validate prizeSplits length is bounded 1–10 (Milestone 5)
+        if (_prizeSplits.length == 0 || _prizeSplits.length > 10) revert InvalidSplits();
+
+        // Validate maxPlayers can cover all prize slots (Milestone 5)
+        if (_maxPlayers < _prizeSplits.length) revert InvalidSplits();
+
         // Validate splits sum to 10000 (100%)
         uint256 totalSplits;
         for (uint256 i = 0; i < _prizeSplits.length; i++) {
             totalSplits += _prizeSplits[i];
         }
         if (totalSplits != 10000) revert InvalidSplits();
-        if (_maxPlayers == 0) revert InvalidFee();
 
         uint256 tournamentId = tournamentCount++;
 
@@ -296,13 +306,17 @@ contract IRacingTournament is AccessControl, ReentrancyGuard, Pausable {
         bytes32 _resultHash
     ) external onlyRole(ORACLE_ROLE) nonReentrant whenNotPaused {
         Tournament storage t = tournaments[_tournamentId];
-        if (t.status != TournamentStatus.Racing && t.status != TournamentStatus.RegistrationClosed)
+        // Only allow result submission when status is Racing (Milestone 5)
+        if (t.status != TournamentStatus.Racing)
             revert InvalidStatus(TournamentStatus.Racing, t.status);
         if (_winners.length != t.prizeSplits.length) revert InvalidSplits();
 
-        // Validate all winners are registered
+        // Validate all winners are registered and no duplicates (Milestone 5)
         for (uint256 i = 0; i < _winners.length; i++) {
             if (!registrations[_tournamentId][_winners[i]].registered) revert NotRegistered();
+            for (uint256 j = 0; j < i; j++) {
+                if (_winners[j] == _winners[i]) revert DuplicateWinner();
+            }
         }
 
         t.resultHash = _resultHash;
