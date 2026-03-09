@@ -1,6 +1,8 @@
 require("dotenv").config();
+const crypto = require("crypto");
 const express = require("express");
 const cors = require("cors");
+const rateLimit = require("express-rate-limit");
 const { ethers } = require("ethers");
 const winston = require("winston");
 const { iRacingAuth, fetchSubsessionResults } = require("./iracing-api");
@@ -170,15 +172,48 @@ function generateMockResults(tournamentId) {
 //  EXPRESS API
 // ============================================================
 const app = express();
-app.use(cors());
+
+// CORS allowlist — only your frontend origin can call the API (Milestone 2)
+const ALLOWED_ORIGINS = process.env.ALLOWED_ORIGINS
+  ? process.env.ALLOWED_ORIGINS.split(",")
+  : ["http://localhost:3000"];
+app.use(cors({
+  origin: ALLOWED_ORIGINS,
+  methods: ["GET", "POST"],
+}));
+
+// Global rate limit — 60 requests per minute per IP (Milestone 2)
+app.use(rateLimit({
+  windowMs: 60 * 1000,
+  max: 60,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { error: "Too many requests, please try again later" },
+}));
+
 app.use(express.json());
 
-// Auth middleware for admin endpoints
+// Auth middleware — timing-safe comparison prevents timing attacks (Milestone 2)
+import crypto from "crypto";
+
 function requireApiKey(req, res, next) {
   const apiKey = req.headers["x-api-key"];
-  if (apiKey !== ADMIN_API_KEY) {
+  if (typeof apiKey !== "string") {
     return res.status(401).json({ error: "Unauthorized" });
   }
+
+  const a = Buffer.from(apiKey);
+  const b = Buffer.from(ADMIN_API_KEY);
+
+  let valid = false;
+  if (a.length === b.length) {
+    valid = crypto.timingSafeEqual(a, b);
+  }
+
+  if (!valid) {
+    return res.status(401).json({ error: "Unauthorized" });
+  }
+
   next();
 }
 
