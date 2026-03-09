@@ -26,20 +26,16 @@ export default function Home() {
   const [showOracle, setShowOracle] = useState(false);
   const [showCreateTournament, setShowCreateTournament] = useState(false);
 
-  // Fetch tournaments and oracle status from the backend API
+  // Fetch tournaments from the backend API
   const fetchData = useCallback(async () => {
     try {
-      const [tournamentsRes, oracleRes] = await Promise.all([
-        fetch("/api/tournaments"),
-        fetch("/api/oracle/status"),
-      ]);
+      const tournamentsRes = await fetch("/api/tournaments");
 
-      if (!tournamentsRes.ok || !oracleRes.ok) {
+      if (!tournamentsRes.ok) {
         throw new Error("Backend not reachable — is it running on port 3001?");
       }
 
       setTournaments(await tournamentsRes.json());
-      setOracle(await oracleRes.json());
       setError(null);
     } catch (err) {
       setError(err instanceof Error ? err.message : String(err));

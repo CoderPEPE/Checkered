@@ -194,8 +194,6 @@ app.use(rateLimit({
 app.use(express.json());
 
 // Auth middleware — timing-safe comparison prevents timing attacks (Milestone 2)
-import crypto from "crypto";
-
 function requireApiKey(req, res, next) {
   const apiKey = req.headers["x-api-key"];
   if (typeof apiKey !== "string") {
@@ -217,15 +215,9 @@ function requireApiKey(req, res, next) {
   next();
 }
 
-// Health check
+// Public health check — returns only safe info (Milestone 3)
 app.get("/api/health", (req, res) => {
-  res.json({
-    status: "ok",
-    oracle: oracleWallet.address,
-    contract: process.env.TOURNAMENT_CONTRACT_ADDRESS,
-    mockMode: MOCK_MODE,
-    uptime: process.uptime(),
-  });
+  res.json({ status: "ok" });
 });
 
 // Get all tournaments
@@ -253,14 +245,19 @@ app.get("/api/tournaments", async (req, res) => {
     res.json(tournaments);
   } catch (err) {
     logger.error(`GET /api/tournaments error: ${err.message}`);
-    res.status(500).json({ error: err.message });
+    res.status(500).json({ error: "Internal server error" });
   }
 });
 
 // Get single tournament with player details
 app.get("/api/tournaments/:id", async (req, res) => {
+  // Validate tournament ID — reject NaN, negative, non-numeric (Milestone 3)
+  const id = Number(req.params.id);
+  if (!Number.isInteger(id) || id < 0) {
+    return res.status(400).json({ error: "Invalid tournament ID: must be a non-negative integer" });
+  }
+
   try {
-    const id = parseInt(req.params.id);
     const t = await tournamentContract.getTournament(id);
     const players = await tournamentContract.getTournamentPlayers(id);
 
@@ -291,12 +288,12 @@ app.get("/api/tournaments/:id", async (req, res) => {
     });
   } catch (err) {
     logger.error(`GET /api/tournaments/${req.params.id} error: ${err.message}`);
-    res.status(500).json({ error: err.message });
+    res.status(500).json({ error: "Internal server error" });
   }
 });
 
-// Oracle status
-app.get("/api/oracle/status", (req, res) => {
+// Oracle status — detailed info requires API key (Milestone 3)
+app.get("/api/oracle/status", requireApiKey, (_req, res) => {
   res.json({
     address: oracleWallet.address,
     contract: process.env.TOURNAMENT_CONTRACT_ADDRESS,
@@ -312,7 +309,8 @@ app.post("/api/oracle/poll", requireApiKey, async (req, res) => {
     await pollTournaments();
     res.json({ status: "poll complete" });
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    logger.error(`POST /api/oracle/poll error: ${err.message}`);
+    res.status(500).json({ error: "Internal server error" });
   }
 });
 
