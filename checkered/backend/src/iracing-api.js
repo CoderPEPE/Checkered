@@ -58,6 +58,11 @@ async function iRacingAuth() {
  * @returns {Array} Array of driver results sorted by finish position
  */
 async function fetchSubsessionResults(subsessionId) {
+  // Validate subsession ID before constructing URL (Milestone 10)
+  if (!Number.isInteger(subsessionId) || subsessionId <= 0) {
+    throw new Error(`Invalid subsession ID: ${subsessionId}`);
+  }
+
   const cookie = await iRacingAuth();
 
   // Step 1: Get the results link

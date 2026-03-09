@@ -1,0 +1,66 @@
+Milestone 1 — Backend: No Default Secrets & Env Validation
+Scope: Prevent startup with missing or default credentials.
+- Require `ADMIN_API_KEY` at startup (no fallback to `"dev-api-key"`).
+- Require `ORACLE_PRIVATE_KEY`, `TOURNAMENT_CONTRACT_ADDRESS`, `USDC_ADDRESS`, `BASE_RPC_URL` at startup; exit with a clear error if any are missing.
+- Remove Hardhat deploy fallback for `DEPLOYER_PRIVATE_KEY`; fail explicitly if not set.
+Deliverable: Backend and Hardhat config refuse to run with missing or default secrets.
+
+Milestone 2 — Backend: CORS & API Security Basics
+Scope: Lock down who can call the API and how.
+- Restrict CORS to allowed origins (e.g. frontend origin in production, localhost in dev).
+- Add timing-safe comparison for `X-API-Key` (e.g. `crypto.timingSafeEqual`).
+- Add global rate limiting (e.g. 60 requests per minute per IP).
+Deliverable: CORS allowlist, timing-safe API key check, rate limiting in place.
+
+Milestone 3 — Backend: Error Handling & Status Endpoints
+Scope: Stop leaking internal details to clients.
+- Return generic `"Internal server error"` to API consumers; log full error server-side.
+- Restrict public health/status to `{ status: "ok" }`; move oracle/contract/mock/uptime details behind API-key–protected endpoint(s).
+- Validate tournament ID (reject `NaN`, negative, non-numeric) and return 400 with a clear message.
+Deliverable: No raw RPC/ethers/stack traces in API responses; safe status endpoint; validated IDs.
+
+Milestone 4 — Frontend: Dependency & Config Hardening
+Scope: Fix critical frontend and build/deploy risks.
+- Upgrade Next.js to latest (address RCE and other known CVEs).
+- Pin `@coinbase/onchainkit` to a specific version (no `"latest"`).
+- Use env-based backend URL (e.g. `BACKEND_URL` / `NEXT_PUBLIC_API_URL`) for API proxy instead of hardcoded `http://localhost:3001`.
+Deliverable: Next.js upgraded, OnchainKit pinned, backend URL configurable.
+
+Milestone 5 — Contract: Winner & Input Validation
+Scope: Prevent invalid or malicious result submissions.
+- Reject duplicate winner addresses in `submitResultsAndDistribute` (each address at most once).
+- Validate tournament creation: non-empty name, bounded `prizeSplits` (e.g. length 1–10), `maxPlayers >= prizeSplits.length`.
+- Allow result submission only when status is `Racing` (not `RegistrationClosed`).
+Deliverable: Duplicate-winner check; creation bounds; result submission only in `Racing`.
+
+Milestone 6 — Contract: Emergency & Test Quality
+Scope: Reduce risk of permanently locked funds and improve test reliability.
+- Add time-locked emergency withdrawal (e.g. `DEFAULT_ADMIN_ROLE`, 30-day delay) for stuck tournament funds.
+- Fix vacuous test (e.g. “Should store result hash”) to assert the actual result hash or remove if not testable.
+- Fix E2E script to fail the process (e.g. `process.exit(1)`) on mismatch so CI fails correctly.
+Deliverable: Emergency rescue path; non-vacuous contract test; E2E that fails on failure.
+
+Milestone 7 — Backend: Security Headers & Logging
+Scope: Harden HTTP and operational hygiene.
+- Add security headers (e.g. HSTS, X-Content-Type-Options, X-Frame-Options, CSP, Referrer-Policy) via middleware (e.g. `helmet`).
+- Add log rotation for `oracle.log` (e.g. daily rotate or max size + max files).
+Deliverable: Security headers on all backend responses; rotating logs.
+
+Milestone 8 — Frontend: Paymaster & Error Display
+Scope: Limit paymaster abuse and improve UX/safety of errors.
+- Document and apply CDP portal controls for OnchainKit/Paymaster (usage caps, domain allowlist); optionally add server-side paymaster proxy.
+- Sanitize frontend error display: show user-friendly messages instead of raw wallet/contract revert text.
+Deliverable: Paymaster usage constrained and documented; user-facing errors sanitized.
+
+Milestone 9 — Test Coverage: Backend & Contract Gaps
+Scope: Automated coverage for backend and remaining contract paths.
+- Backend test suite: API key middleware (valid/invalid/missing), tournament ID validation, error response shape, and at least one happy path for poll/submit (e.g. with mocks).
+- Contract tests for: zero entry fee, cancel from `Racing` and `RegistrationClosed`, duplicate winners revert, result submit only in `Racing`, pause behavior, and any other untested paths from the audit.
+Deliverable: Backend tests for auth, validation, and core flows; contract tests for previously untested cases.
+
+Milestone 10 — Test Coverage: Frontend & Ongoing Hardening
+Scope: Frontend quality and longer-term improvements.
+- Frontend test suite: critical flows (e.g. admin check, register flow, contract ABI usage, error states); avoid exposing secrets in tests.
+- Optional/low-risk hardening: iRacing subsession ID validation in backend URL construction; document or mitigate iRacing ID-on-chain privacy (e.g. document as accepted trade-off or hash-on-chain).
+- Plan (design/doc only or minimal wiring): multi-sig or dispute mechanism for oracle; monitoring/alerting for oracle health and failures.
+Deliverable: Frontend tests for main user and admin flows; minor backend/contract cleanups; roadmap for oracle resilience and monitoring.
