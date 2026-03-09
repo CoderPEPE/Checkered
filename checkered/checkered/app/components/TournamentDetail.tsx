@@ -3,6 +3,7 @@
 import { useEffect } from "react";
 import { useAccount, useWriteContract, useWaitForTransactionReceipt } from "wagmi";
 import { TOURNAMENT_ADDRESS, TOURNAMENT_ABI, EXPLORER_URL } from "../contracts";
+import { sanitizeError } from "../utils/sanitizeError";
 import type { TournamentDetail as TournamentDetailType } from "../types";
 import RegisterForTournament from "./RegisterForTournament";
 import Overlay from "./Overlay";
@@ -213,7 +214,7 @@ export default function TournamentDetail({
             )}
             {error && (
               <div className="mt-2 text-xs text-red-400">
-                Failed: {error.message}
+                {sanitizeError(error)}
               </div>
             )}
           </div>

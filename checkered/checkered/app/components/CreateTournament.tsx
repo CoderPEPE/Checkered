@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { parseUnits } from "viem";
 import { useWriteContract, useWaitForTransactionReceipt } from "wagmi";
 import { TOURNAMENT_ADDRESS, TOURNAMENT_ABI, EXPLORER_URL } from "../contracts";
+import { sanitizeError } from "../utils/sanitizeError";
 import Overlay from "./Overlay";
 
 // Preset prize split options (values in basis points, must sum to 10000)
@@ -191,7 +192,7 @@ export default function CreateTournament({ open, onClose, onCreated }: Props) {
           )}
           {error && (
             <span className="text-sm text-red-400">
-              Failed: {error.message}
+              {sanitizeError(error)}
             </span>
           )}
         </div>

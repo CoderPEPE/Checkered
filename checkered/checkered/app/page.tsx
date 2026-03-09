@@ -7,6 +7,7 @@ import Header from "./components/Header";
 import CreateTournament from "./components/CreateTournament";
 import TournamentList from "./components/TournamentList";
 import TournamentDetail from "./components/TournamentDetail";
+import { sanitizeError } from "./utils/sanitizeError";
 import type { Tournament, TournamentDetail as TournamentDetailType } from "./types";
 
 export default function Home() {
@@ -35,7 +36,7 @@ export default function Home() {
       setTournaments(await tournamentsRes.json());
       setError(null);
     } catch (err) {
-      setError(err instanceof Error ? err.message : String(err));
+      setError(sanitizeError(err));
     } finally {
       setLoading(false);
     }
@@ -55,7 +56,7 @@ export default function Home() {
       const data = await res.json();
       setSelectedTournament(data);
     } catch (err) {
-      setError(err instanceof Error ? err.message : String(err));
+      setError(sanitizeError(err));
     }
   }
 
