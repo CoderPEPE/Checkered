@@ -61,11 +61,13 @@ contract IRacingTournament is AccessControl, ReentrancyGuard, Pausable {
     address public treasury;
     uint256 public platformFeeBps;     // basis points (500 = 5%)
     uint256 public constant MAX_FEE_BPS = 2000; // 20% cap
+    uint256 public constant EMERGENCY_DELAY = 30 days;
     uint256 public tournamentCount;
 
     mapping(uint256 => Tournament) public tournaments;
     mapping(uint256 => mapping(address => PlayerRegistration)) public registrations;
     mapping(uint256 => address[]) public tournamentPlayers;
+    mapping(uint256 => uint256) public emergencyWithdrawRequests; // tournamentId → request timestamp
 
     // ============================================================
     //  EVENTS
@@ -80,6 +82,8 @@ contract IRacingTournament is AccessControl, ReentrancyGuard, Pausable {
     event RefundClaimed(uint256 indexed tournamentId, address indexed player, uint256 amount);
     event PlatformFeeUpdated(uint256 oldFee, uint256 newFee);
     event TreasuryUpdated(address oldTreasury, address newTreasury);
+    event EmergencyWithdrawRequested(uint256 indexed tournamentId, uint256 executeAfter);
+    event EmergencyWithdrawExecuted(uint256 indexed tournamentId, uint256 amount);
 
     // ============================================================
     //  ERRORS
@@ -96,6 +100,9 @@ contract IRacingTournament is AccessControl, ReentrancyGuard, Pausable {
     error InsufficientAllowance();
     error InvalidName();
     error DuplicateWinner();
+    error EmergencyNotRequested();
+    error EmergencyDelayNotMet();
+    error NoFundsToWithdraw();
 
     // ============================================================
     //  CONSTRUCTOR
@@ -232,6 +239,45 @@ contract IRacingTournament is AccessControl, ReentrancyGuard, Pausable {
      */
     function unpause() external onlyRole(DEFAULT_ADMIN_ROLE) {
         _unpause();
+    }
+
+    // ============================================================
+    //  EMERGENCY WITHDRAWAL (Milestone 6)
+    // ============================================================
+
+    /**
+     * @notice Initiate a time-locked emergency withdrawal for stuck tournament funds
+     * @dev Requires DEFAULT_ADMIN_ROLE. Funds can be withdrawn after EMERGENCY_DELAY (30 days).
+     */
+    function requestEmergencyWithdraw(uint256 _tournamentId) external onlyRole(DEFAULT_ADMIN_ROLE) {
+        Tournament storage t = tournaments[_tournamentId];
+        if (t.prizePool == 0) revert NoFundsToWithdraw();
+
+        uint256 executeAfter = block.timestamp + EMERGENCY_DELAY;
+        emergencyWithdrawRequests[_tournamentId] = executeAfter;
+        emit EmergencyWithdrawRequested(_tournamentId, executeAfter);
+    }
+
+    /**
+     * @notice Execute emergency withdrawal after the 30-day delay has passed
+     * @dev Sends the tournament's prize pool to the treasury address
+     */
+    function executeEmergencyWithdraw(uint256 _tournamentId) external onlyRole(DEFAULT_ADMIN_ROLE) nonReentrant {
+        uint256 executeAfter = emergencyWithdrawRequests[_tournamentId];
+        if (executeAfter == 0) revert EmergencyNotRequested();
+        if (block.timestamp < executeAfter) revert EmergencyDelayNotMet();
+
+        Tournament storage t = tournaments[_tournamentId];
+        uint256 amount = t.prizePool;
+        if (amount == 0) revert NoFundsToWithdraw();
+
+        // Clear state before transfer
+        t.prizePool = 0;
+        t.status = TournamentStatus.Cancelled;
+        delete emergencyWithdrawRequests[_tournamentId];
+
+        usdc.safeTransfer(treasury, amount);
+        emit EmergencyWithdrawExecuted(_tournamentId, amount);
     }
 
     // ============================================================

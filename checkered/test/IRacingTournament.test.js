@@ -1,5 +1,6 @@
 const { expect } = require("chai");
-const { ethers } = require("hardhat");
+const hre = require("hardhat");
+const { ethers } = hre;
 const { loadFixture } = require("@nomicfoundation/hardhat-toolbox/network-helpers");
 
 describe("IRacingTournament", function () {
@@ -385,15 +386,20 @@ describe("IRacingTournament", function () {
       ).to.be.revertedWithCustomError(tournament, "InvalidStatus");
     });
 
-    it("Should store result hash", async function () {
+    it("Should store result hash and emit ResultsSubmitted event", async function () {
       const { tournament, oracle, player1, player2, player3 } = await fullTournamentFixture();
       const resultHash = ethers.keccak256(ethers.toUtf8Bytes("official-results"));
-      await tournament.connect(oracle).submitResultsAndDistribute(
-        0, [player1.address, player2.address, player3.address], resultHash
-      );
-      const t = await tournament.getTournament(0);
-      // resultHash is not returned by getTournament, check via direct storage
-      expect(await tournament.tournaments(0)).to.exist;
+
+      // Verify the event emits the correct hash
+      await expect(
+        tournament.connect(oracle).submitResultsAndDistribute(
+          0, [player1.address, player2.address, player3.address], resultHash
+        )
+      ).to.emit(tournament, "ResultsSubmitted").withArgs(0, resultHash);
+
+      // Verify on-chain storage via auto-generated getter (returns struct fields except arrays)
+      const stored = await tournament.tournaments(0);
+      expect(stored.resultHash).to.equal(resultHash);
     });
   });
 
@@ -502,6 +508,107 @@ describe("IRacingTournament", function () {
 
       await tournament.connect(owner).unpause();
       await tournament.connect(admin).createTournament("Race", 1000000, 10, [10000], 0);
+    });
+  });
+
+  // ============================================================
+  //  EMERGENCY WITHDRAWAL (Milestone 6)
+  // ============================================================
+  describe("Emergency Withdrawal", function () {
+    async function stuckTournamentFixture() {
+      const fixture = await loadFixture(deployFixture);
+      const entryFee = ethers.parseUnits("10", 6);
+      await fixture.tournament.connect(fixture.admin).createTournament(
+        "Stuck Race", entryFee, 10, [10000], 99999
+      );
+      await fixture.tournament.connect(fixture.player1).register(0, 100001);
+      return { ...fixture, entryFee };
+    }
+
+    it("Should request and execute emergency withdrawal after 30 days", async function () {
+      const { tournament, usdc, owner, treasury, entryFee } = await stuckTournamentFixture();
+
+      // Request emergency withdrawal
+      await expect(tournament.connect(owner).requestEmergencyWithdraw(0))
+        .to.emit(tournament, "EmergencyWithdrawRequested");
+
+      // Fast-forward 30 days
+      await hre.network.provider.send("evm_increaseTime", [30 * 24 * 60 * 60]);
+      await hre.network.provider.send("evm_mine");
+
+      const treasuryBefore = await usdc.balanceOf(treasury.address);
+
+      // Execute withdrawal
+      await expect(tournament.connect(owner).executeEmergencyWithdraw(0))
+        .to.emit(tournament, "EmergencyWithdrawExecuted")
+        .withArgs(0, entryFee);
+
+      const treasuryAfter = await usdc.balanceOf(treasury.address);
+      expect(treasuryAfter - treasuryBefore).to.equal(entryFee);
+
+      // Tournament should be cancelled with zero prize pool
+      const t = await tournament.getTournament(0);
+      expect(t.prizePool).to.equal(0);
+      expect(t.status).to.equal(5); // Cancelled
+    });
+
+    it("Should reject execution before 30-day delay", async function () {
+      const { tournament, owner } = await stuckTournamentFixture();
+      await tournament.connect(owner).requestEmergencyWithdraw(0);
+
+      // Try to execute immediately
+      await expect(
+        tournament.connect(owner).executeEmergencyWithdraw(0)
+      ).to.be.revertedWithCustomError(tournament, "EmergencyDelayNotMet");
+    });
+
+    it("Should reject execution without prior request", async function () {
+      const { tournament, owner } = await stuckTournamentFixture();
+      await expect(
+        tournament.connect(owner).executeEmergencyWithdraw(0)
+      ).to.be.revertedWithCustomError(tournament, "EmergencyNotRequested");
+    });
+
+    it("Should reject request for tournament with no funds", async function () {
+      const { tournament, owner, admin } = await loadFixture(deployFixture);
+      await tournament.connect(admin).createTournament("Empty", 0, 10, [10000], 0);
+      await expect(
+        tournament.connect(owner).requestEmergencyWithdraw(0)
+      ).to.be.revertedWithCustomError(tournament, "NoFundsToWithdraw");
+    });
+
+    it("Should reject non-admin requesting emergency withdrawal", async function () {
+      const { tournament, nonAdmin } = await stuckTournamentFixture();
+      await expect(
+        tournament.connect(nonAdmin).requestEmergencyWithdraw(0)
+      ).to.be.reverted;
+    });
+
+    it("Should reject non-admin executing emergency withdrawal", async function () {
+      const { tournament, owner, nonAdmin } = await stuckTournamentFixture();
+      await tournament.connect(owner).requestEmergencyWithdraw(0);
+
+      await hre.network.provider.send("evm_increaseTime", [30 * 24 * 60 * 60]);
+      await hre.network.provider.send("evm_mine");
+
+      await expect(
+        tournament.connect(nonAdmin).executeEmergencyWithdraw(0)
+      ).to.be.reverted;
+    });
+
+    it("Should reject double execution after successful withdrawal", async function () {
+      const { tournament, owner } = await stuckTournamentFixture();
+      await tournament.connect(owner).requestEmergencyWithdraw(0);
+
+      await hre.network.provider.send("evm_increaseTime", [30 * 24 * 60 * 60]);
+      await hre.network.provider.send("evm_mine");
+
+      await tournament.connect(owner).executeEmergencyWithdraw(0);
+
+      // Second attempt should fail — request was deleted
+      await expect(
+        tournament.connect(owner).executeEmergencyWithdraw(0)
+      ).to.be.revertedWithCustomError(tournament, "EmergencyNotRequested");
     });
   });
 

@@ -219,10 +219,9 @@ async function main() {
   const treasuryAfter = await usdc.balanceOf(deployer.address);
   const treasuryGain = Number(treasuryAfter) - Number(treasuryBefore);
 
-  // Each player started with 100 USDC, paid 10 USDC entry (twice for tournament 0 and 1 for p1/p2)
-  // Player 1: 100 - 10 (t0) - 10 (t1) + 8.55 (2nd prize) = 88.55
-  // Player 2: 100 - 10 (t0) - 10 (t1) + 17.1 (1st prize) = 97.1
-  // Player 3: 100 - 10 (t1) + 2.85 (3rd prize) = 92.85
+  // Player 1: minted 100, paid 10 (t0) + 10 (t1), received 8.55 (2nd) = 88.55
+  // Player 2: minted 100, paid 10 (t0) + 10 (t1), received 17.1 (1st) = 97.1
+  // Player 3: minted 100 + 100 (twice), paid 10 (t1), received 2.85 (3rd) = 192.85
 
   console.log("\n  Actual final balances:");
   console.log(`    Player 1 (2nd): ${Number(p1Final) / 1_000_000} USDC`);
@@ -230,24 +229,41 @@ async function main() {
   console.log(`    Player 3 (3rd): ${Number(p3Final) / 1_000_000} USDC`);
   console.log(`    Treasury gain:  ${treasuryGain / 1_000_000} USDC`);
 
-  // Verify prizes are correct (just for tournament 1)
-  // Player 2 received prize1st
-  // Note: p1 and p2 also paid 10 USDC into tournament 0 which is still escrowed
-  const p2Net = Number(p2Final) - (100_000_000 - 10_000_000 - 10_000_000); // balance minus starting minus 2 entries
+  // Verify net prize received (tournament 1 only)
+  // p1/p2: started 100, paid 10 into t0 (escrowed) + 10 into t1
+  // p3: started 200 (minted twice), paid 10 into t1
   const p1Net = Number(p1Final) - (100_000_000 - 10_000_000 - 10_000_000);
-  const p3Net = Number(p3Final) - (100_000_000 - 10_000_000);
+  const p2Net = Number(p2Final) - (100_000_000 - 10_000_000 - 10_000_000);
+  const p3Net = Number(p3Final) - (200_000_000 - 10_000_000);
+
+  // Verify prizes match expected values — fail the process on any mismatch (Milestone 6)
+  let failed = false;
+
+  function assertEq(label, actual, expected) {
+    if (actual === expected) {
+      console.log(`    ${label}: +${actual / 1_000_000} USDC ✓ CORRECT`);
+    } else {
+      console.error(`    ${label}: +${actual / 1_000_000} USDC ✗ MISMATCH (expected ${expected / 1_000_000})`);
+      failed = true;
+    }
+  }
 
   console.log("\n  Net prize received (tournament 1 only):");
-  console.log(`    Player 1 (2nd): +${p1Net / 1_000_000} USDC ${p1Net === prize2nd ? "✓ CORRECT" : "✗ MISMATCH (expected " + prize2nd / 1_000_000 + ")"}`);
-  console.log(`    Player 2 (1st): +${p2Net / 1_000_000} USDC ${p2Net === prize1st ? "✓ CORRECT" : "✗ MISMATCH (expected " + prize1st / 1_000_000 + ")"}`);
-  console.log(`    Player 3 (3rd): +${p3Net / 1_000_000} USDC ${p3Net === prize3rd ? "✓ CORRECT" : "✗ MISMATCH (expected " + prize3rd / 1_000_000 + ")"}`);
+  assertEq("Player 1 (2nd)", p1Net, prize2nd);
+  assertEq("Player 2 (1st)", p2Net, prize1st);
+  assertEq("Player 3 (3rd)", p3Net, prize3rd);
 
   console.log("\n" + "=".repeat(60));
-  console.log("  END-TO-END TEST COMPLETE");
+  if (failed) {
+    console.error("  END-TO-END TEST FAILED — prize mismatch detected");
+    console.log("=".repeat(60));
+    process.exit(1);
+  }
+  console.log("  END-TO-END TEST COMPLETE — all checks passed");
   console.log("=".repeat(60));
 }
 
 main().catch((error) => {
   console.error(error);
-  process.exitCode = 1;
+  process.exit(1);
 });
