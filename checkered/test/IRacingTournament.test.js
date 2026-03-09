@@ -613,6 +613,148 @@ describe("IRacingTournament", function () {
   });
 
   // ============================================================
+  //  ADDITIONAL COVERAGE (Milestone 9)
+  // ============================================================
+  describe("Additional Coverage (Milestone 9)", function () {
+    // ── Zero entry fee ─────────────────────────────────────
+    it("Should allow tournament with zero entry fee", async function () {
+      const { tournament, admin, player1 } = await loadFixture(deployFixture);
+      await tournament.connect(admin).createTournament("Free Race", 0, 10, [10000], 0);
+
+      // Player registers for free (no USDC transfer)
+      await tournament.connect(player1).register(0, 100001);
+      const t = await tournament.getTournament(0);
+      expect(t.registeredCount).to.equal(1);
+      expect(t.prizePool).to.equal(0);
+    });
+
+    it("Should distribute zero-fee tournament (no prizes)", async function () {
+      const { tournament, admin, oracle, player1 } = await loadFixture(deployFixture);
+      await tournament.connect(admin).createTournament("Free Race", 0, 10, [10000], 0);
+      await tournament.connect(player1).register(0, 100001);
+      await tournament.connect(admin).closeRegistration(0);
+      await tournament.connect(admin).startRace(0);
+
+      const resultHash = ethers.keccak256(ethers.toUtf8Bytes("free-results"));
+      await tournament.connect(oracle).submitResultsAndDistribute(0, [player1.address], resultHash);
+
+      const t = await tournament.getTournament(0);
+      expect(t.status).to.equal(4); // Completed
+    });
+
+    // ── Cancel from Racing ─────────────────────────────────
+    it("Should cancel tournament in Racing status", async function () {
+      const { tournament, admin } = await loadFixture(deployFixture);
+      await tournament.connect(admin).createTournament("Race", 1000000, 10, [10000], 0);
+      await tournament.connect(admin).closeRegistration(0);
+      await tournament.connect(admin).startRace(0);
+
+      await expect(tournament.connect(admin).cancelTournament(0))
+        .to.emit(tournament, "TournamentCancelled").withArgs(0);
+      expect((await tournament.getTournament(0)).status).to.equal(5); // Cancelled
+    });
+
+    // ── Cancel from RegistrationClosed ─────────────────────
+    it("Should cancel tournament in RegistrationClosed status", async function () {
+      const { tournament, admin } = await loadFixture(deployFixture);
+      await tournament.connect(admin).createTournament("Race", 1000000, 10, [10000], 0);
+      await tournament.connect(admin).closeRegistration(0);
+
+      await expect(tournament.connect(admin).cancelTournament(0))
+        .to.emit(tournament, "TournamentCancelled").withArgs(0);
+      expect((await tournament.getTournament(0)).status).to.equal(5);
+    });
+
+    // ── Cancel already-cancelled tournament ─────────────────
+    it("Should reject cancelling already-cancelled tournament", async function () {
+      const { tournament, admin } = await loadFixture(deployFixture);
+      await tournament.connect(admin).createTournament("Race", 1000000, 10, [10000], 0);
+      await tournament.connect(admin).cancelTournament(0);
+
+      await expect(
+        tournament.connect(admin).cancelTournament(0)
+      ).to.be.revertedWithCustomError(tournament, "InvalidStatus");
+    });
+
+    // ── Submit results from Created status ──────────────────
+    it("Should reject results from Created status", async function () {
+      const { tournament, admin, oracle, player1 } = await loadFixture(deployFixture);
+      await tournament.connect(admin).createTournament("Race", 1000000, 10, [10000], 0);
+      await tournament.connect(player1).register(0, 100001);
+
+      const resultHash = ethers.keccak256(ethers.toUtf8Bytes("data"));
+      await expect(
+        tournament.connect(oracle).submitResultsAndDistribute(0, [player1.address], resultHash)
+      ).to.be.revertedWithCustomError(tournament, "InvalidStatus");
+    });
+
+    // ── Pause blocks registration ───────────────────────────
+    it("Should reject registration when paused", async function () {
+      const { tournament, owner, admin, player1 } = await loadFixture(deployFixture);
+      await tournament.connect(admin).createTournament("Race", 1000000, 10, [10000], 0);
+      await tournament.connect(owner).pause();
+
+      await expect(
+        tournament.connect(player1).register(0, 100001)
+      ).to.be.revertedWithCustomError(tournament, "EnforcedPause");
+    });
+
+    // ── Pause blocks submitResultsAndDistribute ─────────────
+    it("Should reject result submission when paused", async function () {
+      const { tournament, owner, admin, oracle, player1 } = await loadFixture(deployFixture);
+      await tournament.connect(admin).createTournament("Race", 1000000, 10, [10000], 0);
+      await tournament.connect(player1).register(0, 100001);
+      await tournament.connect(admin).closeRegistration(0);
+      await tournament.connect(admin).startRace(0);
+
+      // Pause after race started
+      await tournament.connect(owner).pause();
+
+      const resultHash = ethers.keccak256(ethers.toUtf8Bytes("data"));
+      await expect(
+        tournament.connect(oracle).submitResultsAndDistribute(0, [player1.address], resultHash)
+      ).to.be.revertedWithCustomError(tournament, "EnforcedPause");
+    });
+
+    // ── Admin settings access control ───────────────────────
+    it("Should reject non-admin setting platform fee", async function () {
+      const { tournament, nonAdmin } = await loadFixture(deployFixture);
+      await expect(
+        tournament.connect(nonAdmin).setPlatformFee(100)
+      ).to.be.reverted;
+    });
+
+    it("Should reject non-admin setting treasury", async function () {
+      const { tournament, nonAdmin } = await loadFixture(deployFixture);
+      await expect(
+        tournament.connect(nonAdmin).setTreasury(nonAdmin.address)
+      ).to.be.reverted;
+    });
+
+    it("Should reject setting treasury to zero address", async function () {
+      const { tournament, owner } = await loadFixture(deployFixture);
+      await expect(
+        tournament.connect(owner).setTreasury(ethers.ZeroAddress)
+      ).to.be.revertedWithCustomError(tournament, "InvalidAddress");
+    });
+
+    it("Should reject non-admin pausing", async function () {
+      const { tournament, nonAdmin } = await loadFixture(deployFixture);
+      await expect(
+        tournament.connect(nonAdmin).pause()
+      ).to.be.reverted;
+    });
+
+    it("Should reject non-admin unpausing", async function () {
+      const { tournament, owner, nonAdmin } = await loadFixture(deployFixture);
+      await tournament.connect(owner).pause();
+      await expect(
+        tournament.connect(nonAdmin).unpause()
+      ).to.be.reverted;
+    });
+  });
+
+  // ============================================================
   //  VIEW FUNCTIONS
   // ============================================================
   describe("View Functions", function () {
