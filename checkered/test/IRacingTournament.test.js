@@ -469,7 +469,7 @@ describe("IRacingTournament", function () {
 
       await expect(
         tournament.connect(admin).cancelTournament(0)
-      ).to.be.revertedWithCustomError(tournament, "InvalidStatus");
+      ).to.be.revertedWithCustomError(tournament, "CannotCancelTerminalTournament");
     });
   });
 
@@ -673,7 +673,7 @@ describe("IRacingTournament", function () {
 
       await expect(
         tournament.connect(admin).cancelTournament(0)
-      ).to.be.revertedWithCustomError(tournament, "InvalidStatus");
+      ).to.be.revertedWithCustomError(tournament, "CannotCancelTerminalTournament");
     });
 
     // ── Submit results from Created status ──────────────────
@@ -776,6 +776,91 @@ describe("IRacingTournament", function () {
       expect(splits[0]).to.equal(6000);
       expect(splits[1]).to.equal(3000);
       expect(splits[2]).to.equal(1000);
+    });
+  });
+
+  // ============================================================
+  //  NEW FIXES — PRODUCTION HARDENING
+  // ============================================================
+  describe("Production Hardening", function () {
+    it("Should reject registration with iRacingCustomerId = 0", async function () {
+      const { tournament, admin, player1 } = await loadFixture(deployFixture);
+      await tournament.connect(admin).createTournament("Race", 1000000, 10, [10000], 0);
+
+      await expect(
+        tournament.connect(player1).register(0, 0)
+      ).to.be.revertedWithCustomError(tournament, "InvalidIRacingId");
+    });
+
+    it("Should decrement prizePool on refund claim", async function () {
+      const { tournament, admin, player1 } = await loadFixture(deployFixture);
+      const entryFee = ethers.parseUnits("5", 6);
+      await tournament.connect(admin).createTournament("Race", entryFee, 10, [10000], 0);
+      await tournament.connect(player1).register(0, 100001);
+
+      // prizePool should be entryFee after registration
+      let t = await tournament.getTournament(0);
+      expect(t.prizePool).to.equal(entryFee);
+
+      await tournament.connect(admin).cancelTournament(0);
+      await tournament.connect(player1).claimRefund(0);
+
+      // prizePool should be 0 after refund
+      t = await tournament.getTournament(0);
+      expect(t.prizePool).to.equal(0);
+    });
+
+    it("Should mark refunds claimed after emergency withdrawal", async function () {
+      const { tournament, owner, admin, player1 } = await loadFixture(deployFixture);
+      const entryFee = ethers.parseUnits("5", 6);
+      await tournament.connect(admin).createTournament("Race", entryFee, 10, [10000], 0);
+      await tournament.connect(player1).register(0, 100001);
+
+      // Request and execute emergency withdrawal
+      await tournament.connect(owner).requestEmergencyWithdraw(0);
+
+      // Fast-forward 30 days
+      await hre.network.provider.send("evm_increaseTime", [30 * 24 * 60 * 60 + 1]);
+      await hre.network.provider.send("evm_mine");
+
+      await tournament.connect(owner).executeEmergencyWithdraw(0);
+
+      // Player's refundClaimed should be true
+      const reg = await tournament.getPlayerRegistration(0, player1.address);
+      expect(reg.refundClaimed).to.be.true;
+
+      // Player should NOT be able to claim refund (already marked as claimed)
+      await expect(
+        tournament.connect(player1).claimRefund(0)
+      ).to.be.revertedWithCustomError(tournament, "RefundAlreadyClaimed");
+    });
+
+    it("Should reject address(0) as winner", async function () {
+      const { tournament, admin, oracle, player1 } = await loadFixture(deployFixture);
+      await tournament.connect(admin).createTournament("Race", 1000000, 10, [10000], 0);
+      await tournament.connect(player1).register(0, 100001);
+      await tournament.connect(admin).closeRegistration(0);
+      await tournament.connect(admin).startRace(0);
+
+      const resultHash = ethers.keccak256(ethers.toUtf8Bytes("data"));
+      await expect(
+        tournament.connect(oracle).submitResultsAndDistribute(0, [ethers.ZeroAddress], resultHash)
+      ).to.be.revertedWithCustomError(tournament, "InvalidAddress");
+    });
+
+    it("Should use CannotCancelTerminalTournament for completed tournaments", async function () {
+      const { tournament, admin, oracle, player1 } = await loadFixture(deployFixture);
+      await tournament.connect(admin).createTournament("Race", 1000000, 10, [10000], 0);
+      await tournament.connect(player1).register(0, 100001);
+      await tournament.connect(admin).closeRegistration(0);
+      await tournament.connect(admin).startRace(0);
+
+      const resultHash = ethers.keccak256(ethers.toUtf8Bytes("data"));
+      await tournament.connect(oracle).submitResultsAndDistribute(0, [player1.address], resultHash);
+
+      await expect(
+        tournament.connect(admin).cancelTournament(0)
+      ).to.be.revertedWithCustomError(tournament, "CannotCancelTerminalTournament");
     });
   });
 });

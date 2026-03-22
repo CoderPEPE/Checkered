@@ -13,7 +13,14 @@ export interface Tournament {
 
 export interface Player {
   wallet: string;
-  iRacingCustomerId: string;
+  iRacingCustomerId: number;
+  refundClaimed?: boolean;
+}
+
+export interface Winner {
+  wallet: string;
+  amount: string; // USDC in 6-decimal units
+  position: number;
 }
 
 export interface TournamentDetail extends Tournament {
@@ -21,6 +28,7 @@ export interface TournamentDetail extends Tournament {
   creator: string;
   createdAt: number;
   players: Player[];
+  winners?: Winner[];
 }
 
 export interface OracleData {

@@ -93,12 +93,14 @@ contract IRacingTournament is AccessControl, ReentrancyGuard, Pausable {
     error InvalidSplits();
     error TournamentNotFound();
     error InvalidStatus(TournamentStatus expected, TournamentStatus actual);
+    error CannotCancelTerminalTournament();
     error TournamentFull();
     error AlreadyRegistered();
     error NotRegistered();
     error RefundAlreadyClaimed();
     error InsufficientAllowance();
     error InvalidName();
+    error InvalidIRacingId();
     error DuplicateWinner();
     error EmergencyNotRequested();
     error EmergencyDelayNotMet();
@@ -200,8 +202,9 @@ contract IRacingTournament is AccessControl, ReentrancyGuard, Pausable {
      */
     function cancelTournament(uint256 _tournamentId) external onlyRole(ADMIN_ROLE) {
         Tournament storage t = tournaments[_tournamentId];
+        // Cannot cancel tournaments that are already Completed or Cancelled
         if (t.status == TournamentStatus.Completed || t.status == TournamentStatus.Cancelled)
-            revert InvalidStatus(TournamentStatus.Created, t.status);
+            revert CannotCancelTerminalTournament();
 
         t.status = TournamentStatus.Cancelled;
         emit TournamentCancelled(_tournamentId);
@@ -271,6 +274,12 @@ contract IRacingTournament is AccessControl, ReentrancyGuard, Pausable {
         uint256 amount = t.prizePool;
         if (amount == 0) revert NoFundsToWithdraw();
 
+        // Mark all player refunds as claimed so UI doesn't show broken refund button
+        address[] storage players = tournamentPlayers[_tournamentId];
+        for (uint256 i = 0; i < players.length; i++) {
+            registrations[_tournamentId][players[i]].refundClaimed = true;
+        }
+
         // Clear state before transfer
         t.prizePool = 0;
         t.status = TournamentStatus.Cancelled;
@@ -299,6 +308,8 @@ contract IRacingTournament is AccessControl, ReentrancyGuard, Pausable {
             revert InvalidStatus(TournamentStatus.Created, t.status);
         if (t.registeredCount >= t.maxPlayers) revert TournamentFull();
         if (registrations[_tournamentId][msg.sender].registered) revert AlreadyRegistered();
+        // Validate iRacing customer ID is not zero
+        if (_iRacingCustomerId == 0) revert InvalidIRacingId();
 
         // Transfer USDC entry fee from player to contract
         usdc.safeTransferFrom(msg.sender, address(this), t.entryFee);
@@ -331,6 +342,8 @@ contract IRacingTournament is AccessControl, ReentrancyGuard, Pausable {
         if (reg.refundClaimed) revert RefundAlreadyClaimed();
 
         reg.refundClaimed = true;
+        // Decrement prize pool so accounting stays accurate
+        t.prizePool -= t.entryFee;
         usdc.safeTransfer(msg.sender, t.entryFee);
 
         emit RefundClaimed(_tournamentId, msg.sender, t.entryFee);
@@ -357,8 +370,9 @@ contract IRacingTournament is AccessControl, ReentrancyGuard, Pausable {
             revert InvalidStatus(TournamentStatus.Racing, t.status);
         if (_winners.length != t.prizeSplits.length) revert InvalidSplits();
 
-        // Validate all winners are registered and no duplicates (Milestone 5)
+        // Validate all winners are valid, registered, and no duplicates
         for (uint256 i = 0; i < _winners.length; i++) {
+            if (_winners[i] == address(0)) revert InvalidAddress();
             if (!registrations[_tournamentId][_winners[i]].registered) revert NotRegistered();
             for (uint256 j = 0; j < i; j++) {
                 if (_winners[j] == _winners[i]) revert DuplicateWinner();

@@ -14,7 +14,10 @@ const CONTRACT_ERRORS: Record<string, string> = {
   InvalidSplits: "Prize split configuration is invalid.",
   InvalidFee: "The fee amount is invalid or exceeds the maximum.",
   InsufficientAllowance: "USDC spending approval is insufficient. Please try again.",
+  RefundAlreadyClaimed: "You've already claimed your refund for this tournament.",
   DuplicateWinner: "Duplicate winner address detected.",
+  InvalidIRacingId: "iRacing Customer ID cannot be zero.",
+  CannotCancelTerminalTournament: "Cannot cancel a tournament that is already completed or cancelled.",
   InvalidAddress: "An invalid wallet address was provided.",
   NoFundsToWithdraw: "No funds available to withdraw.",
 };

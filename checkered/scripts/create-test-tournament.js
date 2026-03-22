@@ -8,7 +8,7 @@ async function main() {
   // Connect to deployed contract
   const tournament = await hre.ethers.getContractAt(
     "IRacingTournament",
-    "0x325C6D6d0386F0cAf0200d94043eef9A87a21aEA",
+    "0xF8D32D1AA112A3A5663eDDEF8a29ecc769233Def",
     deployer
   );
 
