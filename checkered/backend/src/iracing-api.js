@@ -1,96 +1,217 @@
 /**
  * iRacing Data API Integration
- * 
- * Authentication uses cookie-based auth with SHA-256 password hashing.
- * API docs: https://members-ng.iracing.com/data/doc
+ *
+ * As of December 2025, iRacing retired legacy cookie-based auth.
+ * All access now requires OAuth2 via https://oauth.iracing.com
+ *
+ * Two flows supported:
+ *   1. "password_limited" grant — server-to-server (needs client_id + client_secret)
+ *   2. Manual token — paste an access_token from browser OAuth flow
+ *
+ * Required env vars for password_limited:
+ *   IRACING_CLIENT_ID, IRACING_CLIENT_SECRET, IRACING_EMAIL, IRACING_PASSWORD
+ *
+ * Or for manual token:
+ *   IRACING_ACCESS_TOKEN (and optionally IRACING_REFRESH_TOKEN)
+ *
+ * API docs: https://oauth.iracing.com/oauth2/book/data_api_workflow.html
  */
 const crypto = require("crypto");
 
-let authCookie = null;
-let cookieExpiry = null;
+// Token cache
+let accessToken = null;
+let refreshToken = null;
+let tokenExpiry = null;
 
 /**
- * Authenticate with iRacing Data API
- * @returns {string} Auth cookie for subsequent requests
+ * Authenticate with iRacing Data API using OAuth2.
+ * Returns a Bearer token string for the Authorization header.
  */
 async function iRacingAuth() {
-  // Return cached cookie if still valid
-  if (authCookie && cookieExpiry && Date.now() < cookieExpiry) {
-    return authCookie;
+  // 1. If we have a valid cached token, reuse it
+  if (accessToken && tokenExpiry && Date.now() < tokenExpiry) {
+    return accessToken;
   }
 
+  // 2. If a manual access token is set in env, use it directly
+  if (process.env.IRACING_ACCESS_TOKEN) {
+    accessToken = process.env.IRACING_ACCESS_TOKEN;
+    tokenExpiry = Date.now() + 3600000; // assume 1 hour
+    return accessToken;
+  }
+
+  // 3. If we have a refresh token, try refreshing first
+  if (refreshToken && process.env.IRACING_CLIENT_ID) {
+    try {
+      const refreshed = await refreshAccessToken();
+      if (refreshed) return accessToken;
+    } catch (err) {
+      // Refresh failed — fall through to full auth
+    }
+  }
+
+  // 4. Password Limited grant (server-to-server OAuth2)
+  const clientId = process.env.IRACING_CLIENT_ID;
+  const clientSecret = process.env.IRACING_CLIENT_SECRET;
   const email = process.env.IRACING_EMAIL;
   const password = process.env.IRACING_PASSWORD;
+
+  if (!clientId || !clientSecret) {
+    throw new Error(
+      "iRacing OAuth2 credentials not configured.\n" +
+      "Set IRACING_CLIENT_ID and IRACING_CLIENT_SECRET in .env\n" +
+      "Register at: https://oauth.iracing.com/oauth2/book/client_registration.html\n" +
+      "Or set IRACING_ACCESS_TOKEN for manual token usage."
+    );
+  }
 
   if (!email || !password) {
     throw new Error("IRACING_EMAIL and IRACING_PASSWORD must be set");
   }
 
-  // iRacing requires SHA-256(password + email.toLowerCase())
-  const hashInput = password + email.toLowerCase();
-  const hash = crypto.createHash("sha256").update(hashInput).digest("base64");
+  // Mask the password: SHA-256(password + lowercase email), base64 encoded
+  const maskedPassword = crypto
+    .createHash("sha256")
+    .update(password + email.toLowerCase())
+    .digest("base64");
 
-  const response = await fetch("https://members-ng.iracing.com/auth", {
+  // Mask the client secret: SHA-256(client_secret + client_id), base64 encoded
+  const maskedSecret = crypto
+    .createHash("sha256")
+    .update(clientSecret + clientId)
+    .digest("base64");
+
+  const body = new URLSearchParams({
+    grant_type: "password_limited",
+    client_id: clientId,
+    client_secret: maskedSecret,
+    username: email,
+    password: maskedPassword,
+    scope: "iracing.auth",
+  });
+
+  const response = await fetch("https://oauth.iracing.com/oauth2/token", {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ email, password: hash }),
+    headers: { "Content-Type": "application/x-www-form-urlencoded" },
+    body: body.toString(),
   });
 
   if (!response.ok) {
-    throw new Error(`iRacing auth failed: ${response.status} ${response.statusText}`);
+    const errBody = await response.text();
+    throw new Error(`iRacing OAuth2 auth failed: ${response.status} — ${errBody}`);
   }
 
-  // Extract session cookie
-  const cookies = response.headers.get("set-cookie");
-  if (!cookies) {
-    throw new Error("No auth cookie received from iRacing");
-  }
+  const tokenData = await response.json();
+  accessToken = tokenData.access_token;
+  refreshToken = tokenData.refresh_token || null;
 
-  authCookie = cookies.split(";")[0];
-  cookieExpiry = Date.now() + 3600000; // Refresh after 1 hour
+  // Token expiry: use expires_in from response, default to 1 hour
+  const expiresIn = tokenData.expires_in || 3600;
+  tokenExpiry = Date.now() + (expiresIn * 1000) - 60000; // refresh 1 min early
 
-  return authCookie;
+  return accessToken;
 }
 
 /**
- * Fetch race results for a specific subsession
- * @param {number} subsessionId iRacing subsession ID
- * @returns {Array} Array of driver results sorted by finish position
+ * Refresh an expired access token using the refresh token.
  */
-async function fetchSubsessionResults(subsessionId) {
-  // Validate subsession ID before constructing URL (Milestone 10)
-  if (!Number.isInteger(subsessionId) || subsessionId <= 0) {
-    throw new Error(`Invalid subsession ID: ${subsessionId}`);
+async function refreshAccessToken() {
+  const clientId = process.env.IRACING_CLIENT_ID;
+  const clientSecret = process.env.IRACING_CLIENT_SECRET;
+
+  const maskedSecret = crypto
+    .createHash("sha256")
+    .update(clientSecret + clientId)
+    .digest("base64");
+
+  const body = new URLSearchParams({
+    grant_type: "refresh_token",
+    client_id: clientId,
+    client_secret: maskedSecret,
+    refresh_token: refreshToken,
+  });
+
+  const response = await fetch("https://oauth.iracing.com/oauth2/token", {
+    method: "POST",
+    headers: { "Content-Type": "application/x-www-form-urlencoded" },
+    body: body.toString(),
+  });
+
+  if (!response.ok) {
+    accessToken = null;
+    refreshToken = null;
+    tokenExpiry = null;
+    return false;
   }
 
-  const cookie = await iRacingAuth();
+  const tokenData = await response.json();
+  accessToken = tokenData.access_token;
+  refreshToken = tokenData.refresh_token || refreshToken;
+  const expiresIn = tokenData.expires_in || 3600;
+  tokenExpiry = Date.now() + (expiresIn * 1000) - 60000;
 
-  // Step 1: Get the results link
-  const linkResponse = await fetch(
-    `https://members-ng.iracing.com/data/results/get?subsession_id=${subsessionId}`,
-    { headers: { Cookie: cookie } }
-  );
+  return true;
+}
+
+/**
+ * Make an authenticated request to the iRacing Data API.
+ * Handles the two-step link-then-fetch pattern iRacing uses.
+ */
+async function iRacingFetch(path) {
+  const token = await iRacingAuth();
+
+  // Step 1: Get the redirect link from the /data endpoint
+  const linkResponse = await fetch(`https://members-ng.iracing.com${path}`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
 
   if (!linkResponse.ok) {
-    if (linkResponse.status === 404) {
-      return null; // Race not yet complete
+    if (linkResponse.status === 401) {
+      // Token may have expired — clear cache and retry once
+      accessToken = null;
+      tokenExpiry = null;
+      const newToken = await iRacingAuth();
+      const retryResponse = await fetch(`https://members-ng.iracing.com${path}`, {
+        headers: { Authorization: `Bearer ${newToken}` },
+      });
+      if (!retryResponse.ok) {
+        throw new Error(`iRacing API failed after retry: ${retryResponse.status}`);
+      }
+      const retryLink = await retryResponse.json();
+      const retryData = await fetch(retryLink.link);
+      return retryData.json();
     }
-    throw new Error(`iRacing results link failed: ${linkResponse.status}`);
+    return null; // 404 = not found, etc.
   }
 
   const linkData = await linkResponse.json();
 
-  // Step 2: Fetch actual data from the link
+  // Step 2: Fetch actual data from the S3/CDN link
   const dataResponse = await fetch(linkData.link);
   if (!dataResponse.ok) {
-    throw new Error(`iRacing results data failed: ${dataResponse.status}`);
+    throw new Error(`iRacing data fetch failed: ${dataResponse.status}`);
   }
 
-  const resultsData = await dataResponse.json();
+  return dataResponse.json();
+}
+
+/**
+ * Fetch race results for a specific subsession.
+ * @param {number} subsessionId iRacing subsession ID
+ * @returns {Array|null} Array of driver results sorted by finish position, or null if not found
+ */
+async function fetchSubsessionResults(subsessionId) {
+  // Validate subsession ID before constructing URL
+  if (!Number.isInteger(subsessionId) || subsessionId <= 0) {
+    throw new Error(`Invalid subsession ID: ${subsessionId}`);
+  }
+
+  const data = await iRacingFetch(`/data/results/get?subsession_id=${subsessionId}`);
+  if (!data) return null;
 
   // Extract driver results from session results
   // iRacing returns nested structure: session_results → results[]
-  const raceSession = resultsData.session_results?.find(
+  const raceSession = data.session_results?.find(
     (s) => s.simsession_type_name === "Race"
   );
 
@@ -114,4 +235,32 @@ async function fetchSubsessionResults(subsessionId) {
   }));
 }
 
-module.exports = { iRacingAuth, fetchSubsessionResults };
+/**
+ * Fetch member info for the authenticated user (or a specific cust_id).
+ * @param {number} [custId] Optional customer ID
+ */
+async function fetchMemberInfo(custId) {
+  const path = custId
+    ? `/data/member/info?cust_ids=${custId}`
+    : "/data/member/info";
+  return iRacingFetch(path);
+}
+
+/**
+ * Fetch recent races for a member.
+ * @param {number} [custId] Optional customer ID
+ */
+async function fetchRecentRaces(custId) {
+  const path = custId
+    ? `/data/stats/member_recent_races?cust_id=${custId}`
+    : "/data/stats/member_recent_races";
+  return iRacingFetch(path);
+}
+
+module.exports = {
+  iRacingAuth,
+  fetchSubsessionResults,
+  fetchMemberInfo,
+  fetchRecentRaces,
+  iRacingFetch,
+};

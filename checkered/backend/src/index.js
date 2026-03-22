@@ -2,7 +2,7 @@ require("dotenv").config();
 const { ethers } = require("ethers");
 const winston = require("winston");
 require("winston-daily-rotate-file");
-const { iRacingAuth, fetchSubsessionResults } = require("./iracing-api");
+const { iRacingAuth, fetchSubsessionResults, fetchMemberInfo } = require("./iracing-api");
 const { createApp } = require("./app");
 
 // ============================================================
@@ -69,8 +69,11 @@ const tournamentContract = new ethers.Contract(
 // ============================================================
 //  IN-MEMORY STATE
 // ============================================================
-const walletMap = new Map();
-const activeTournaments = new Map();
+// Tracks tournaments with in-flight submissions to prevent double-submit
+const submittingTournaments = new Set();
+// Tracks tournaments that failed due to insufficient finishers, with retry count
+const insufficientFinisherRetries = new Map();
+const MAX_INSUFFICIENT_RETRIES = 10; // After this many polls, log error instead of warn
 
 // ============================================================
 //  ORACLE POLLING
@@ -86,6 +89,12 @@ async function pollTournaments() {
 
       // Status 2 = Racing — check for results
       if (status === 2) {
+        // Skip if a submission is already in-flight for this tournament
+        if (submittingTournaments.has(i)) {
+          logger.info(`Tournament ${i}: Submission already in-flight, skipping`);
+          continue;
+        }
+
         logger.info(`Tournament ${i} (${t.name}) is Racing — checking iRacing API for subsession ${t.iRacingSubsessionId}`);
 
         try {
@@ -104,6 +113,10 @@ async function pollTournaments() {
         } catch (err) {
           logger.error(`Tournament ${i} poll error: ${err.message}`);
         }
+      } else {
+        // Tournament is no longer Racing — clean up tracking state
+        submittingTournaments.delete(i);
+        insufficientFinisherRetries.delete(i);
       }
     }
   } catch (err) {
@@ -112,6 +125,9 @@ async function pollTournaments() {
 }
 
 async function submitResults(tournamentId, raceResults, tournamentData) {
+  // Mark as in-flight to prevent double-submission
+  submittingTournaments.add(tournamentId);
+
   try {
     const players = await tournamentContract.getTournamentPlayers(tournamentId);
     const playerMap = new Map();
@@ -127,7 +143,18 @@ async function submitResults(tournamentId, raceResults, tournamentData) {
       .sort((a, b) => a.finishPosition - b.finishPosition);
 
     if (sortedResults.length < prizeSplitCount) {
-      logger.warn(`Tournament ${tournamentId}: Only ${sortedResults.length} finishers, need ${prizeSplitCount}`);
+      // Track retry count so this doesn't poll forever silently
+      const retries = (insufficientFinisherRetries.get(tournamentId) || 0) + 1;
+      insufficientFinisherRetries.set(tournamentId, retries);
+
+      if (retries >= MAX_INSUFFICIENT_RETRIES) {
+        logger.error(`Tournament ${tournamentId}: Only ${sortedResults.length}/${prizeSplitCount} registered finishers after ${retries} polls — may need admin intervention (cancel or manual resolution)`);
+      } else {
+        logger.warn(`Tournament ${tournamentId}: Only ${sortedResults.length} finishers, need ${prizeSplitCount} (retry ${retries}/${MAX_INSUFFICIENT_RETRIES})`);
+      }
+
+      // Allow retry on next poll
+      submittingTournaments.delete(tournamentId);
       return;
     }
 
@@ -135,7 +162,8 @@ async function submitResults(tournamentId, raceResults, tournamentData) {
       .slice(0, prizeSplitCount)
       .map((r) => playerMap.get(r.custId));
 
-    const resultData = JSON.stringify(raceResults.slice(0, prizeSplitCount));
+    // Hash the filtered+sorted results that actually correspond to the winners
+    const resultData = JSON.stringify(sortedResults.slice(0, prizeSplitCount));
     const resultHash = ethers.keccak256(ethers.toUtf8Bytes(resultData));
 
     logger.info(`Tournament ${tournamentId}: Submitting results — Winners: ${winners.join(", ")}`);
@@ -149,8 +177,14 @@ async function submitResults(tournamentId, raceResults, tournamentData) {
 
     logger.info(`Tournament ${tournamentId}: Results submitted! TX: ${receipt.hash}`);
     logger.info(`Gas used: ${receipt.gasUsed.toString()}`);
+
+    // Clean up tracking state on success
+    insufficientFinisherRetries.delete(tournamentId);
   } catch (err) {
     logger.error(`Submit results error for tournament ${tournamentId}: ${err.message}`);
+  } finally {
+    // Always clear in-flight flag so next poll can retry if needed
+    submittingTournaments.delete(tournamentId);
   }
 }
 
@@ -172,6 +206,9 @@ const app = createApp({
   mockMode: MOCK_MODE,
   logger,
   pollTournaments,
+  provider,
+  iRacingAuth,
+  fetchMemberInfo,
 });
 
 app.listen(PORT, () => {
@@ -180,7 +217,9 @@ app.listen(PORT, () => {
   logger.info(`Contract: ${process.env.TOURNAMENT_CONTRACT_ADDRESS}`);
   logger.info(`Mock mode: ${MOCK_MODE}`);
 
+  // Run first poll immediately, then repeat on interval
   const interval = parseInt(process.env.POLL_INTERVAL || "30000");
+  pollTournaments();
   setInterval(pollTournaments, interval);
   logger.info(`Polling every ${interval / 1000} seconds`);
 });

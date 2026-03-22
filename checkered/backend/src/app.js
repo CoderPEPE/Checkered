@@ -17,8 +17,11 @@ const rateLimit = require("express-rate-limit");
  * @param {boolean} deps.mockMode - Whether iRacing is in mock mode
  * @param {object} deps.logger - Winston logger (or mock)
  * @param {function} deps.pollTournaments - Poll function for manual trigger
+ * @param {object} deps.provider - ethers Provider for event queries
+ * @param {function} deps.iRacingAuth - iRacing OAuth auth function (optional)
+ * @param {function} deps.fetchMemberInfo - iRacing member info function (optional)
  */
-function createApp({ adminApiKey, tournamentContract, oracleWallet, mockMode, logger, pollTournaments }) {
+function createApp({ adminApiKey, tournamentContract, oracleWallet, mockMode, logger, pollTournaments, provider, iRacingAuth, fetchMemberInfo }) {
   const app = express();
 
   // Security headers — explicit config for readability (Milestone 7)
@@ -57,20 +60,17 @@ function createApp({ adminApiKey, tournamentContract, oracleWallet, mockMode, lo
 
   app.use(express.json());
 
-  // Auth middleware — timing-safe comparison (Milestone 2)
+  // Auth middleware — constant-time comparison regardless of input length (Milestone 2)
   function requireApiKey(req, res, next) {
     const apiKey = req.headers["x-api-key"];
     if (typeof apiKey !== "string") {
       return res.status(401).json({ error: "Unauthorized" });
     }
 
-    const a = Buffer.from(apiKey);
-    const b = Buffer.from(adminApiKey);
-
-    let valid = false;
-    if (a.length === b.length) {
-      valid = crypto.timingSafeEqual(a, b);
-    }
+    // Hash both sides to fixed-length digests so timing doesn't leak key length
+    const expected = crypto.createHmac("sha256", "checkered-auth").update(adminApiKey).digest();
+    const actual = crypto.createHmac("sha256", "checkered-auth").update(apiKey).digest();
+    const valid = crypto.timingSafeEqual(actual, expected);
 
     if (!valid) {
       return res.status(401).json({ error: "Unauthorized" });
@@ -135,7 +135,8 @@ function createApp({ adminApiKey, tournamentContract, oracleWallet, mockMode, lo
         })
       );
 
-      res.json({
+      const statusNum = Number(t.status);
+      const response = {
         id,
         name: t.name,
         entryFee: t.entryFee.toString(),
@@ -143,12 +144,34 @@ function createApp({ adminApiKey, tournamentContract, oracleWallet, mockMode, lo
         registeredCount: Number(t.registeredCount),
         prizePool: t.prizePool.toString(),
         prizeSplits: t.prizeSplits.map(Number),
-        status: Number(t.status),
-        statusName: ["Created", "RegistrationClosed", "Racing", "ResultsSubmitted", "Completed", "Cancelled"][Number(t.status)],
+        status: statusNum,
+        statusName: ["Created", "RegistrationClosed", "Racing", "ResultsSubmitted", "Completed", "Cancelled"][statusNum],
         iRacingSubsessionId: Number(t.iRacingSubsessionId),
         createdAt: Number(t.createdAt),
         players: playerDetails,
-      });
+      };
+
+      // For completed tournaments, fetch winners from PrizesDistributed events
+      if (statusNum === 4 && provider) {
+        try {
+          const filter = tournamentContract.filters.PrizesDistributed(id);
+          const events = await tournamentContract.queryFilter(filter);
+          if (events.length > 0) {
+            const event = events[events.length - 1]; // most recent
+            const winners = event.args.winners;
+            const amounts = event.args.amounts;
+            response.winners = winners.map((addr, i) => ({
+              wallet: addr,
+              amount: amounts[i].toString(),
+              position: i + 1,
+            }));
+          }
+        } catch (evtErr) {
+          logger.warn(`Could not fetch winners for tournament ${id}: ${evtErr.message}`);
+        }
+      }
+
+      res.json(response);
     } catch (err) {
       logger.error(`GET /api/tournaments/${req.params.id} error: ${err.message}`);
       res.status(500).json({ error: "Internal server error" });
@@ -161,7 +184,7 @@ function createApp({ adminApiKey, tournamentContract, oracleWallet, mockMode, lo
       address: oracleWallet.address,
       contract: process.env.TOURNAMENT_CONTRACT_ADDRESS,
       mockMode,
-      pollInterval: process.env.POLL_INTERVAL || 30000,
+      pollInterval: parseInt(process.env.POLL_INTERVAL || "30000"),
       uptime: process.uptime(),
     });
   });
@@ -174,6 +197,37 @@ function createApp({ adminApiKey, tournamentContract, oracleWallet, mockMode, lo
     } catch (err) {
       logger.error(`POST /api/oracle/poll error: ${err.message}`);
       res.status(500).json({ error: "Internal server error" });
+    }
+  });
+
+  // iRacing API status — verifies OAuth connection is working
+  app.get("/api/iracing/status", requireApiKey, async (_req, res) => {
+    try {
+      if (mockMode) {
+        return res.json({ connected: true, mockMode: true, member: null });
+      }
+
+      if (!iRacingAuth || !fetchMemberInfo) {
+        return res.json({ connected: false, error: "iRacing functions not configured" });
+      }
+
+      // Test OAuth token
+      await iRacingAuth();
+
+      // Get member info to confirm API access
+      const member = await fetchMemberInfo();
+      res.json({
+        connected: true,
+        mockMode: false,
+        member: member ? {
+          custId: member.cust_id,
+          displayName: member.display_name,
+          memberSince: member.member_since,
+        } : null,
+      });
+    } catch (err) {
+      logger.error(`GET /api/iracing/status error: ${err.message}`);
+      res.json({ connected: false, error: err.message });
     }
   });
 

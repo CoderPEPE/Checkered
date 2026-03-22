@@ -15,55 +15,36 @@ import { buildRegisterCalls } from "../calls";
 
 interface Props {
   tournamentId: number;
-  entryFee: string; // USDC in 6-decimal units (string from API)
+  entryFee: string;
   onRegistered: () => void;
 }
 
-/**
- * Registration form + OnchainKit Transaction component.
- * Batches USDC approve + tournament register into a single transaction flow.
- */
-export default function RegisterForTournament({
-  tournamentId,
-  entryFee,
-  onRegistered,
-}: Props) {
+export default function RegisterForTournament({ tournamentId, entryFee, onRegistered }: Props) {
   const [iRacingId, setIRacingId] = useState("");
 
   const entryFeeBigInt = BigInt(entryFee);
   const iRacingIdNum = Number(iRacingId);
-  const isValid = iRacingId.length > 0 && iRacingIdNum > 0;
+  const isValid = iRacingId.length > 0 && Number.isInteger(iRacingIdNum) && iRacingIdNum > 0;
 
   function handleStatus(status: LifecycleStatus) {
     if (status.statusName === "success") {
       setIRacingId("");
-      // Give the backend time to index the event before refreshing
       setTimeout(() => onRegistered(), 2000);
     }
   }
 
   return (
-    <div className="border-t border-zinc-800 pt-4">
-      <div className="text-xs text-zinc-500 uppercase tracking-wide mb-2">
-        Register
+    <div className="border-t border-zinc-800/30 pt-4">
+      <div className="text-[11px] text-zinc-500 uppercase tracking-wider font-medium mb-3">
+        Register for Tournament
       </div>
 
-      {/* iRacing ID input */}
       <div className="mb-3">
-        <label className="block text-sm text-zinc-400 mb-1">
-          iRacing Customer ID
-        </label>
-        <input
-          type="number"
-          value={iRacingId}
-          onChange={(e) => setIRacingId(e.target.value)}
-          min="1"
-          placeholder="e.g. 123456"
-          className="w-full max-w-xs bg-zinc-800 border border-zinc-700 rounded px-3 py-2 text-sm text-zinc-100 focus:border-blue-500 focus:outline-none"
-        />
+        <label className="block text-[11px] font-medium text-zinc-500 mb-1.5">iRacing Customer ID</label>
+        <input type="number" value={iRacingId} onChange={(e) => setIRacingId(e.target.value)} min="1" placeholder="123456"
+          className="w-full max-w-xs bg-zinc-900/60 border border-zinc-800/50 rounded-xl px-4 py-2.5 text-sm text-zinc-100 placeholder:text-zinc-700 focus:border-indigo-500/40 focus:ring-1 focus:ring-indigo-500/20 focus:outline-none transition-all" />
       </div>
 
-      {/* OnchainKit Transaction — batches approve + register */}
       {isValid && (
         <Transaction
           chainId={baseSepolia.id}
@@ -73,7 +54,7 @@ export default function RegisterForTournament({
         >
           <TransactionButton
             text={`Register — $${(Number(entryFee) / 1_000_000).toFixed(2)} USDC`}
-            className="bg-green-600 hover:bg-green-500 text-white text-sm font-semibold px-6 py-2 rounded transition-colors"
+            className="bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white text-sm font-semibold px-6 py-2.5 rounded-xl transition-all shadow-lg shadow-indigo-500/15"
           />
           <TransactionSponsor />
           <TransactionStatus>

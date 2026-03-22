@@ -2,19 +2,18 @@
 
 import type { Tournament } from "../types";
 
-// Format USDC amount from 6-decimal integer string to readable dollar value
 function formatUSDC(amount: string) {
-  return (Number(amount) / 1_000_000).toFixed(2);
+  const val = Number(amount) / 1_000_000;
+  return val < 1 ? val.toFixed(2) : val % 1 === 0 ? val.toFixed(0) : val.toFixed(2);
 }
 
-// Status badge colors — pill style with translucent backgrounds
-const STATUS_COLORS: Record<string, string> = {
-  Created: "bg-green-600/20 text-green-400",
-  RegistrationClosed: "bg-yellow-600/20 text-yellow-400",
-  Racing: "bg-blue-600/20 text-blue-400",
-  ResultsSubmitted: "bg-purple-600/20 text-purple-400",
-  Completed: "bg-zinc-600/20 text-zinc-400",
-  Cancelled: "bg-red-600/20 text-red-400",
+const STATUS_CONFIG: Record<string, { color: string; dot: string; label: string }> = {
+  Created: { color: "text-emerald-400", dot: "bg-emerald-400", label: "Open" },
+  RegistrationClosed: { color: "text-amber-400", dot: "bg-amber-400", label: "Closed" },
+  Racing: { color: "text-blue-400", dot: "bg-blue-400", label: "Live" },
+  ResultsSubmitted: { color: "text-violet-400", dot: "bg-violet-400", label: "Results" },
+  Completed: { color: "text-zinc-500", dot: "bg-zinc-500", label: "Done" },
+  Cancelled: { color: "text-red-400", dot: "bg-red-400", label: "Cancelled" },
 };
 
 interface Props {
@@ -23,85 +22,110 @@ interface Props {
   onSelect: (id: number) => void;
 }
 
-export default function TournamentList({
-  tournaments,
-  loading,
-  onSelect,
-}: Props) {
+export default function TournamentList({ tournaments, loading, onSelect }: Props) {
+  if (loading) {
+    return (
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+        {[...Array(6)].map((_, i) => (
+          <div key={i} className="tournament-card p-6">
+            <div className="skeleton h-3 w-16 mb-6" />
+            <div className="skeleton h-4 w-3/4 mb-5" />
+            <div className="skeleton h-9 w-24 mb-2" />
+            <div className="skeleton h-3 w-12 mb-6" />
+            <div className="skeleton h-1 w-full mb-5" />
+            <div className="skeleton h-3 w-full" />
+          </div>
+        ))}
+      </div>
+    );
+  }
+
+  if (tournaments.length === 0) {
+    return (
+      <div className="flex flex-col items-center justify-center py-28">
+        <div className="w-16 h-16 rounded-2xl bg-white/[0.02] border border-white/[0.04] flex items-center justify-center mb-5">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="text-zinc-700">
+            <path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z" strokeLinecap="round" strokeLinejoin="round" />
+            <line x1="4" y1="22" x2="4" y2="15" strokeLinecap="round" />
+          </svg>
+        </div>
+        <p className="text-sm font-medium text-zinc-500">No tournaments yet</p>
+        <p className="text-xs text-zinc-700 mt-1">Create one to get started</p>
+      </div>
+    );
+  }
+
   return (
     <section>
-      <h2 className="text-sm font-semibold text-zinc-400 uppercase tracking-wide mb-4">
-        Tournaments ({tournaments.length})
-      </h2>
+      <div className="flex items-center gap-3 mb-6">
+        <h2 className="text-[13px] font-semibold text-zinc-400">Tournaments</h2>
+        <span className="text-[11px] tabular-nums text-zinc-600 bg-white/[0.03] px-2 py-0.5 rounded-md">
+          {tournaments.length}
+        </span>
+      </div>
 
-      {loading ? (
-        <p className="text-zinc-500">Loading...</p>
-      ) : tournaments.length === 0 ? (
-        <div className="bg-zinc-900 border border-zinc-800 rounded-lg p-8 text-center text-zinc-500">
-          No tournaments yet.
-        </div>
-      ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {tournaments.map((t) => (
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+        {tournaments.map((t) => {
+          const cfg = STATUS_CONFIG[t.statusName] || { color: "text-zinc-400", dot: "bg-zinc-400", label: t.statusName };
+          const fillPct = t.maxPlayers > 0 ? (t.registeredCount / t.maxPlayers) * 100 : 0;
+          const isOpen = t.statusName === "Created";
+
+          return (
             <button
               key={t.id}
               onClick={() => onSelect(t.id)}
-              className="bg-zinc-900 border border-zinc-800 rounded-lg p-6 text-left hover:border-zinc-600 transition-colors cursor-pointer"
+              className="tournament-card p-6 text-left cursor-pointer group"
             >
-              {/* Top row: name + status pill */}
-              <div className="flex items-center justify-between mb-4">
-                <span className="font-semibold text-zinc-100 truncate mr-2">
-                  {t.name}
-                </span>
-                <span
-                  className={`text-xs px-2 py-0.5 rounded-full font-medium whitespace-nowrap ${STATUS_COLORS[t.statusName] || "bg-zinc-700 text-zinc-300"}`}
-                >
-                  {t.statusName}
-                </span>
+              {/* Status row */}
+              <div className="flex items-center justify-between mb-5">
+                <div className={`flex items-center gap-2 text-[11px] font-semibold uppercase tracking-wider ${cfg.color}`}>
+                  <span className={`w-[6px] h-[6px] rounded-full ${cfg.dot} ${isOpen ? 'animate-pulse' : ''}`} />
+                  {cfg.label}
+                </div>
+                <span className="text-[11px] text-zinc-700 tabular-nums font-mono">#{t.id}</span>
               </div>
 
-              {/* Middle: entry fee + players */}
-              <div className="grid grid-cols-2 gap-4 mb-4">
-                <div>
-                  <div className="text-xs text-zinc-500 mb-1">Entry Fee</div>
-                  <div className="text-sm text-zinc-200">
-                    ${formatUSDC(t.entryFee)} USDC
-                  </div>
-                </div>
-                <div>
-                  <div className="text-xs text-zinc-500 mb-1">Players</div>
-                  <div className="text-sm text-zinc-200 mb-1">
-                    {t.registeredCount}/{t.maxPlayers}
-                  </div>
-                  {/* Progress bar */}
-                  <div className="h-1.5 rounded-full bg-zinc-700 overflow-hidden">
-                    <div
-                      className="h-full rounded-full bg-green-500 transition-all"
-                      style={{
-                        width: `${t.maxPlayers > 0 ? (t.registeredCount / t.maxPlayers) * 100 : 0}%`,
-                      }}
-                    />
-                  </div>
+              {/* Name */}
+              <h3 className="text-base font-semibold text-zinc-200 group-hover:text-white transition-colors mb-5 leading-tight">
+                {t.name}
+              </h3>
+
+              {/* Entry fee */}
+              <div className="mb-6">
+                <div className="flex items-baseline gap-1">
+                  <span className="text-[32px] font-bold text-white tabular-nums leading-none tracking-tight">
+                    ${formatUSDC(t.entryFee)}
+                  </span>
+                  <span className="text-[11px] text-zinc-600 font-semibold uppercase">USDC</span>
                 </div>
               </div>
 
-              {/* Prize pool */}
-              <div className="mb-4">
-                <div className="text-xs text-zinc-500 mb-1">Prize Pool</div>
-                <div className="text-sm text-zinc-200">
-                  ${formatUSDC(t.prizePool)} USDC
+              {/* Players */}
+              <div className="mb-5">
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-[11px] text-zinc-500 font-medium">Players</span>
+                  <span className="text-[12px] tabular-nums">
+                    <span className="text-zinc-300 font-semibold">{t.registeredCount}</span>
+                    <span className="text-zinc-700"> / {t.maxPlayers}</span>
+                  </span>
+                </div>
+                <div className="progress-bar">
+                  <div className="progress-fill" style={{ width: `${Math.max(fillPct, 3)}%` }} />
                 </div>
               </div>
 
-              {/* Bottom: subsession + ID */}
-              <div className="flex items-center justify-between text-xs text-zinc-600">
-                <span>Subsession: {t.iRacingSubsessionId}</span>
-                <span>#{t.id}</span>
+              {/* Footer */}
+              <div className="flex items-center justify-between pt-4 border-t border-white/[0.04]">
+                <span className="text-[11px] text-zinc-600 font-mono tabular-nums">#{t.iRacingSubsessionId}</span>
+                <div className="text-[11px]">
+                  <span className="text-zinc-600">Pool </span>
+                  <span className="text-zinc-400 font-semibold tabular-nums">${formatUSDC(t.prizePool)}</span>
+                </div>
               </div>
             </button>
-          ))}
-        </div>
-      )}
+          );
+        })}
+      </div>
     </section>
   );
 }

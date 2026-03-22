@@ -1,7 +1,7 @@
 import type { NextConfig } from "next";
 
 // Backend URL — defaults to localhost for dev, override via env for production
-const BACKEND_URL = process.env.BACKEND_URL || "http://localhost:3001";
+const BACKEND_URL = process.env.BACKEND_URL || "http://localhost:3002";
 
 const nextConfig: NextConfig = {
   // Externalize packages that don't bundle well (replaces old webpack externals)
