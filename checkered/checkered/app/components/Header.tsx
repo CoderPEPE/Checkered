@@ -1,15 +1,24 @@
 "use client";
 
+import AppBar from "@mui/material/AppBar";
+import Toolbar from "@mui/material/Toolbar";
+import Box from "@mui/material/Box";
+import Button from "@mui/material/Button";
+import Typography from "@mui/material/Typography";
+import Divider from "@mui/material/Divider";
+import Tooltip from "@mui/material/Tooltip";
+import AddIcon from "@mui/icons-material/Add";
+import AccountBalanceWalletIcon from "@mui/icons-material/AccountBalanceWallet";
 import {
   Wallet,
   ConnectWallet,
   WalletDropdown,
   WalletDropdownDisconnect,
-  WalletDropdownFundLink,
 } from "@coinbase/onchainkit/wallet";
 import { Address, Avatar, Name, Identity } from "@coinbase/onchainkit/identity";
-import { FundButton } from "@coinbase/onchainkit/fund";
-import { useAccount } from "wagmi";
+
+import { useAccount, useConnect } from "wagmi";
+import { injected } from "wagmi/connectors";
 import { baseSepolia } from "wagmi/chains";
 
 interface Props {
@@ -19,14 +28,50 @@ interface Props {
 
 export default function Header({ onNewTournament, showNewTournament }: Props) {
   const { isConnected } = useAccount();
+  const { connect } = useConnect();
+
+  // Connect with any injected browser wallet (Rabby, MetaMask, etc.)
+  function connectBrowserWallet() {
+    connect({ connector: injected() });
+  }
 
   return (
-    <header className="sticky top-0 z-40 backdrop-blur-2xl bg-[#08080c]/70 border-b border-white/[0.04]">
-      <div className="max-w-6xl mx-auto flex items-center justify-between px-8 h-16">
+    <AppBar position="sticky" sx={{ zIndex: 40 }}>
+      <Toolbar
+        sx={{
+          maxWidth: "72rem",
+          width: "100%",
+          mx: "auto",
+          px: { xs: 2, sm: 4 },
+          height: 64,
+          display: "flex",
+          justifyContent: "space-between",
+        }}
+      >
         {/* Branding */}
-        <div className="flex items-center gap-4">
-          <div className="relative w-9 h-9 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 p-[1px]">
-            <div className="w-full h-full rounded-xl bg-[#08080c] flex items-center justify-center">
+        <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
+          {/* Logo — checkered flag pattern */}
+          <Box
+            sx={{
+              position: "relative",
+              width: 36,
+              height: 36,
+              borderRadius: "12px",
+              background: "linear-gradient(135deg, #6366f1, #9333ea)",
+              p: "1px",
+            }}
+          >
+            <Box
+              sx={{
+                width: "100%",
+                height: "100%",
+                borderRadius: "11px",
+                bgcolor: "#08080c",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+              }}
+            >
               <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
                 <rect x="0" y="0" width="4" height="4" fill="white" opacity="0.9" />
                 <rect x="8" y="0" width="4" height="4" fill="white" opacity="0.9" />
@@ -37,47 +82,85 @@ export default function Header({ onNewTournament, showNewTournament }: Props) {
                 <rect x="4" y="12" width="4" height="4" fill="white" opacity="0.5" />
                 <rect x="12" y="12" width="4" height="4" fill="white" opacity="0.5" />
               </svg>
-            </div>
-          </div>
-          <div className="flex items-center gap-3">
-            <span className="text-[17px] font-bold text-white tracking-tight">Checkered</span>
-            <div className="h-4 w-px bg-white/10" />
-            <span className="text-[11px] font-medium text-indigo-400/70 uppercase tracking-widest">Testnet</span>
-          </div>
-        </div>
-
-        {/* Right */}
-        <div className="flex items-center gap-3">
-          {showNewTournament && (
-            <button
-              onClick={onNewTournament}
-              className="h-9 px-4 rounded-lg bg-indigo-600 hover:bg-indigo-500 active:bg-indigo-700 text-white text-[13px] font-semibold transition-all flex items-center gap-2 shadow-lg shadow-indigo-600/20 hover:shadow-indigo-500/30"
+            </Box>
+          </Box>
+          <Box sx={{ display: "flex", alignItems: "center", gap: 1.5 }}>
+            <Typography variant="body1" sx={{ fontWeight: 700, color: "white", letterSpacing: "-0.01em" }}>
+              Checkered
+            </Typography>
+            <Divider orientation="vertical" flexItem sx={{ borderColor: "rgba(255,255,255,0.1)", height: 16, alignSelf: "center" }} />
+            <Typography
+              variant="caption"
+              sx={{ fontWeight: 500, color: "primary.light", opacity: 0.7, textTransform: "uppercase", letterSpacing: "0.12em", fontSize: "0.65rem" }}
             >
-              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
-                <line x1="12" y1="5" x2="12" y2="19" />
-                <line x1="5" y1="12" x2="19" y2="12" />
-              </svg>
+              Testnet
+            </Typography>
+          </Box>
+        </Box>
+
+        {/* Right side */}
+        <Box sx={{ display: "flex", alignItems: "center", gap: 1.5 }}>
+          {/* New Tournament button (admin only) */}
+          {showNewTournament && (
+            <Button
+              onClick={onNewTournament}
+              variant="contained"
+              size="small"
+              startIcon={<AddIcon sx={{ fontSize: 16 }} />}
+              sx={{
+                background: "linear-gradient(135deg, #6366f1, #7c3aed)",
+                "&:hover": { background: "linear-gradient(135deg, #818cf8, #8b5cf6)" },
+                boxShadow: "0 4px 14px rgba(99, 102, 241, 0.25)",
+                fontSize: "0.8rem",
+                height: 36,
+              }}
+            >
               New Tournament
-            </button>
+            </Button>
           )}
-          {isConnected && <FundButton />}
+
+          {/* Rabby / Browser wallet connect button (when not connected) */}
+          {!isConnected && (
+            <Tooltip title="Connect Rabby, MetaMask, or other browser wallet" arrow>
+              <Button
+                onClick={connectBrowserWallet}
+                variant="outlined"
+                size="small"
+                startIcon={<AccountBalanceWalletIcon sx={{ fontSize: 16 }} />}
+                sx={{
+                  borderColor: "rgba(255,255,255,0.12)",
+                  color: "#a1a1aa",
+                  "&:hover": {
+                    borderColor: "primary.main",
+                    color: "primary.light",
+                    bgcolor: "rgba(99,102,241,0.08)",
+                  },
+                  fontSize: "0.8rem",
+                  height: 36,
+                }}
+              >
+                Browser Wallet
+              </Button>
+            </Tooltip>
+          )}
+
+          {/* OnchainKit wallet (Coinbase Smart Wallet + EOA) — use inline styles, not Tailwind */}
           <Wallet>
             <ConnectWallet>
-              <Avatar className="h-6 w-6" />
+              <Avatar style={{ height: 24, width: 24 }} />
               <Name chain={baseSepolia} />
             </ConnectWallet>
             <WalletDropdown>
-              <Identity className="px-4 pt-3 pb-2" hasCopyAddressOnClick>
+              <Identity hasCopyAddressOnClick>
                 <Avatar />
                 <Name chain={baseSepolia} />
                 <Address />
               </Identity>
-              <WalletDropdownFundLink />
               <WalletDropdownDisconnect />
             </WalletDropdown>
           </Wallet>
-        </div>
-      </div>
-    </header>
+        </Box>
+      </Toolbar>
+    </AppBar>
   );
 }

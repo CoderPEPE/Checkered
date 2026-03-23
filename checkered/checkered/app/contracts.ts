@@ -37,7 +37,8 @@ export const TOURNAMENT_ABI = parseAbi([
   "event RefundClaimed(uint256 indexed tournamentId, address indexed player, uint256 amount)",
 ]);
 
-// ERC-20 ABI — only the approve function needed for USDC
+// ERC-20 ABI — approve + balanceOf for USDC
 export const ERC20_ABI = parseAbi([
   "function approve(address spender, uint256 amount) returns (bool)",
+  "function balanceOf(address account) view returns (uint256)",
 ]);

@@ -10,6 +10,12 @@ import TournamentDetail from "./components/TournamentDetail";
 import { sanitizeError } from "./utils/sanitizeError";
 import type { Tournament, TournamentDetail as TournamentDetailType } from "./types";
 
+import Box from "@mui/material/Box";
+import Container from "@mui/material/Container";
+import Typography from "@mui/material/Typography";
+import Alert from "@mui/material/Alert";
+import ErrorOutlineIcon from "@mui/icons-material/ErrorOutline";
+
 export default function Home() {
   const { isConnected } = useAccount();
   const { isAdmin } = useIsAdmin();
@@ -60,41 +66,69 @@ export default function Home() {
   const activeTournaments = tournaments.filter(t => t.statusName === "Created" || t.statusName === "Racing").length;
 
   return (
-    <div className="min-h-screen bg-[#08080c] text-zinc-100 bg-grid top-glow">
+    <Box sx={{ minHeight: "100vh", bgcolor: "background.default", color: "text.primary" }} className="bg-grid top-glow">
       <Header
         onNewTournament={() => setShowCreateTournament(true)}
         showNewTournament={isConnected && isAdmin}
       />
 
-      <main className="relative z-10 max-w-6xl mx-auto px-8 pt-10 pb-20">
+      <Container maxWidth="lg" sx={{ position: "relative", zIndex: 10, pt: 5, pb: 10 }}>
         {/* Stats bar */}
         {!loading && tournaments.length > 0 && (
-          <div className="flex items-center justify-center gap-16 mb-10">
+          <Box sx={{ display: "flex", justifyContent: "center", gap: 8, mb: 5 }}>
             {[
               { value: activeTournaments.toString(), label: "Active" },
               { value: totalPlayers.toString(), label: "Players" },
               { value: `$${(totalPool / 1_000_000).toFixed(0)}`, label: "Total Pool" },
             ].map((s) => (
-              <div key={s.label} className="text-center">
-                <div className="text-2xl font-bold gradient-text tabular-nums">{s.value}</div>
-                <div className="text-[11px] text-zinc-600 mt-0.5 uppercase tracking-widest font-medium">{s.label}</div>
-              </div>
+              <Box key={s.label} sx={{ textAlign: "center" }}>
+                <Typography
+                  variant="h5"
+                  sx={{
+                    fontWeight: 700,
+                    fontVariantNumeric: "tabular-nums",
+                    lineHeight: 1.2,
+                    background: "linear-gradient(135deg, #818cf8, #c084fc)",
+                    WebkitBackgroundClip: "text",
+                    WebkitTextFillColor: "transparent",
+                    backgroundClip: "text",
+                  }}
+                >
+                  {s.value}
+                </Typography>
+                <Typography
+                  variant="caption"
+                  sx={{
+                    color: "#52525b",
+                    textTransform: "uppercase",
+                    letterSpacing: "0.12em",
+                    fontWeight: 500,
+                    fontSize: "0.6rem",
+                    mt: 0.5,
+                    display: "block",
+                  }}
+                >
+                  {s.label}
+                </Typography>
+              </Box>
             ))}
-          </div>
+          </Box>
         )}
 
-        {/* Error */}
+        {/* Error message */}
         {error && (
-          <div className="mb-8 bg-red-500/5 border border-red-500/10 text-red-400/90 px-5 py-3.5 rounded-xl text-sm flex items-center gap-3">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" className="shrink-0">
-              <circle cx="12" cy="12" r="10" /><line x1="12" y1="8" x2="12" y2="12" /><line x1="12" y1="16" x2="12.01" y2="16" />
-            </svg>
+          <Alert
+            severity="error"
+            variant="outlined"
+            icon={<ErrorOutlineIcon fontSize="small" />}
+            sx={{ mb: 4, bgcolor: "rgba(239,68,68,0.04)" }}
+          >
             {error}
-          </div>
+          </Alert>
         )}
 
         <TournamentList tournaments={tournaments} loading={loading} onSelect={selectTournament} />
-      </main>
+      </Container>
 
       {selectedTournament && (
         <TournamentDetail
@@ -106,9 +140,22 @@ export default function Home() {
       )}
       <CreateTournament open={showCreateTournament} onClose={() => setShowCreateTournament(false)} onCreated={fetchData} />
 
-      <footer className="relative z-10 border-t border-white/[0.03] px-8 py-6 text-center">
-        <span className="text-[11px] text-zinc-700">Checkered — iRacing Tournaments on Base</span>
-      </footer>
-    </div>
+      {/* Footer */}
+      <Box
+        component="footer"
+        sx={{
+          position: "relative",
+          zIndex: 10,
+          borderTop: "1px solid rgba(255,255,255,0.03)",
+          px: 4,
+          py: 3,
+          textAlign: "center",
+        }}
+      >
+        <Typography variant="caption" sx={{ color: "#3f3f46", fontSize: "0.65rem" }}>
+          Checkered — iRacing Tournaments on Base
+        </Typography>
+      </Box>
+    </Box>
   );
 }

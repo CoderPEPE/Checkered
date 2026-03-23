@@ -1,7 +1,7 @@
 require("dotenv").config();
 const hre = require("hardhat");
 
-const CONTRACT = "0xF8D32D1AA112A3A5663eDDEF8a29ecc769233Def";
+const CONTRACT = "0x55952de3B1dB66fB3D98aBfa348cA2B72b5F0473";
 
 const tournaments = [
   { name: "Daytona 500 Sprint", fee: 5000000, max: 20, splits: [5000, 3000, 2000], sub: 67890 },

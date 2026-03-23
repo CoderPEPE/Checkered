@@ -7,6 +7,16 @@ import { TOURNAMENT_ADDRESS, TOURNAMENT_ABI, EXPLORER_URL } from "../contracts";
 import { sanitizeError } from "../utils/sanitizeError";
 import Overlay from "./Overlay";
 
+import Box from "@mui/material/Box";
+import Button from "@mui/material/Button";
+import TextField from "@mui/material/TextField";
+import Typography from "@mui/material/Typography";
+import Alert from "@mui/material/Alert";
+import CircularProgress from "@mui/material/CircularProgress";
+import Link from "@mui/material/Link";
+import Grid from "@mui/material/Grid";
+import InputAdornment from "@mui/material/InputAdornment";
+
 const SPLIT_PRESETS = [
   { label: "Winner Take All", desc: "100%", splits: [10000n] },
   { label: "Top 2", desc: "70 / 30", splits: [7000n, 3000n] },
@@ -55,71 +65,173 @@ export default function CreateTournament({ open, onClose, onCreated }: Props) {
 
   return (
     <Overlay open={open} onClose={onClose} title="New Tournament">
-      <form onSubmit={handleSubmit} className="space-y-5">
-        {/* Name */}
-        <div>
-          <label className="block text-[11px] font-medium text-zinc-500 mb-1.5 uppercase tracking-wider">
-            Tournament Name
-          </label>
-          <input type="text" value={name} onChange={(e) => setName(e.target.value)} required
-            placeholder="Friday Night Thunder"
-            className="w-full bg-zinc-900/60 border border-zinc-800/50 rounded-xl px-4 py-2.5 text-sm text-zinc-100 placeholder:text-zinc-700 focus:border-indigo-500/40 focus:ring-1 focus:ring-indigo-500/20 focus:outline-none transition-all" />
-        </div>
+      <Box component="form" onSubmit={handleSubmit} sx={{ display: "flex", flexDirection: "column", gap: 2.5 }}>
+        {/* Tournament name */}
+        <TextField
+          label="Tournament Name"
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+          required
+          placeholder="Friday Night Thunder"
+          fullWidth
+        />
 
-        <div className="grid grid-cols-3 gap-3">
-          <div>
-            <label className="block text-[11px] font-medium text-zinc-500 mb-1.5 uppercase tracking-wider">Entry Fee</label>
-            <div className="relative">
-              <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-zinc-600 text-sm">$</span>
-              <input type="number" value={entryFee} onChange={(e) => setEntryFee(e.target.value)} required min="0" step="0.01" placeholder="10"
-                className="w-full bg-zinc-900/60 border border-zinc-800/50 rounded-xl pl-7 pr-3 py-2.5 text-sm text-zinc-100 placeholder:text-zinc-700 focus:border-indigo-500/40 focus:ring-1 focus:ring-indigo-500/20 focus:outline-none transition-all" />
-            </div>
-          </div>
-          <div>
-            <label className="block text-[11px] font-medium text-zinc-500 mb-1.5 uppercase tracking-wider">Max Players</label>
-            <input type="number" value={maxPlayers} onChange={(e) => setMaxPlayers(e.target.value)} required min="2" max="64" placeholder="20"
-              className="w-full bg-zinc-900/60 border border-zinc-800/50 rounded-xl px-4 py-2.5 text-sm text-zinc-100 placeholder:text-zinc-700 focus:border-indigo-500/40 focus:ring-1 focus:ring-indigo-500/20 focus:outline-none transition-all" />
-          </div>
-          <div>
-            <label className="block text-[11px] font-medium text-zinc-500 mb-1.5 uppercase tracking-wider">Subsession</label>
-            <input type="number" value={subsessionId} onChange={(e) => setSubsessionId(e.target.value)} required min="1" placeholder="12345"
-              className="w-full bg-zinc-900/60 border border-zinc-800/50 rounded-xl px-4 py-2.5 text-sm text-zinc-100 placeholder:text-zinc-700 focus:border-indigo-500/40 focus:ring-1 focus:ring-indigo-500/20 focus:outline-none transition-all" />
-          </div>
-        </div>
+        {/* Entry Fee, Max Players, Subsession ID */}
+        <Grid container spacing={1.5}>
+          <Grid size={4}>
+            <TextField
+              label="Entry Fee"
+              type="number"
+              value={entryFee}
+              onChange={(e) => setEntryFee(e.target.value)}
+              required
+              slotProps={{
+                htmlInput: { min: 0, step: "0.01" },
+                input: {
+                  startAdornment: <InputAdornment position="start">$</InputAdornment>,
+                },
+              }}
+              placeholder="10"
+              fullWidth
+            />
+          </Grid>
+          <Grid size={4}>
+            <TextField
+              label="Max Players"
+              type="number"
+              value={maxPlayers}
+              onChange={(e) => setMaxPlayers(e.target.value)}
+              required
+              slotProps={{ htmlInput: { min: 2, max: 64 } }}
+              placeholder="20"
+              fullWidth
+            />
+          </Grid>
+          <Grid size={4}>
+            <TextField
+              label="Subsession"
+              type="number"
+              value={subsessionId}
+              onChange={(e) => setSubsessionId(e.target.value)}
+              required
+              slotProps={{ htmlInput: { min: 1 } }}
+              placeholder="12345"
+              fullWidth
+            />
+          </Grid>
+        </Grid>
 
-        {/* Prize Split */}
-        <div>
-          <label className="block text-[11px] font-medium text-zinc-500 mb-2 uppercase tracking-wider">Prize Split</label>
-          <div className="grid grid-cols-2 gap-2">
+        {/* Prize Split presets */}
+        <Box>
+          <Typography variant="overline" sx={{ color: "text.secondary", letterSpacing: "0.1em", display: "block", mb: 1, fontWeight: 500 }}>
+            Prize Split
+          </Typography>
+          <Grid container spacing={1}>
             {SPLIT_PRESETS.map((preset, i) => (
-              <button key={i} type="button" onClick={() => setSplitIndex(i)}
-                className={`text-left px-3.5 py-2.5 rounded-xl border transition-all ${
-                  splitIndex === i
-                    ? "bg-indigo-500/10 border-indigo-500/30 text-indigo-400"
-                    : "bg-zinc-900/40 border-zinc-800/30 text-zinc-500 hover:border-zinc-700/50 hover:text-zinc-400"
-                }`}>
-                <div className="text-xs font-medium">{preset.label}</div>
-                <div className={`text-[10px] mt-0.5 ${splitIndex === i ? "text-indigo-400/60" : "text-zinc-700"}`}>{preset.desc}</div>
-              </button>
+              <Grid key={i} size={6}>
+                <Button
+                  onClick={() => setSplitIndex(i)}
+                  variant={splitIndex === i ? "outlined" : "text"}
+                  fullWidth
+                  sx={{
+                    justifyContent: "flex-start",
+                    px: 2,
+                    py: 1.2,
+                    borderRadius: "12px",
+                    textAlign: "left",
+                    border: splitIndex === i
+                      ? "1px solid rgba(99,102,241,0.3)"
+                      : "1px solid rgba(63,63,70,0.3)",
+                    bgcolor: splitIndex === i
+                      ? "rgba(99,102,241,0.08)"
+                      : "rgba(24,24,27,0.4)",
+                    color: splitIndex === i ? "primary.light" : "text.secondary",
+                    "&:hover": {
+                      bgcolor: splitIndex === i
+                        ? "rgba(99,102,241,0.12)"
+                        : "rgba(63,63,70,0.2)",
+                      borderColor: splitIndex === i
+                        ? "rgba(99,102,241,0.4)"
+                        : "rgba(63,63,70,0.5)",
+                    },
+                    flexDirection: "column",
+                    alignItems: "flex-start",
+                  }}
+                >
+                  <Typography variant="caption" sx={{ fontWeight: 500, lineHeight: 1.2, fontSize: "0.75rem" }}>
+                    {preset.label}
+                  </Typography>
+                  <Typography
+                    variant="caption"
+                    sx={{
+                      fontSize: "0.6rem",
+                      color: splitIndex === i ? "rgba(129,140,248,0.6)" : "#3f3f46",
+                    }}
+                  >
+                    {preset.desc}
+                  </Typography>
+                </Button>
+              </Grid>
             ))}
-          </div>
-        </div>
+          </Grid>
+        </Box>
 
-        {/* Submit */}
-        <button type="submit" disabled={!isValid || isPending || isConfirming}
-          className="w-full bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 disabled:opacity-30 disabled:hover:from-indigo-600 disabled:hover:to-purple-600 text-white text-sm font-semibold py-3 rounded-xl transition-all shadow-lg shadow-indigo-500/15">
-          {isPending ? "Waiting for wallet..." : isConfirming ? "Confirming..." : "Create Tournament"}
-        </button>
+        {/* Submit button */}
+        <Button
+          type="submit"
+          disabled={!isValid || isPending || isConfirming}
+          variant="contained"
+          fullWidth
+          sx={{
+            py: 1.5,
+            background: "linear-gradient(135deg, #6366f1, #9333ea)",
+            "&:hover": { background: "linear-gradient(135deg, #818cf8, #a855f7)" },
+            "&:disabled": { opacity: 0.3 },
+            boxShadow: "0 4px 14px rgba(99,102,241,0.2)",
+            fontSize: "0.875rem",
+          }}
+        >
+          {isPending ? (
+            <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+              <CircularProgress size={16} color="inherit" />
+              Waiting for wallet...
+            </Box>
+          ) : isConfirming ? (
+            <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+              <CircularProgress size={16} color="inherit" />
+              Confirming...
+            </Box>
+          ) : (
+            "Create Tournament"
+          )}
+        </Button>
 
+        {/* Status messages */}
         {isConfirming && txHash && (
-          <div className="text-center text-xs text-amber-400 flex items-center justify-center gap-2">
-            <span className="animate-spin w-3.5 h-3.5 border-2 border-amber-400 border-t-transparent rounded-full" />
-            <a href={`${EXPLORER_URL}/tx/${txHash}`} target="_blank" rel="noopener noreferrer" className="underline">View on BaseScan</a>
-          </div>
+          <Box sx={{ textAlign: "center" }}>
+            <Link
+              href={`${EXPLORER_URL}/tx/${txHash}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              underline="always"
+              variant="caption"
+              color="warning.main"
+            >
+              View on BaseScan
+            </Link>
+          </Box>
         )}
-        {isConfirmed && <div className="text-center text-sm text-emerald-400 font-medium">Tournament created!</div>}
-        {error && <div className="text-center text-xs text-red-400">{sanitizeError(error)}</div>}
-      </form>
+        {isConfirmed && (
+          <Alert severity="success" variant="outlined" sx={{ justifyContent: "center" }}>
+            <Typography variant="body2" fontWeight={500}>Tournament created!</Typography>
+          </Alert>
+        )}
+        {error && (
+          <Alert severity="error" variant="outlined">
+            <Typography variant="caption">{sanitizeError(error)}</Typography>
+          </Alert>
+        )}
+      </Box>
     </Overlay>
   );
 }
