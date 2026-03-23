@@ -1,6 +1,10 @@
 "use client";
 
 import type { OracleData } from "../types";
+import Box from "@mui/material/Box";
+import Paper from "@mui/material/Paper";
+import Typography from "@mui/material/Typography";
+import Grid from "@mui/material/Grid";
 
 interface Props {
   oracle: OracleData | null;
@@ -9,38 +13,40 @@ interface Props {
 
 export default function OracleStatus({ oracle, loading }: Props) {
   return (
-    <section>
-      <h2 className="text-sm font-semibold text-zinc-400 uppercase tracking-wide mb-3">
+    <Box component="section">
+      <Typography variant="subtitle2" sx={{ color: "text.secondary", textTransform: "uppercase", letterSpacing: "0.05em", mb: 1.5 }}>
         Oracle Status
-      </h2>
+      </Typography>
       {oracle ? (
-        <div className="bg-zinc-900 border border-zinc-800 rounded-lg p-4 grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
-          <div>
-            <div className="text-zinc-500">Address</div>
-            <div className="font-mono text-xs truncate" title={oracle.address}>
-              {oracle.address}
-            </div>
-          </div>
-          <div>
-            <div className="text-zinc-500">Contract</div>
-            <div className="font-mono text-xs truncate" title={oracle.contract}>
-              {oracle.contract}
-            </div>
-          </div>
-          <div>
-            <div className="text-zinc-500">Mock Mode</div>
-            <div>{oracle.mockMode ? "Enabled" : "Disabled"}</div>
-          </div>
-          <div>
-            <div className="text-zinc-500">Poll Interval</div>
-            <div>{Number(oracle.pollInterval) / 1000}s</div>
-          </div>
-        </div>
+        <Paper sx={{ p: 2, bgcolor: "background.paper" }}>
+          <Grid container spacing={2}>
+            <Grid size={{ xs: 6, md: 3 }}>
+              <Typography variant="caption" color="text.secondary">Address</Typography>
+              <Typography variant="body2" sx={{ fontFamily: "monospace", fontSize: "0.75rem", overflow: "hidden", textOverflow: "ellipsis" }} title={oracle.address}>
+                {oracle.address}
+              </Typography>
+            </Grid>
+            <Grid size={{ xs: 6, md: 3 }}>
+              <Typography variant="caption" color="text.secondary">Contract</Typography>
+              <Typography variant="body2" sx={{ fontFamily: "monospace", fontSize: "0.75rem", overflow: "hidden", textOverflow: "ellipsis" }} title={oracle.contract}>
+                {oracle.contract}
+              </Typography>
+            </Grid>
+            <Grid size={{ xs: 6, md: 3 }}>
+              <Typography variant="caption" color="text.secondary">Mock Mode</Typography>
+              <Typography variant="body2">{oracle.mockMode ? "Enabled" : "Disabled"}</Typography>
+            </Grid>
+            <Grid size={{ xs: 6, md: 3 }}>
+              <Typography variant="caption" color="text.secondary">Poll Interval</Typography>
+              <Typography variant="body2">{Number(oracle.pollInterval) / 1000}s</Typography>
+            </Grid>
+          </Grid>
+        </Paper>
       ) : (
         !loading && (
-          <p className="text-zinc-500">Could not load oracle status</p>
+          <Typography variant="body2" color="text.secondary">Could not load oracle status</Typography>
         )
       )}
-    </section>
+    </Box>
   );
 }

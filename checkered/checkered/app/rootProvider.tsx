@@ -2,6 +2,9 @@
 import { ReactNode } from "react";
 import { baseSepolia } from "wagmi/chains";
 import { OnchainKitProvider } from "@coinbase/onchainkit";
+import { ThemeProvider } from "@mui/material/styles";
+import CssBaseline from "@mui/material/CssBaseline";
+import { theme } from "./theme";
 import "@coinbase/onchainkit/styles.css";
 
 export function RootProvider({ children }: { children: ReactNode }) {
@@ -15,6 +18,7 @@ export function RootProvider({ children }: { children: ReactNode }) {
         },
         wallet: {
           display: "modal",
+          // "all" enables Smart Wallet + EOA (MetaMask, Rabby, etc.)
           preference: "all",
         },
         // Paymaster for gasless player transactions (uses CDP API key)
@@ -23,7 +27,10 @@ export function RootProvider({ children }: { children: ReactNode }) {
           : undefined,
       }}
     >
-      {children}
+      <ThemeProvider theme={theme}>
+        <CssBaseline />
+        {children}
+      </ThemeProvider>
     </OnchainKitProvider>
   );
 }

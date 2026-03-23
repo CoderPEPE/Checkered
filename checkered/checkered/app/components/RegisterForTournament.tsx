@@ -11,7 +11,17 @@ import {
 } from "@coinbase/onchainkit/transaction";
 import type { LifecycleStatus } from "@coinbase/onchainkit/transaction";
 import { baseSepolia } from "wagmi/chains";
+import { useAccount, useReadContract } from "wagmi";
 import { buildRegisterCalls } from "../calls";
+import { USDC_ADDRESS, ERC20_ABI } from "../contracts";
+
+import Box from "@mui/material/Box";
+import TextField from "@mui/material/TextField";
+import Typography from "@mui/material/Typography";
+import Divider from "@mui/material/Divider";
+import Alert from "@mui/material/Alert";
+import Snackbar from "@mui/material/Snackbar";
+import Chip from "@mui/material/Chip";
 
 interface Props {
   tournamentId: number;
@@ -21,48 +31,180 @@ interface Props {
 
 export default function RegisterForTournament({ tournamentId, entryFee, onRegistered }: Props) {
   const [iRacingId, setIRacingId] = useState("");
+  const [toastOpen, setToastOpen] = useState(false);
+  const [toastMsg, setToastMsg] = useState("");
+
+  const { address } = useAccount();
+
+  // Read the user's USDC balance
+  const { data: usdcBalance } = useReadContract({
+    address: USDC_ADDRESS,
+    abi: ERC20_ABI,
+    functionName: "balanceOf",
+    args: address ? [address] : undefined,
+    query: { enabled: !!address },
+  });
 
   const entryFeeBigInt = BigInt(entryFee);
   const iRacingIdNum = Number(iRacingId);
   const isValid = iRacingId.length > 0 && Number.isInteger(iRacingIdNum) && iRacingIdNum > 0;
+
+  // Check if balance is sufficient
+  const balanceNum = usdcBalance !== undefined ? Number(usdcBalance) : null;
+  const entryFeeNum = Number(entryFee);
+  const hasEnoughBalance = balanceNum !== null && balanceNum >= entryFeeNum;
+  const balanceFormatted = balanceNum !== null ? (balanceNum / 1_000_000).toFixed(2) : "...";
+  const entryFeeFormatted = (entryFeeNum / 1_000_000).toFixed(2);
 
   function handleStatus(status: LifecycleStatus) {
     if (status.statusName === "success") {
       setIRacingId("");
       setTimeout(() => onRegistered(), 2000);
     }
+    if (status.statusName === "error") {
+      // Show toast for any transaction error
+      setToastMsg("Transaction failed. Check your USDC balance and try again.");
+      setToastOpen(true);
+    }
+  }
+
+  // Intercept registration if balance is too low
+  function handleRegisterClick() {
+    if (!hasEnoughBalance) {
+      setToastMsg(
+        `Insufficient USDC balance. You have $${balanceFormatted} but need $${entryFeeFormatted} to register.`
+      );
+      setToastOpen(true);
+    }
   }
 
   return (
-    <div className="border-t border-zinc-800/30 pt-4">
-      <div className="text-[11px] text-zinc-500 uppercase tracking-wider font-medium mb-3">
+    <Box sx={{ pt: 2 }}>
+      <Divider sx={{ mb: 2 }} />
+      <Typography variant="overline" sx={{ color: "text.secondary", letterSpacing: "0.1em", display: "block", mb: 1.5, fontWeight: 500 }}>
         Register for Tournament
-      </div>
+      </Typography>
 
-      <div className="mb-3">
-        <label className="block text-[11px] font-medium text-zinc-500 mb-1.5">iRacing Customer ID</label>
-        <input type="number" value={iRacingId} onChange={(e) => setIRacingId(e.target.value)} min="1" placeholder="123456"
-          className="w-full max-w-xs bg-zinc-900/60 border border-zinc-800/50 rounded-xl px-4 py-2.5 text-sm text-zinc-100 placeholder:text-zinc-700 focus:border-indigo-500/40 focus:ring-1 focus:ring-indigo-500/20 focus:outline-none transition-all" />
-      </div>
+      {/* USDC Balance display */}
+      <Box sx={{ display: "flex", alignItems: "center", gap: 1, mb: 2 }}>
+        <Typography variant="caption" sx={{ color: "text.secondary" }}>
+          Your USDC Balance:
+        </Typography>
+        <Chip
+          label={`$${balanceFormatted}`}
+          size="small"
+          color={hasEnoughBalance ? "success" : "error"}
+          variant="outlined"
+          sx={{ fontWeight: 600, fontVariantNumeric: "tabular-nums" }}
+        />
+        {!hasEnoughBalance && balanceNum !== null && (
+          <Typography variant="caption" color="error.main" sx={{ fontWeight: 500 }}>
+            Need ${entryFeeFormatted}
+          </Typography>
+        )}
+      </Box>
 
-      {isValid && (
-        <Transaction
-          chainId={baseSepolia.id}
-          calls={buildRegisterCalls(tournamentId, iRacingIdNum, entryFeeBigInt)}
-          isSponsored
-          onStatus={handleStatus}
-        >
-          <TransactionButton
-            text={`Register — $${(Number(entryFee) / 1_000_000).toFixed(2)} USDC`}
-            className="bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white text-sm font-semibold px-6 py-2.5 rounded-xl transition-all shadow-lg shadow-indigo-500/15"
-          />
-          <TransactionSponsor />
-          <TransactionStatus>
-            <TransactionStatusLabel className="text-sm mt-2" />
-            <TransactionStatusAction className="text-sm mt-1" />
-          </TransactionStatus>
-        </Transaction>
+      {/* Insufficient balance warning */}
+      {!hasEnoughBalance && balanceNum !== null && (
+        <Alert severity="warning" variant="outlined" sx={{ mb: 2, bgcolor: "rgba(245,158,11,0.04)" }}>
+          <Typography variant="caption">
+            You need ${entryFeeFormatted} USDC to register. Your balance is ${balanceFormatted} USDC.
+          </Typography>
+        </Alert>
       )}
-    </div>
+
+      <Box sx={{ mb: 2 }}>
+        <TextField
+          label="iRacing Customer ID"
+          type="number"
+          value={iRacingId}
+          onChange={(e) => setIRacingId(e.target.value)}
+          slotProps={{ htmlInput: { min: 1 } }}
+          placeholder="123456"
+          sx={{ maxWidth: 280 }}
+        />
+      </Box>
+
+      {/* OnchainKit Transaction — only show if balance is sufficient */}
+      {isValid && hasEnoughBalance && (
+        <Box
+          sx={{
+            "& button": {
+              background: "linear-gradient(135deg, #6366f1, #9333ea) !important",
+              color: "#fff !important",
+              fontWeight: 600,
+              fontSize: "0.875rem",
+              padding: "10px 24px",
+              borderRadius: "12px",
+              border: "none",
+              cursor: "pointer",
+              width: "100%",
+              transition: "opacity 0.2s",
+              boxShadow: "0 4px 14px rgba(99,102,241,0.2)",
+              "&:hover": {
+                opacity: 0.9,
+              },
+            },
+            "& [data-testid]": {
+              fontSize: "0.875rem",
+              marginTop: "8px",
+            },
+          }}
+        >
+          <Transaction
+            chainId={baseSepolia.id}
+            calls={buildRegisterCalls(tournamentId, iRacingIdNum, entryFeeBigInt)}
+            isSponsored
+            onStatus={handleStatus}
+          >
+            <TransactionButton
+              text={`Register — $${entryFeeFormatted} USDC`}
+            />
+            <TransactionSponsor />
+            <TransactionStatus>
+              <TransactionStatusLabel />
+              <TransactionStatusAction />
+            </TransactionStatus>
+          </Transaction>
+        </Box>
+      )}
+
+      {/* Disabled button when balance is insufficient but form is valid */}
+      {isValid && !hasEnoughBalance && balanceNum !== null && (
+        <Box
+          onClick={handleRegisterClick}
+          sx={{
+            background: "rgba(99,102,241,0.15)",
+            color: "rgba(255,255,255,0.4)",
+            fontWeight: 600,
+            fontSize: "0.875rem",
+            padding: "10px 24px",
+            borderRadius: "12px",
+            textAlign: "center",
+            cursor: "not-allowed",
+            userSelect: "none",
+          }}
+        >
+          Insufficient USDC — ${ balanceFormatted} / ${entryFeeFormatted} needed
+        </Box>
+      )}
+
+      {/* Toast notification */}
+      <Snackbar
+        open={toastOpen}
+        autoHideDuration={5000}
+        onClose={() => setToastOpen(false)}
+        anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
+      >
+        <Alert
+          onClose={() => setToastOpen(false)}
+          severity="error"
+          variant="filled"
+          sx={{ width: "100%" }}
+        >
+          {toastMsg}
+        </Alert>
+      </Snackbar>
+    </Box>
   );
 }

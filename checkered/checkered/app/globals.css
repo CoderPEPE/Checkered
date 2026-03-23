@@ -1,24 +1,6 @@
 @import "tailwindcss";
 
-html {
-  color-scheme: dark;
-}
-
-body {
-  background-color: #08080c;
-  color: #ededed;
-  font-family: var(--font-inter), system-ui, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-}
-
-* {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
-}
-
-/* Background grid */
+/* Background grid effect */
 .bg-grid {
   background-image:
     linear-gradient(rgba(255,255,255,0.015) 1px, transparent 1px),
@@ -26,7 +8,7 @@ body {
   background-size: 72px 72px;
 }
 
-/* Top glow */
+/* Top glow effect */
 .top-glow::before {
   content: '';
   position: fixed;
@@ -40,73 +22,13 @@ body {
   z-index: 0;
 }
 
-/* Tournament card */
-.tournament-card {
-  background: rgba(17, 17, 21, 0.9);
-  border: 1px solid rgba(255, 255, 255, 0.06);
-  border-radius: 14px;
-  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-}
-.tournament-card:hover {
-  transform: translateY(-3px);
-  border-color: rgba(99, 102, 241, 0.25);
-  box-shadow:
-    0 16px 48px rgba(0, 0, 0, 0.4),
-    0 0 0 1px rgba(99, 102, 241, 0.1),
-    inset 0 1px 0 rgba(255, 255, 255, 0.03);
-}
-
-/* Stat card */
-.stat-card {
-  background: rgba(17, 17, 21, 0.7);
-  border: 1px solid rgba(255, 255, 255, 0.05);
-  border-radius: 12px;
-}
-
-/* Progress bar */
-.progress-bar {
-  height: 4px;
-  border-radius: 999px;
-  background: rgba(255, 255, 255, 0.06);
-  overflow: hidden;
-}
-.progress-fill {
-  height: 100%;
-  border-radius: 999px;
-  background: linear-gradient(90deg, #6366f1, #a855f7);
-  transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-/* Gradient text */
-.gradient-text {
-  background: linear-gradient(135deg, #818cf8, #c084fc);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-}
-
-/* Animations */
-@keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
-}
-@keyframes slideUp {
-  from { opacity: 0; transform: translateY(24px) scale(0.97); }
-  to { opacity: 1; transform: translateY(0) scale(1); }
-}
-.animate-fadeIn { animation: fadeIn 0.15s ease-out; }
-.animate-slideUp { animation: slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1); }
-
-/* Skeleton shimmer */
-@keyframes shimmer {
-  0% { background-position: -200% 0; }
-  100% { background-position: 200% 0; }
-}
-.skeleton {
-  background: linear-gradient(90deg, rgba(39,39,42,0.4) 25%, rgba(63,63,70,0.2) 50%, rgba(39,39,42,0.4) 75%);
-  background-size: 200% 100%;
-  animation: shimmer 1.5s ease-in-out infinite;
-  border-radius: 8px;
+/* Prevent OnchainKit global styles from overriding MUI inputs */
+.MuiOutlinedInput-root input,
+.MuiOutlinedInput-root fieldset,
+.MuiTextField-root input {
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
 }
 
 /* Scrollbar */
