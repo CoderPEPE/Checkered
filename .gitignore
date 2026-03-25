@@ -34,5 +34,9 @@ build/
 # Temp files
 *.tmp.*
 
+# Wallet private keys (NEVER commit these!)
+wallets/
+*.keystore
+
 # Claude Code local settings
 .claude/

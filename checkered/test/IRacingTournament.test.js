@@ -91,7 +91,7 @@ describe("IRacingTournament", function () {
       const entryFee = ethers.parseUnits("1", 6); // 1 USDC
 
       await expect(
-        tournament.connect(admin).createTournament("Test Race", entryFee, 20, [6000, 3000, 1000], 12345)
+        tournament.connect(admin).createTournament("Test Race", entryFee, 20, [6000, 3000, 1000], 12345, 0, 0)
       ).to.emit(tournament, "TournamentCreated").withArgs(0, "Test Race", entryFee, 20);
 
       const t = await tournament.getTournament(0);
@@ -104,7 +104,7 @@ describe("IRacingTournament", function () {
     it("Should reject invalid prize splits (not summing to 10000)", async function () {
       const { tournament, admin } = await loadFixture(deployFixture);
       await expect(
-        tournament.connect(admin).createTournament("Bad Split", 1000000, 10, [5000, 3000, 1000], 0)
+        tournament.connect(admin).createTournament("Bad Split", 1000000, 10, [5000, 3000, 1000], 0, 0, 0)
       ).to.be.revertedWithCustomError(tournament, "InvalidSplits");
     });
 
@@ -112,14 +112,14 @@ describe("IRacingTournament", function () {
       const { tournament, admin } = await loadFixture(deployFixture);
       // maxPlayers (0) < prizeSplits.length (1) → InvalidSplits
       await expect(
-        tournament.connect(admin).createTournament("No Players", 1000000, 0, [10000], 0)
+        tournament.connect(admin).createTournament("No Players", 1000000, 0, [10000], 0, 0, 0)
       ).to.be.revertedWithCustomError(tournament, "InvalidSplits");
     });
 
     it("Should reject empty tournament name", async function () {
       const { tournament, admin } = await loadFixture(deployFixture);
       await expect(
-        tournament.connect(admin).createTournament("", 1000000, 10, [10000], 0)
+        tournament.connect(admin).createTournament("", 1000000, 10, [10000], 0, 0, 0)
       ).to.be.revertedWithCustomError(tournament, "InvalidName");
     });
 
@@ -128,7 +128,7 @@ describe("IRacingTournament", function () {
       // 11 splits of 909 each = 9999, add 1 to first = 10000
       const splits = [910, 909, 909, 909, 909, 909, 909, 909, 909, 909, 909];
       await expect(
-        tournament.connect(admin).createTournament("Too Many Splits", 1000000, 20, splits, 0)
+        tournament.connect(admin).createTournament("Too Many Splits", 1000000, 20, splits, 0, 0, 0)
       ).to.be.revertedWithCustomError(tournament, "InvalidSplits");
     });
 
@@ -136,22 +136,59 @@ describe("IRacingTournament", function () {
       const { tournament, admin } = await loadFixture(deployFixture);
       // 3 prize splits but only 2 max players
       await expect(
-        tournament.connect(admin).createTournament("Too Few Players", 1000000, 2, [6000, 3000, 1000], 0)
+        tournament.connect(admin).createTournament("Too Few Players", 1000000, 2, [6000, 3000, 1000], 0, 0, 0)
       ).to.be.revertedWithCustomError(tournament, "InvalidSplits");
     });
 
     it("Should reject non-admin creating tournament", async function () {
       const { tournament, nonAdmin } = await loadFixture(deployFixture);
       await expect(
-        tournament.connect(nonAdmin).createTournament("Unauthorized", 1000000, 10, [10000], 0)
+        tournament.connect(nonAdmin).createTournament("Unauthorized", 1000000, 10, [10000], 0, 0, 0)
       ).to.be.reverted;
     });
 
     it("Should increment tournament count", async function () {
       const { tournament, admin } = await loadFixture(deployFixture);
-      await tournament.connect(admin).createTournament("Race 1", 1000000, 10, [10000], 0);
-      await tournament.connect(admin).createTournament("Race 2", 1000000, 10, [10000], 0);
+      await tournament.connect(admin).createTournament("Race 1", 1000000, 10, [10000], 0, 0, 0);
+      await tournament.connect(admin).createTournament("Race 2", 1000000, 10, [10000], 0, 0, 0);
       expect(await tournament.tournamentCount()).to.equal(2);
+    });
+
+    it("Should create league tournament with leagueId and seasonId", async function () {
+      const { tournament, admin } = await loadFixture(deployFixture);
+      const entryFee = ethers.parseUnits("5", 6);
+
+      await tournament.connect(admin).createTournament(
+        "League Night", entryFee, 20, [6000, 3000, 1000], 0, 12345, 67890
+      );
+
+      const t = await tournament.getTournament(0);
+      expect(t.name).to.equal("League Night");
+      expect(t.iRacingSubsessionId).to.equal(0);
+      expect(t.iRacingLeagueId).to.equal(12345);
+      expect(t.iRacingSeasonId).to.equal(67890);
+    });
+
+    it("Should allow oracle to update subsessionId for league tournaments", async function () {
+      const { tournament, admin, oracle } = await loadFixture(deployFixture);
+      const entryFee = ethers.parseUnits("5", 6);
+
+      await tournament.connect(admin).createTournament(
+        "League Night", entryFee, 20, [6000, 3000, 1000], 0, 12345, 67890
+      );
+
+      await tournament.connect(oracle).updateSubsessionId(0, 99999);
+      const t = await tournament.getTournament(0);
+      expect(t.iRacingSubsessionId).to.equal(99999);
+    });
+
+    it("Should reject non-oracle from updating subsessionId", async function () {
+      const { tournament, admin, nonAdmin } = await loadFixture(deployFixture);
+      await tournament.connect(admin).createTournament("Race", 1000000, 10, [10000], 0, 12345, 67890);
+
+      await expect(
+        tournament.connect(nonAdmin).updateSubsessionId(0, 99999)
+      ).to.be.reverted;
     });
   });
 
@@ -163,7 +200,7 @@ describe("IRacingTournament", function () {
       const fixture = await loadFixture(deployFixture);
       const entryFee = ethers.parseUnits("5", 6); // 5 USDC
       await fixture.tournament.connect(fixture.admin).createTournament(
-        "Weekly Race", entryFee, 3, [6000, 3000, 1000], 99999
+        "Weekly Race", entryFee, 3, [6000, 3000, 1000], 99999, 0, 0
       );
       return { ...fixture, entryFee };
     }
@@ -233,7 +270,7 @@ describe("IRacingTournament", function () {
   describe("Status Transitions", function () {
     it("Should transition Created → RegistrationClosed → Racing", async function () {
       const { tournament, admin } = await loadFixture(deployFixture);
-      await tournament.connect(admin).createTournament("Race", 1000000, 10, [10000], 0);
+      await tournament.connect(admin).createTournament("Race", 1000000, 10, [10000], 0, 0, 0);
 
       await tournament.connect(admin).closeRegistration(0);
       expect((await tournament.getTournament(0)).status).to.equal(1); // RegistrationClosed
@@ -244,7 +281,7 @@ describe("IRacingTournament", function () {
 
     it("Should reject closing already closed registration", async function () {
       const { tournament, admin } = await loadFixture(deployFixture);
-      await tournament.connect(admin).createTournament("Race", 1000000, 10, [10000], 0);
+      await tournament.connect(admin).createTournament("Race", 1000000, 10, [10000], 0, 0, 0);
       await tournament.connect(admin).closeRegistration(0);
       await expect(
         tournament.connect(admin).closeRegistration(0)
@@ -253,7 +290,7 @@ describe("IRacingTournament", function () {
 
     it("Should reject starting race from Created status", async function () {
       const { tournament, admin } = await loadFixture(deployFixture);
-      await tournament.connect(admin).createTournament("Race", 1000000, 10, [10000], 0);
+      await tournament.connect(admin).createTournament("Race", 1000000, 10, [10000], 0, 0, 0);
       await expect(
         tournament.connect(admin).startRace(0)
       ).to.be.revertedWithCustomError(tournament, "InvalidStatus");
@@ -269,7 +306,7 @@ describe("IRacingTournament", function () {
       const entryFee = ethers.parseUnits("10", 6); // 10 USDC
 
       await fixture.tournament.connect(fixture.admin).createTournament(
-        "Big Race", entryFee, 10, [6000, 3000, 1000], 55555
+        "Big Race", entryFee, 10, [6000, 3000, 1000], 55555, 0, 0
       );
 
       // Register 3 players
@@ -369,7 +406,7 @@ describe("IRacingTournament", function () {
     it("Should reject results when status is RegistrationClosed (not Racing)", async function () {
       const { tournament, admin, oracle, player1, player2, player3 } = await loadFixture(deployFixture);
       const entryFee = ethers.parseUnits("10", 6);
-      await tournament.connect(admin).createTournament("Race", entryFee, 10, [6000, 3000, 1000], 55555);
+      await tournament.connect(admin).createTournament("Race", entryFee, 10, [6000, 3000, 1000], 55555, 0, 0);
 
       await tournament.connect(player1).register(0, 100001);
       await tournament.connect(player2).register(0, 100002);
@@ -411,7 +448,7 @@ describe("IRacingTournament", function () {
       const { tournament, usdc, admin, player1 } = await loadFixture(deployFixture);
       const entryFee = ethers.parseUnits("5", 6);
 
-      await tournament.connect(admin).createTournament("Cancelled Race", entryFee, 10, [10000], 0);
+      await tournament.connect(admin).createTournament("Cancelled Race", entryFee, 10, [10000], 0, 0, 0);
       await tournament.connect(player1).register(0, 100001);
 
       const balBefore = await usdc.balanceOf(player1.address);
@@ -427,7 +464,7 @@ describe("IRacingTournament", function () {
 
     it("Should reject double refund", async function () {
       const { tournament, admin, player1 } = await loadFixture(deployFixture);
-      await tournament.connect(admin).createTournament("Race", 1000000, 10, [10000], 0);
+      await tournament.connect(admin).createTournament("Race", 1000000, 10, [10000], 0, 0, 0);
       await tournament.connect(player1).register(0, 100001);
       await tournament.connect(admin).cancelTournament(0);
       await tournament.connect(player1).claimRefund(0);
@@ -439,7 +476,7 @@ describe("IRacingTournament", function () {
 
     it("Should reject refund from non-cancelled tournament", async function () {
       const { tournament, admin, player1 } = await loadFixture(deployFixture);
-      await tournament.connect(admin).createTournament("Race", 1000000, 10, [10000], 0);
+      await tournament.connect(admin).createTournament("Race", 1000000, 10, [10000], 0, 0, 0);
       await tournament.connect(player1).register(0, 100001);
 
       await expect(
@@ -449,7 +486,7 @@ describe("IRacingTournament", function () {
 
     it("Should reject refund for unregistered player", async function () {
       const { tournament, admin, nonAdmin } = await loadFixture(deployFixture);
-      await tournament.connect(admin).createTournament("Race", 1000000, 10, [10000], 0);
+      await tournament.connect(admin).createTournament("Race", 1000000, 10, [10000], 0, 0, 0);
       await tournament.connect(admin).cancelTournament(0);
 
       await expect(
@@ -459,7 +496,7 @@ describe("IRacingTournament", function () {
 
     it("Should reject cancelling completed tournament", async function () {
       const { tournament, admin, oracle, player1 } = await loadFixture(deployFixture);
-      await tournament.connect(admin).createTournament("Race", 1000000, 10, [10000], 0);
+      await tournament.connect(admin).createTournament("Race", 1000000, 10, [10000], 0, 0, 0);
       await tournament.connect(player1).register(0, 100001);
       await tournament.connect(admin).closeRegistration(0);
       await tournament.connect(admin).startRace(0);
@@ -503,11 +540,11 @@ describe("IRacingTournament", function () {
       await tournament.connect(owner).pause();
 
       await expect(
-        tournament.connect(admin).createTournament("Race", 1000000, 10, [10000], 0)
+        tournament.connect(admin).createTournament("Race", 1000000, 10, [10000], 0, 0, 0)
       ).to.be.revertedWithCustomError(tournament, "EnforcedPause");
 
       await tournament.connect(owner).unpause();
-      await tournament.connect(admin).createTournament("Race", 1000000, 10, [10000], 0);
+      await tournament.connect(admin).createTournament("Race", 1000000, 10, [10000], 0, 0, 0);
     });
   });
 
@@ -519,7 +556,7 @@ describe("IRacingTournament", function () {
       const fixture = await loadFixture(deployFixture);
       const entryFee = ethers.parseUnits("10", 6);
       await fixture.tournament.connect(fixture.admin).createTournament(
-        "Stuck Race", entryFee, 10, [10000], 99999
+        "Stuck Race", entryFee, 10, [10000], 99999, 0, 0
       );
       await fixture.tournament.connect(fixture.player1).register(0, 100001);
       return { ...fixture, entryFee };
@@ -571,7 +608,7 @@ describe("IRacingTournament", function () {
 
     it("Should reject request for tournament with no funds", async function () {
       const { tournament, owner, admin } = await loadFixture(deployFixture);
-      await tournament.connect(admin).createTournament("Empty", 0, 10, [10000], 0);
+      await tournament.connect(admin).createTournament("Empty", 0, 10, [10000], 0, 0, 0);
       await expect(
         tournament.connect(owner).requestEmergencyWithdraw(0)
       ).to.be.revertedWithCustomError(tournament, "NoFundsToWithdraw");
@@ -619,7 +656,7 @@ describe("IRacingTournament", function () {
     // ── Zero entry fee ─────────────────────────────────────
     it("Should allow tournament with zero entry fee", async function () {
       const { tournament, admin, player1 } = await loadFixture(deployFixture);
-      await tournament.connect(admin).createTournament("Free Race", 0, 10, [10000], 0);
+      await tournament.connect(admin).createTournament("Free Race", 0, 10, [10000], 0, 0, 0);
 
       // Player registers for free (no USDC transfer)
       await tournament.connect(player1).register(0, 100001);
@@ -630,7 +667,7 @@ describe("IRacingTournament", function () {
 
     it("Should distribute zero-fee tournament (no prizes)", async function () {
       const { tournament, admin, oracle, player1 } = await loadFixture(deployFixture);
-      await tournament.connect(admin).createTournament("Free Race", 0, 10, [10000], 0);
+      await tournament.connect(admin).createTournament("Free Race", 0, 10, [10000], 0, 0, 0);
       await tournament.connect(player1).register(0, 100001);
       await tournament.connect(admin).closeRegistration(0);
       await tournament.connect(admin).startRace(0);
@@ -645,7 +682,7 @@ describe("IRacingTournament", function () {
     // ── Cancel from Racing ─────────────────────────────────
     it("Should cancel tournament in Racing status", async function () {
       const { tournament, admin } = await loadFixture(deployFixture);
-      await tournament.connect(admin).createTournament("Race", 1000000, 10, [10000], 0);
+      await tournament.connect(admin).createTournament("Race", 1000000, 10, [10000], 0, 0, 0);
       await tournament.connect(admin).closeRegistration(0);
       await tournament.connect(admin).startRace(0);
 
@@ -657,7 +694,7 @@ describe("IRacingTournament", function () {
     // ── Cancel from RegistrationClosed ─────────────────────
     it("Should cancel tournament in RegistrationClosed status", async function () {
       const { tournament, admin } = await loadFixture(deployFixture);
-      await tournament.connect(admin).createTournament("Race", 1000000, 10, [10000], 0);
+      await tournament.connect(admin).createTournament("Race", 1000000, 10, [10000], 0, 0, 0);
       await tournament.connect(admin).closeRegistration(0);
 
       await expect(tournament.connect(admin).cancelTournament(0))
@@ -668,7 +705,7 @@ describe("IRacingTournament", function () {
     // ── Cancel already-cancelled tournament ─────────────────
     it("Should reject cancelling already-cancelled tournament", async function () {
       const { tournament, admin } = await loadFixture(deployFixture);
-      await tournament.connect(admin).createTournament("Race", 1000000, 10, [10000], 0);
+      await tournament.connect(admin).createTournament("Race", 1000000, 10, [10000], 0, 0, 0);
       await tournament.connect(admin).cancelTournament(0);
 
       await expect(
@@ -679,7 +716,7 @@ describe("IRacingTournament", function () {
     // ── Submit results from Created status ──────────────────
     it("Should reject results from Created status", async function () {
       const { tournament, admin, oracle, player1 } = await loadFixture(deployFixture);
-      await tournament.connect(admin).createTournament("Race", 1000000, 10, [10000], 0);
+      await tournament.connect(admin).createTournament("Race", 1000000, 10, [10000], 0, 0, 0);
       await tournament.connect(player1).register(0, 100001);
 
       const resultHash = ethers.keccak256(ethers.toUtf8Bytes("data"));
@@ -691,7 +728,7 @@ describe("IRacingTournament", function () {
     // ── Pause blocks registration ───────────────────────────
     it("Should reject registration when paused", async function () {
       const { tournament, owner, admin, player1 } = await loadFixture(deployFixture);
-      await tournament.connect(admin).createTournament("Race", 1000000, 10, [10000], 0);
+      await tournament.connect(admin).createTournament("Race", 1000000, 10, [10000], 0, 0, 0);
       await tournament.connect(owner).pause();
 
       await expect(
@@ -702,7 +739,7 @@ describe("IRacingTournament", function () {
     // ── Pause blocks submitResultsAndDistribute ─────────────
     it("Should reject result submission when paused", async function () {
       const { tournament, owner, admin, oracle, player1 } = await loadFixture(deployFixture);
-      await tournament.connect(admin).createTournament("Race", 1000000, 10, [10000], 0);
+      await tournament.connect(admin).createTournament("Race", 1000000, 10, [10000], 0, 0, 0);
       await tournament.connect(player1).register(0, 100001);
       await tournament.connect(admin).closeRegistration(0);
       await tournament.connect(admin).startRace(0);
@@ -760,7 +797,7 @@ describe("IRacingTournament", function () {
   describe("View Functions", function () {
     it("Should return player registration details", async function () {
       const { tournament, admin, player1 } = await loadFixture(deployFixture);
-      await tournament.connect(admin).createTournament("Race", 1000000, 10, [10000], 0);
+      await tournament.connect(admin).createTournament("Race", 1000000, 10, [10000], 0, 0, 0);
       await tournament.connect(player1).register(0, 12345);
 
       const reg = await tournament.getPlayerRegistration(0, player1.address);
@@ -771,7 +808,7 @@ describe("IRacingTournament", function () {
 
     it("Should return prize splits", async function () {
       const { tournament, admin } = await loadFixture(deployFixture);
-      await tournament.connect(admin).createTournament("Race", 1000000, 10, [6000, 3000, 1000], 0);
+      await tournament.connect(admin).createTournament("Race", 1000000, 10, [6000, 3000, 1000], 0, 0, 0);
       const splits = await tournament.getPrizeSplits(0);
       expect(splits[0]).to.equal(6000);
       expect(splits[1]).to.equal(3000);
@@ -785,7 +822,7 @@ describe("IRacingTournament", function () {
   describe("Production Hardening", function () {
     it("Should reject registration with iRacingCustomerId = 0", async function () {
       const { tournament, admin, player1 } = await loadFixture(deployFixture);
-      await tournament.connect(admin).createTournament("Race", 1000000, 10, [10000], 0);
+      await tournament.connect(admin).createTournament("Race", 1000000, 10, [10000], 0, 0, 0);
 
       await expect(
         tournament.connect(player1).register(0, 0)
@@ -795,7 +832,7 @@ describe("IRacingTournament", function () {
     it("Should decrement prizePool on refund claim", async function () {
       const { tournament, admin, player1 } = await loadFixture(deployFixture);
       const entryFee = ethers.parseUnits("5", 6);
-      await tournament.connect(admin).createTournament("Race", entryFee, 10, [10000], 0);
+      await tournament.connect(admin).createTournament("Race", entryFee, 10, [10000], 0, 0, 0);
       await tournament.connect(player1).register(0, 100001);
 
       // prizePool should be entryFee after registration
@@ -813,7 +850,7 @@ describe("IRacingTournament", function () {
     it("Should mark refunds claimed after emergency withdrawal", async function () {
       const { tournament, owner, admin, player1 } = await loadFixture(deployFixture);
       const entryFee = ethers.parseUnits("5", 6);
-      await tournament.connect(admin).createTournament("Race", entryFee, 10, [10000], 0);
+      await tournament.connect(admin).createTournament("Race", entryFee, 10, [10000], 0, 0, 0);
       await tournament.connect(player1).register(0, 100001);
 
       // Request and execute emergency withdrawal
@@ -837,7 +874,7 @@ describe("IRacingTournament", function () {
 
     it("Should reject address(0) as winner", async function () {
       const { tournament, admin, oracle, player1 } = await loadFixture(deployFixture);
-      await tournament.connect(admin).createTournament("Race", 1000000, 10, [10000], 0);
+      await tournament.connect(admin).createTournament("Race", 1000000, 10, [10000], 0, 0, 0);
       await tournament.connect(player1).register(0, 100001);
       await tournament.connect(admin).closeRegistration(0);
       await tournament.connect(admin).startRace(0);
@@ -850,7 +887,7 @@ describe("IRacingTournament", function () {
 
     it("Should use CannotCancelTerminalTournament for completed tournaments", async function () {
       const { tournament, admin, oracle, player1 } = await loadFixture(deployFixture);
-      await tournament.connect(admin).createTournament("Race", 1000000, 10, [10000], 0);
+      await tournament.connect(admin).createTournament("Race", 1000000, 10, [10000], 0, 0, 0);
       await tournament.connect(player1).register(0, 100001);
       await tournament.connect(admin).closeRegistration(0);
       await tournament.connect(admin).startRace(0);

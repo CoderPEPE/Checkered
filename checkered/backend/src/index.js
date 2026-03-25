@@ -2,7 +2,7 @@ require("dotenv").config();
 const { ethers } = require("ethers");
 const winston = require("winston");
 require("winston-daily-rotate-file");
-const { iRacingAuth, fetchSubsessionResults, fetchMemberInfo } = require("./iracing-api");
+const { iRacingAuth, fetchSubsessionResults, fetchMemberInfo, fetchLeagueSeasonSessions } = require("./iracing-api");
 const { createApp } = require("./app");
 
 // ============================================================
@@ -51,10 +51,11 @@ const oracleWallet = new ethers.Wallet(process.env.ORACLE_PRIVATE_KEY, provider)
 
 // Minimal ABI for the functions we call
 const TOURNAMENT_ABI = [
-  "function getTournament(uint256) view returns (string name, uint256 entryFee, uint256 maxPlayers, uint256 registeredCount, uint256 prizePool, uint256[] prizeSplits, uint256 iRacingSubsessionId, uint8 status, address creator, uint256 createdAt)",
+  "function getTournament(uint256) view returns (string name, uint256 entryFee, uint256 maxPlayers, uint256 registeredCount, uint256 prizePool, uint256[] prizeSplits, uint256 iRacingSubsessionId, uint8 status, address creator, uint256 createdAt, uint256 iRacingLeagueId, uint256 iRacingSeasonId)",
   "function getTournamentPlayers(uint256) view returns (address[])",
   "function getPlayerRegistration(uint256, address) view returns (uint256 iRacingCustomerId, bool registered, bool refundClaimed)",
   "function submitResultsAndDistribute(uint256, address[], bytes32)",
+  "function updateSubsessionId(uint256, uint256)",
   "function tournamentCount() view returns (uint256)",
   "event TournamentCreated(uint256 indexed tournamentId, string name, uint256 entryFee, uint256 maxPlayers)",
   "event PrizesDistributed(uint256 indexed tournamentId, address[] winners, uint256[] amounts)",
@@ -95,14 +96,40 @@ async function pollTournaments() {
           continue;
         }
 
-        logger.info(`Tournament ${i} (${t.name}) is Racing — checking iRacing API for subsession ${t.iRacingSubsessionId}`);
+        const leagueId = Number(t.iRacingLeagueId || 0);
+        const seasonId = Number(t.iRacingSeasonId || 0);
+        let subsessionId = Number(t.iRacingSubsessionId);
+
+        // League auto-discovery: if leagueId is set and subsessionId is 0, discover from league
+        if (leagueId > 0 && subsessionId === 0 && !MOCK_MODE) {
+          try {
+            logger.info(`Tournament ${i}: Discovering subsession from league ${leagueId} season ${seasonId}`);
+            const sessions = await fetchLeagueSeasonSessions(leagueId, seasonId);
+            if (sessions && sessions.length > 0) {
+              subsessionId = sessions[0].subsessionId;
+              logger.info(`Tournament ${i}: Discovered subsession ${subsessionId} (${sessions[0].trackName})`);
+
+              const updateTx = await tournamentContract.updateSubsessionId(i, subsessionId);
+              await updateTx.wait();
+              logger.info(`Tournament ${i}: Updated on-chain subsessionId to ${subsessionId}`);
+            } else {
+              logger.info(`Tournament ${i}: No completed sessions found for league ${leagueId}`);
+              continue;
+            }
+          } catch (err) {
+            logger.error(`Tournament ${i} league discovery error: ${err.message}`);
+            continue;
+          }
+        }
+
+        logger.info(`Tournament ${i} (${t.name}) is Racing — checking iRacing API for subsession ${subsessionId}`);
 
         try {
           let results;
           if (MOCK_MODE) {
             results = generateMockResults(i);
           } else {
-            results = await fetchSubsessionResults(Number(t.iRacingSubsessionId));
+            results = await fetchSubsessionResults(subsessionId);
           }
 
           if (results && results.length > 0) {

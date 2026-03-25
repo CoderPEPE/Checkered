@@ -36,13 +36,15 @@ export default function CreateTournament({ open, onClose, onCreated }: Props) {
   const [maxPlayers, setMaxPlayers] = useState("");
   const [splitIndex, setSplitIndex] = useState(2);
   const [subsessionId, setSubsessionId] = useState("");
+  const [leagueId, setLeagueId] = useState("");
+  const [seasonId, setSeasonId] = useState("");
 
   const { writeContract, data: txHash, isPending, error, reset } = useWriteContract();
   const { isLoading: isConfirming, isSuccess: isConfirmed } = useWaitForTransactionReceipt({ hash: txHash });
 
   useEffect(() => {
     if (isConfirmed) {
-      setName(""); setEntryFee(""); setMaxPlayers(""); setSubsessionId("");
+      setName(""); setEntryFee(""); setMaxPlayers(""); setSubsessionId(""); setLeagueId(""); setSeasonId("");
       const timer = setTimeout(() => { onCreated(); onClose(); }, 2000);
       return () => clearTimeout(timer);
     }
@@ -57,11 +59,20 @@ export default function CreateTournament({ open, onClose, onCreated }: Props) {
       address: TOURNAMENT_ADDRESS,
       abi: TOURNAMENT_ABI,
       functionName: "createTournament",
-      args: [name, feeInUnits, BigInt(maxPlayers), splits, BigInt(subsessionId)],
+      args: [
+        name,
+        feeInUnits,
+        BigInt(maxPlayers),
+        splits,
+        BigInt(subsessionId || "0"),
+        BigInt(leagueId || "0"),
+        BigInt(seasonId || "0"),
+      ],
     });
   }
 
-  const isValid = name && entryFee && maxPlayers && subsessionId;
+  const hasLeague = leagueId && seasonId;
+  const isValid = name && entryFee && maxPlayers && (subsessionId || hasLeague);
 
   return (
     <Overlay open={open} onClose={onClose} title="New Tournament">
@@ -113,10 +124,44 @@ export default function CreateTournament({ open, onClose, onCreated }: Props) {
               type="number"
               value={subsessionId}
               onChange={(e) => setSubsessionId(e.target.value)}
-              required
-              slotProps={{ htmlInput: { min: 1 } }}
-              placeholder="12345"
+              required={!hasLeague}
+              slotProps={{ htmlInput: { min: 0 } }}
+              placeholder={hasLeague ? "Auto" : "12345"}
+              disabled={!!hasLeague}
               fullWidth
+              helperText={hasLeague ? "Auto-discovered" : ""}
+            />
+          </Grid>
+        </Grid>
+
+        {/* League Integration (optional) */}
+        <Grid container spacing={1.5}>
+          <Grid size={6}>
+            <TextField
+              label="League ID"
+              type="number"
+              value={leagueId}
+              onChange={(e) => {
+                setLeagueId(e.target.value);
+                if (e.target.value) setSubsessionId("");
+              }}
+              slotProps={{ htmlInput: { min: 1 } }}
+              placeholder="Optional"
+              fullWidth
+              helperText="iRacing league for auto-discovery"
+            />
+          </Grid>
+          <Grid size={6}>
+            <TextField
+              label="Season ID"
+              type="number"
+              value={seasonId}
+              onChange={(e) => setSeasonId(e.target.value)}
+              slotProps={{ htmlInput: { min: 1 } }}
+              placeholder="Optional"
+              fullWidth
+              required={!!leagueId}
+              helperText={leagueId ? "Required with league" : ""}
             />
           </Grid>
         </Grid>

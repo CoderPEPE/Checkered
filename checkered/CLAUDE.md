@@ -49,8 +49,8 @@ trustless USDC escrow and automated prize distribution for tournaments.
 
 ## Key Addresses & Config
 - USDC on Base Mainnet: 0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913
-- USDC on Base Sepolia: 0xD24Ed1355C533771360A4a8dC724C1c1Fe2cB918 (MockUSDC)
-- Tournament Contract (Base Sepolia): 0x325C6D6d0386F0cAf0200d94043eef9A87a21aEA
+- USDC on Base Sepolia: 0xBc7A9d02e7ECe6F647954357d282614ff34e5954 (MockUSDC)
+- Tournament Contract (Base Sepolia): 0x820e2b46C537938A05A4F1F3c742DC29f05D4B8d
 - Base Sepolia Chain ID: 84532
 - Base Mainnet Chain ID: 8453
 - Base Sepolia RPC: https://sepolia.base.org
@@ -70,7 +70,7 @@ trustless USDC escrow and automated prize distribution for tournaments.
 - ORACLE_ROLE: Can submit results and trigger prize distribution
 
 ## Contract Key Functions
-- `createTournament(name, entryFee, maxPlayers, splits[], subsessionId)` — Admin creates tournament
+- `createTournament(name, entryFee, maxPlayers, splits[], subsessionId, leagueId, seasonId)` — Admin creates tournament
 - `register(tournamentId, iRacingId)` — Player pays USDC entry + registers
 - `submitResultsAndDistribute(tournamentId, winners[3], resultHash)` — Oracle submits results
 - `cancelTournament(tournamentId)` — Admin cancels, enables refunds
@@ -78,11 +78,14 @@ trustless USDC escrow and automated prize distribution for tournaments.
 
 ## Oracle Flow
 1. Oracle polls active tournaments every 30 seconds
-2. For each tournament with status "Racing", checks iRacing API for subsession completion
-3. Fetches race results, identifies top 3 finishers by position
-4. Maps iRacing customer IDs to registered wallet addresses
-5. Submits cryptographically signed results on-chain
-6. Smart contract automatically distributes prizes
+2. For each tournament with status "Racing":
+   - If leagueId is set and subsessionId is 0, auto-discovers latest completed race from the league season
+   - Updates the subsessionId on-chain once discovered
+3. Fetches race results from iRacing API for the subsession
+4. Identifies top finishers by position
+5. Maps iRacing customer IDs to registered wallet addresses
+6. Submits cryptographically signed results on-chain
+7. Smart contract automatically distributes prizes
 
 ## CDP Integrations (Grant-Relevant)
 - **CDP Smart Wallet**: OnchainKit Wallet component with `preference: "all"` (Smart Wallet + EOA)

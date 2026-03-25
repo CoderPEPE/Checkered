@@ -102,6 +102,8 @@ function createApp({ adminApiKey, tournamentContract, oracleWallet, mockMode, lo
           status: Number(t.status),
           statusName: ["Created", "RegistrationClosed", "Racing", "ResultsSubmitted", "Completed", "Cancelled"][Number(t.status)],
           iRacingSubsessionId: Number(t.iRacingSubsessionId),
+          iRacingLeagueId: Number(t.iRacingLeagueId || 0),
+          iRacingSeasonId: Number(t.iRacingSeasonId || 0),
           createdAt: Number(t.createdAt),
         });
       }
@@ -147,6 +149,8 @@ function createApp({ adminApiKey, tournamentContract, oracleWallet, mockMode, lo
         status: statusNum,
         statusName: ["Created", "RegistrationClosed", "Racing", "ResultsSubmitted", "Completed", "Cancelled"][statusNum],
         iRacingSubsessionId: Number(t.iRacingSubsessionId),
+        iRacingLeagueId: Number(t.iRacingLeagueId || 0),
+        iRacingSeasonId: Number(t.iRacingSeasonId || 0),
         createdAt: Number(t.createdAt),
         players: playerDetails,
       };

@@ -2,9 +2,9 @@ import { parseAbi } from "viem";
 
 // Contract addresses deployed on Base Sepolia
 export const TOURNAMENT_ADDRESS =
-  "0x55952de3B1dB66fB3D98aBfa348cA2B72b5F0473" as const;
+  "0x820e2b46C537938A05A4F1F3c742DC29f05D4B8d" as const;
 export const USDC_ADDRESS =
-  "0x1c6F2658c88C3E0d81F70264a9C1cf4FF2CDF4cF" as const;
+  "0xBc7A9d02e7ECe6F647954357d282614ff34e5954" as const;
 
 // Block explorer for transaction links
 export const EXPLORER_URL = "https://sepolia.basescan.org";
@@ -12,7 +12,7 @@ export const EXPLORER_URL = "https://sepolia.basescan.org";
 // Tournament contract ABI — admin + player functions
 export const TOURNAMENT_ABI = parseAbi([
   // Admin write functions
-  "function createTournament(string _name, uint256 _entryFee, uint256 _maxPlayers, uint256[] _prizeSplits, uint256 _subsessionId) returns (uint256)",
+  "function createTournament(string _name, uint256 _entryFee, uint256 _maxPlayers, uint256[] _prizeSplits, uint256 _subsessionId, uint256 _leagueId, uint256 _seasonId) returns (uint256)",
   "function closeRegistration(uint256 _tournamentId)",
   "function startRace(uint256 _tournamentId)",
   "function cancelTournament(uint256 _tournamentId)",
@@ -25,7 +25,7 @@ export const TOURNAMENT_ABI = parseAbi([
   "function hasRole(bytes32 role, address account) view returns (bool)",
   "function ADMIN_ROLE() view returns (bytes32)",
   "function tournamentCount() view returns (uint256)",
-  "function getTournament(uint256 _tournamentId) view returns (string name, uint256 entryFee, uint256 maxPlayers, uint256 registeredCount, uint256 prizePool, uint256[] prizeSplits, uint256 iRacingSubsessionId, uint8 status, address creator, uint256 createdAt)",
+  "function getTournament(uint256 _tournamentId) view returns (string name, uint256 entryFee, uint256 maxPlayers, uint256 registeredCount, uint256 prizePool, uint256[] prizeSplits, uint256 iRacingSubsessionId, uint8 status, address creator, uint256 createdAt, uint256 iRacingLeagueId, uint256 iRacingSeasonId)",
   "function getPlayerRegistration(uint256 _tournamentId, address _player) view returns (uint256 iRacingCustomerId, bool registered, bool refundClaimed)",
 
   // Events

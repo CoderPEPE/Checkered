@@ -41,6 +41,8 @@ contract IRacingTournament is AccessControl, ReentrancyGuard, Pausable {
         uint256 prizePool;
         uint256[] prizeSplits;     // basis points (e.g., [6000, 3000, 1000] = 60/30/10)
         uint256 iRacingSubsessionId;
+        uint256 iRacingLeagueId;   // 0 = manual subsession, >0 = auto-discover from league
+        uint256 iRacingSeasonId;   // league season ID for race discovery
         TournamentStatus status;
         address creator;
         uint256 createdAt;
@@ -132,14 +134,18 @@ contract IRacingTournament is AccessControl, ReentrancyGuard, Pausable {
      * @param _entryFee USDC entry fee (6 decimals)
      * @param _maxPlayers Maximum number of participants
      * @param _prizeSplits Array of basis points for prize distribution (must sum to 10000)
-     * @param _subsessionId iRacing subsession ID to link results
+     * @param _subsessionId iRacing subsession ID to link results (0 if using league auto-discovery)
+     * @param _leagueId iRacing league ID for auto-discovery (0 for manual subsession mode)
+     * @param _seasonId iRacing league season ID (required if _leagueId > 0)
      */
     function createTournament(
         string calldata _name,
         uint256 _entryFee,
         uint256 _maxPlayers,
         uint256[] calldata _prizeSplits,
-        uint256 _subsessionId
+        uint256 _subsessionId,
+        uint256 _leagueId,
+        uint256 _seasonId
     ) external onlyRole(ADMIN_ROLE) whenNotPaused returns (uint256) {
         // Validate name is non-empty (Milestone 5)
         if (bytes(_name).length == 0) revert InvalidName();
@@ -165,12 +171,26 @@ contract IRacingTournament is AccessControl, ReentrancyGuard, Pausable {
         t.maxPlayers = _maxPlayers;
         t.prizeSplits = _prizeSplits;
         t.iRacingSubsessionId = _subsessionId;
+        t.iRacingLeagueId = _leagueId;
+        t.iRacingSeasonId = _seasonId;
         t.status = TournamentStatus.Created;
         t.creator = msg.sender;
         t.createdAt = block.timestamp;
 
         emit TournamentCreated(tournamentId, _name, _entryFee, _maxPlayers);
         return tournamentId;
+    }
+
+    /**
+     * @notice Update the subsession ID for a league-based tournament (oracle auto-discovery)
+     * @param _tournamentId Tournament to update
+     * @param _subsessionId The discovered iRacing subsession ID
+     */
+    function updateSubsessionId(uint256 _tournamentId, uint256 _subsessionId) external onlyRole(ORACLE_ROLE) {
+        Tournament storage t = tournaments[_tournamentId];
+        if (t.status == TournamentStatus.Completed || t.status == TournamentStatus.Cancelled)
+            revert CannotCancelTerminalTournament();
+        t.iRacingSubsessionId = _subsessionId;
     }
 
     /**
@@ -429,14 +449,17 @@ contract IRacingTournament is AccessControl, ReentrancyGuard, Pausable {
             uint256 iRacingSubsessionId,
             TournamentStatus status,
             address creator,
-            uint256 createdAt
+            uint256 createdAt,
+            uint256 iRacingLeagueId,
+            uint256 iRacingSeasonId
         )
     {
         Tournament storage t = tournaments[_tournamentId];
         return (
             t.name, t.entryFee, t.maxPlayers, t.registeredCount,
             t.prizePool, t.prizeSplits, t.iRacingSubsessionId,
-            t.status, t.creator, t.createdAt
+            t.status, t.creator, t.createdAt,
+            t.iRacingLeagueId, t.iRacingSeasonId
         );
     }
 

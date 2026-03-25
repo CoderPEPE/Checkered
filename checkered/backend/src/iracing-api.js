@@ -257,10 +257,41 @@ async function fetchRecentRaces(custId) {
   return iRacingFetch(path);
 }
 
+/**
+ * Fetch league season sessions to auto-discover subsession IDs.
+ * Returns completed race subsession IDs for the given league season.
+ * @param {number} leagueId iRacing league ID
+ * @param {number} seasonId iRacing league season ID
+ * @returns {Array|null} Array of { subsessionId, launchAt } or null
+ */
+async function fetchLeagueSeasonSessions(leagueId, seasonId) {
+  if (!Number.isInteger(leagueId) || leagueId <= 0) {
+    throw new Error(`Invalid league ID: ${leagueId}`);
+  }
+  if (!Number.isInteger(seasonId) || seasonId <= 0) {
+    throw new Error(`Invalid season ID: ${seasonId}`);
+  }
+
+  const data = await iRacingFetch(
+    `/data/league/season_sessions?league_id=${leagueId}&season_id=${seasonId}`
+  );
+  if (!data || !data.sessions) return null;
+
+  return data.sessions
+    .filter((s) => s.has_results)
+    .map((s) => ({
+      subsessionId: s.subsession_id,
+      launchAt: s.launch_at,
+      trackName: s.track?.track_name || "Unknown",
+    }))
+    .sort((a, b) => new Date(b.launchAt) - new Date(a.launchAt));
+}
+
 module.exports = {
   iRacingAuth,
   fetchSubsessionResults,
   fetchMemberInfo,
   fetchRecentRaces,
+  fetchLeagueSeasonSessions,
   iRacingFetch,
 };
