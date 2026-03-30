@@ -2,9 +2,9 @@ import { parseAbi } from "viem";
 
 // Contract addresses deployed on Base Sepolia
 export const TOURNAMENT_ADDRESS =
-  "0x820e2b46C537938A05A4F1F3c742DC29f05D4B8d" as const;
+  "0x44cB744685c5591ac19E3b04d10569F735e5E263" as const;
 export const USDC_ADDRESS =
-  "0xBc7A9d02e7ECe6F647954357d282614ff34e5954" as const;
+  "0x77905c2eDa81D18449015d979D670c29948A31F8" as const;
 
 // Block explorer for transaction links
 export const EXPLORER_URL = "https://sepolia.basescan.org";

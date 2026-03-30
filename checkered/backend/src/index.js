@@ -59,6 +59,7 @@ const TOURNAMENT_ABI = [
   "function tournamentCount() view returns (uint256)",
   "event TournamentCreated(uint256 indexed tournamentId, string name, uint256 entryFee, uint256 maxPlayers)",
   "event PrizesDistributed(uint256 indexed tournamentId, address[] winners, uint256[] amounts)",
+  "event SubsessionIdUpdated(uint256 indexed tournamentId, uint256 subsessionId)",
 ];
 
 const tournamentContract = new ethers.Contract(
@@ -72,6 +73,8 @@ const tournamentContract = new ethers.Contract(
 // ============================================================
 // Tracks tournaments with in-flight submissions to prevent double-submit
 const submittingTournaments = new Set();
+// Tracks subsession IDs that have already been successfully submitted (prevents re-submission on restart)
+const processedSubsessions = new Set();
 // Tracks tournaments that failed due to insufficient finishers, with retry count
 const insufficientFinisherRetries = new Map();
 const MAX_INSUFFICIENT_RETRIES = 10; // After this many polls, log error instead of warn
@@ -107,6 +110,13 @@ async function pollTournaments() {
             const sessions = await fetchLeagueSeasonSessions(leagueId, seasonId);
             if (sessions && sessions.length > 0) {
               subsessionId = sessions[0].subsessionId;
+
+              // Skip if this subsession was already processed (prevents double-submit on restart)
+              if (processedSubsessions.has(subsessionId)) {
+                logger.info(`Tournament ${i}: Subsession ${subsessionId} already processed, skipping`);
+                continue;
+              }
+
               logger.info(`Tournament ${i}: Discovered subsession ${subsessionId} (${sessions[0].trackName})`);
 
               const updateTx = await tournamentContract.updateSubsessionId(i, subsessionId);
@@ -120,6 +130,12 @@ async function pollTournaments() {
             logger.error(`Tournament ${i} league discovery error: ${err.message}`);
             continue;
           }
+        }
+
+        // Skip if this subsession was already successfully processed
+        if (subsessionId > 0 && processedSubsessions.has(subsessionId)) {
+          logger.info(`Tournament ${i}: Subsession ${subsessionId} already processed, skipping`);
+          continue;
         }
 
         logger.info(`Tournament ${i} (${t.name}) is Racing — checking iRacing API for subsession ${subsessionId}`);
@@ -204,6 +220,13 @@ async function submitResults(tournamentId, raceResults, tournamentData) {
 
     logger.info(`Tournament ${tournamentId}: Results submitted! TX: ${receipt.hash}`);
     logger.info(`Gas used: ${receipt.gasUsed.toString()}`);
+
+    // Mark this subsession as processed to prevent re-submission
+    const subsessionId = Number(tournamentData.iRacingSubsessionId);
+    if (subsessionId > 0) {
+      processedSubsessions.add(subsessionId);
+      logger.info(`Tournament ${tournamentId}: Subsession ${subsessionId} marked as processed`);
+    }
 
     // Clean up tracking state on success
     insufficientFinisherRetries.delete(tournamentId);

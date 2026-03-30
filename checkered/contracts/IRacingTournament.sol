@@ -86,6 +86,7 @@ contract IRacingTournament is AccessControl, ReentrancyGuard, Pausable {
     event TreasuryUpdated(address oldTreasury, address newTreasury);
     event EmergencyWithdrawRequested(uint256 indexed tournamentId, uint256 executeAfter);
     event EmergencyWithdrawExecuted(uint256 indexed tournamentId, uint256 amount);
+    event SubsessionIdUpdated(uint256 indexed tournamentId, uint256 subsessionId);
 
     // ============================================================
     //  ERRORS
@@ -186,11 +187,15 @@ contract IRacingTournament is AccessControl, ReentrancyGuard, Pausable {
      * @param _tournamentId Tournament to update
      * @param _subsessionId The discovered iRacing subsession ID
      */
-    function updateSubsessionId(uint256 _tournamentId, uint256 _subsessionId) external onlyRole(ORACLE_ROLE) {
+    function updateSubsessionId(uint256 _tournamentId, uint256 _subsessionId) external {
+        // Allow both admin (manual override) and oracle (auto-discovery) to set subsession
+        if (!hasRole(ORACLE_ROLE, msg.sender) && !hasRole(ADMIN_ROLE, msg.sender))
+            revert AccessControlUnauthorizedAccount(msg.sender, ORACLE_ROLE);
         Tournament storage t = tournaments[_tournamentId];
         if (t.status == TournamentStatus.Completed || t.status == TournamentStatus.Cancelled)
             revert CannotCancelTerminalTournament();
         t.iRacingSubsessionId = _subsessionId;
+        emit SubsessionIdUpdated(_tournamentId, _subsessionId);
     }
 
     /**

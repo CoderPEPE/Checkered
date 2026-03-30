@@ -6,32 +6,48 @@ async function main() {
   console.log("Creating tournament with:", deployer.address);
 
   // Connect to deployed contract
+  const contractAddress = process.env.TOURNAMENT_CONTRACT_ADDRESS || "0x44cB744685c5591ac19E3b04d10569F735e5E263";
   const tournament = await hre.ethers.getContractAt(
     "IRacingTournament",
-    "0xF8D32D1AA112A3A5663eDDEF8a29ecc769233Def",
+    contractAddress,
     deployer
   );
 
+  // Check deployer has ADMIN_ROLE
+  const ADMIN_ROLE = await tournament.ADMIN_ROLE();
+  const hasAdmin = await tournament.hasRole(ADMIN_ROLE, deployer.address);
+  console.log("Has ADMIN_ROLE:", hasAdmin);
+  if (!hasAdmin) {
+    console.error("ERROR: Deployer does not have ADMIN_ROLE. Cannot create tournament.");
+    process.exit(1);
+  }
+
   // Tournament parameters
-  const name = "Test Race 1";
-  const entryFee = 1000000;           // 1 USDC (6 decimals)
-  const maxPlayers = 10;
+  const name = "League Test Tournament";
+  const entryFee = 1000000;              // 1 USDC (6 decimals)
+  const maxPlayers = 20;
   const prizeSplits = [6000, 3000, 1000]; // 60/30/10
-  const subsessionId = 12345;         // Fake iRacing subsession for testing
+  const subsessionId = 0;                // 0 = auto-discover from league
+  const leagueId = 14250;                // iRacing league ID
+  const seasonId = 1;                    // Season ID (update if needed)
 
   console.log("\nTournament details:");
   console.log("  Name:", name);
-  console.log("  Entry Fee: 1 USDC (1000000)");
+  console.log("  Entry Fee: 1 USDC");
   console.log("  Max Players:", maxPlayers);
   console.log("  Prize Split: 60/30/10");
-  console.log("  Subsession ID:", subsessionId);
+  console.log("  Subsession ID:", subsessionId, "(auto-discover)");
+  console.log("  League ID:", leagueId);
+  console.log("  Season ID:", seasonId);
 
   const tx = await tournament.createTournament(
     name,
     entryFee,
     maxPlayers,
     prizeSplits,
-    subsessionId
+    subsessionId,
+    leagueId,
+    seasonId
   );
   const receipt = await tx.wait();
 

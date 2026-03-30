@@ -89,8 +89,8 @@ npm run dev
 
 | Contract | Address |
 |---|---|
-| IRacingTournament | [`0x820e2b46C537938A05A4F1F3c742DC29f05D4B8d`](https://sepolia.basescan.org/address/0x820e2b46C537938A05A4F1F3c742DC29f05D4B8d) |
-| MockUSDC | [`0xBc7A9d02e7ECe6F647954357d282614ff34e5954`](https://sepolia.basescan.org/address/0xBc7A9d02e7ECe6F647954357d282614ff34e5954) |
+| IRacingTournament | [`0x44cB744685c5591ac19E3b04d10569F735e5E263`](https://sepolia.basescan.org/address/0x44cB744685c5591ac19E3b04d10569F735e5E263) |
+| MockUSDC | [`0x77905c2eDa81D18449015d979D670c29948A31F8`](https://sepolia.basescan.org/address/0x77905c2eDa81D18449015d979D670c29948A31F8) |
 
 ## Project Structure
 
