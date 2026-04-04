@@ -3,12 +3,15 @@
 export interface Tournament {
   id: number;
   name: string;
-  entryFee: string; // USDC in 6-decimal units
+  entryFee: string; // token amount in raw units
   maxPlayers: number;
   registeredCount: number;
-  prizePool: string; // USDC in 6-decimal units
+  prizePool: string; // token amount in raw units
   statusName: string;
   iRacingSubsessionId: number;
+  paymentToken: string; // address of the ERC-20 used (USDC or CHEX)
+  tokenSymbol: "USDC" | "CHEX"; // derived from paymentToken address
+  tokenDecimals: number; // 6 for USDC, 18 for CHEX
 }
 
 export interface Player {

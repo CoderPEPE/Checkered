@@ -51,12 +51,15 @@ const oracleWallet = new ethers.Wallet(process.env.ORACLE_PRIVATE_KEY, provider)
 
 // Minimal ABI for the functions we call
 const TOURNAMENT_ABI = [
-  "function getTournament(uint256) view returns (string name, uint256 entryFee, uint256 maxPlayers, uint256 registeredCount, uint256 prizePool, uint256[] prizeSplits, uint256 iRacingSubsessionId, uint8 status, address creator, uint256 createdAt, uint256 iRacingLeagueId, uint256 iRacingSeasonId)",
+  "function getTournament(uint256) view returns (string name, uint256 entryFee, uint256 maxPlayers, uint256 registeredCount, uint256 prizePool, uint256[] prizeSplits, uint256 iRacingSubsessionId, uint8 status, address creator, uint256 createdAt)",
+  "function getTournamentExtra(uint256) view returns (uint256 iRacingLeagueId, uint256 iRacingSeasonId, address paymentToken)",
   "function getTournamentPlayers(uint256) view returns (address[])",
   "function getPlayerRegistration(uint256, address) view returns (uint256 iRacingCustomerId, bool registered, bool refundClaimed)",
   "function submitResultsAndDistribute(uint256, address[], bytes32)",
   "function updateSubsessionId(uint256, uint256)",
   "function tournamentCount() view returns (uint256)",
+  "function usdc() view returns (address)",
+  "function chex() view returns (address)",
   "event TournamentCreated(uint256 indexed tournamentId, string name, uint256 entryFee, uint256 maxPlayers)",
   "event PrizesDistributed(uint256 indexed tournamentId, address[] winners, uint256[] amounts)",
   "event SubsessionIdUpdated(uint256 indexed tournamentId, uint256 subsessionId)",
@@ -99,8 +102,10 @@ async function pollTournaments() {
           continue;
         }
 
-        const leagueId = Number(t.iRacingLeagueId || 0);
-        const seasonId = Number(t.iRacingSeasonId || 0);
+        // Get league info from the extra view function
+        const extra = await tournamentContract.getTournamentExtra(i);
+        const leagueId = Number(extra.iRacingLeagueId || 0);
+        const seasonId = Number(extra.iRacingSeasonId || 0);
         let subsessionId = Number(t.iRacingSubsessionId);
 
         // League auto-discovery: if leagueId is set and subsessionId is 0, discover from league

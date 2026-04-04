@@ -91,7 +91,13 @@ function createApp({ adminApiKey, tournamentContract, oracleWallet, mockMode, lo
       const tournaments = [];
 
       for (let i = 0; i < count; i++) {
-        const t = await tournamentContract.getTournament(i);
+        const [t, extra] = await Promise.all([
+          tournamentContract.getTournament(i),
+          tournamentContract.getTournamentExtra(i),
+        ]);
+        // Determine token symbol from payment token address
+        const usdcAddr = await tournamentContract.usdc();
+        const isChex = extra.paymentToken.toLowerCase() !== usdcAddr.toLowerCase();
         tournaments.push({
           id: i,
           name: t.name,
@@ -102,9 +108,12 @@ function createApp({ adminApiKey, tournamentContract, oracleWallet, mockMode, lo
           status: Number(t.status),
           statusName: ["Created", "RegistrationClosed", "Racing", "ResultsSubmitted", "Completed", "Cancelled"][Number(t.status)],
           iRacingSubsessionId: Number(t.iRacingSubsessionId),
-          iRacingLeagueId: Number(t.iRacingLeagueId || 0),
-          iRacingSeasonId: Number(t.iRacingSeasonId || 0),
+          iRacingLeagueId: Number(extra.iRacingLeagueId || 0),
+          iRacingSeasonId: Number(extra.iRacingSeasonId || 0),
           createdAt: Number(t.createdAt),
+          paymentToken: extra.paymentToken,
+          tokenSymbol: isChex ? "CHEX" : "USDC",
+          tokenDecimals: isChex ? 18 : 6,
         });
       }
 
@@ -123,8 +132,11 @@ function createApp({ adminApiKey, tournamentContract, oracleWallet, mockMode, lo
     }
 
     try {
-      const t = await tournamentContract.getTournament(id);
-      const players = await tournamentContract.getTournamentPlayers(id);
+      const [t, extra, players] = await Promise.all([
+        tournamentContract.getTournament(id),
+        tournamentContract.getTournamentExtra(id),
+        tournamentContract.getTournamentPlayers(id),
+      ]);
 
       const playerDetails = await Promise.all(
         players.map(async (addr) => {
@@ -136,6 +148,10 @@ function createApp({ adminApiKey, tournamentContract, oracleWallet, mockMode, lo
           };
         })
       );
+
+      // Determine token symbol from payment token address
+      const usdcAddr = await tournamentContract.usdc();
+      const isChex = extra.paymentToken.toLowerCase() !== usdcAddr.toLowerCase();
 
       const statusNum = Number(t.status);
       const response = {
@@ -149,9 +165,12 @@ function createApp({ adminApiKey, tournamentContract, oracleWallet, mockMode, lo
         status: statusNum,
         statusName: ["Created", "RegistrationClosed", "Racing", "ResultsSubmitted", "Completed", "Cancelled"][statusNum],
         iRacingSubsessionId: Number(t.iRacingSubsessionId),
-        iRacingLeagueId: Number(t.iRacingLeagueId || 0),
-        iRacingSeasonId: Number(t.iRacingSeasonId || 0),
+        iRacingLeagueId: Number(extra.iRacingLeagueId || 0),
+        iRacingSeasonId: Number(extra.iRacingSeasonId || 0),
         createdAt: Number(t.createdAt),
+        paymentToken: extra.paymentToken,
+        tokenSymbol: isChex ? "CHEX" : "USDC",
+        tokenDecimals: isChex ? 18 : 6,
         players: playerDetails,
       };
 

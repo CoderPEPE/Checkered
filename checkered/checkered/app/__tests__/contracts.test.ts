@@ -8,6 +8,7 @@ import { describe, it, expect } from "vitest";
 import {
   TOURNAMENT_ADDRESS,
   USDC_ADDRESS,
+  CHEX_ADDRESS,
   EXPLORER_URL,
   TOURNAMENT_ABI,
   ERC20_ABI,
@@ -24,6 +25,10 @@ describe("contracts config", () => {
       expect(USDC_ADDRESS).toMatch(/^0x[0-9a-fA-F]{40}$/);
     });
 
+    it("CHEX_ADDRESS should be a valid hex address", () => {
+      expect(CHEX_ADDRESS).toMatch(/^0x[0-9a-fA-F]{40}$/);
+    });
+
     it("EXPLORER_URL should be a Base Sepolia URL", () => {
       expect(EXPLORER_URL).toContain("sepolia.basescan.org");
     });
@@ -31,6 +36,7 @@ describe("contracts config", () => {
     it("addresses should not be zero address", () => {
       expect(TOURNAMENT_ADDRESS).not.toBe("0x0000000000000000000000000000000000000000");
       expect(USDC_ADDRESS).not.toBe("0x0000000000000000000000000000000000000000");
+      expect(CHEX_ADDRESS).not.toBe("0x0000000000000000000000000000000000000000");
     });
   });
 
@@ -81,6 +87,15 @@ describe("contracts config", () => {
       expect(hasFunction(TOURNAMENT_ABI, "getTournament")).toBe(true);
     });
 
+    it("should include getTournamentExtra", () => {
+      expect(hasFunction(TOURNAMENT_ABI, "getTournamentExtra")).toBe(true);
+    });
+
+    it("should include usdc and chex getters", () => {
+      expect(hasFunction(TOURNAMENT_ABI, "usdc")).toBe(true);
+      expect(hasFunction(TOURNAMENT_ABI, "chex")).toBe(true);
+    });
+
     it("should include TournamentCreated event", () => {
       expect(hasEvent(TOURNAMENT_ABI, "TournamentCreated")).toBe(true);
     });
@@ -93,6 +108,13 @@ describe("contracts config", () => {
         (item: any) => item.type === "function" && item.name === "approve"
       );
       expect(hasApprove).toBe(true);
+    });
+
+    it("should include decimals function", () => {
+      const hasDecimals = ERC20_ABI.some(
+        (item: any) => item.type === "function" && item.name === "decimals"
+      );
+      expect(hasDecimals).toBe(true);
     });
   });
 });

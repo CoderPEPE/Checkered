@@ -8,10 +8,15 @@ async function main() {
   const network = hre.network.name;
   let usdcAddress;
 
+  let chexAddress;
+
   if (network === "baseMainnet") {
     // Real USDC on Base mainnet
     usdcAddress = "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913";
+    // CHEX on mainnet — update this address after mainnet CHEX deployment
+    chexAddress = process.env.CHEX_ADDRESS || "0x0000000000000000000000000000000000000000";
     console.log("Using Base mainnet USDC:", usdcAddress);
+    console.log("Using Base mainnet CHEX:", chexAddress);
   } else {
     // Deploy MockUSDC for testnet
     console.log("Deploying MockUSDC...");
@@ -25,6 +30,15 @@ async function main() {
     const mintAmount = hre.ethers.parseUnits("100000", 6); // 100k USDC
     await mockUsdc.mint(deployer.address, mintAmount);
     console.log("Minted 100,000 test USDC to deployer");
+
+    // Deploy CHEX (Checkered Credits) token
+    console.log("\nDeploying CheckeredCredits (CHEX)...");
+    const CHEX = await hre.ethers.getContractFactory("CheckeredCredits");
+    const chexToken = await CHEX.deploy(deployer.address);
+    await chexToken.waitForDeployment();
+    chexAddress = await chexToken.getAddress();
+    console.log("CHEX deployed to:", chexAddress);
+    console.log("Minted 1,000,000 CHEX to deployer");
   }
 
   // Deploy Tournament contract
@@ -33,11 +47,12 @@ async function main() {
 
   console.log("\nDeploying IRacingTournament...");
   console.log("  USDC:", usdcAddress);
+  console.log("  CHEX:", chexAddress);
   console.log("  Treasury:", treasuryAddress);
   console.log("  Platform Fee:", platformFeeBps, "bps (5%)");
 
   const Tournament = await hre.ethers.getContractFactory("IRacingTournament");
-  const tournament = await Tournament.deploy(usdcAddress, treasuryAddress, platformFeeBps);
+  const tournament = await Tournament.deploy(usdcAddress, chexAddress, treasuryAddress, platformFeeBps);
   await tournament.waitForDeployment();
   const tournamentAddress = await tournament.getAddress();
   console.log("IRacingTournament deployed to:", tournamentAddress);
@@ -55,14 +70,16 @@ async function main() {
   console.log("============================================");
   console.log("  Network:     ", network);
   console.log("  USDC:        ", usdcAddress);
+  console.log("  CHEX:        ", chexAddress);
   console.log("  Tournament:  ", tournamentAddress);
   console.log("  Treasury:    ", treasuryAddress);
   console.log("  Fee:          5% (500 bps)");
   console.log("============================================");
   console.log("\nTo verify on BaseScan:");
-  console.log(`  npx hardhat verify --network ${network} ${tournamentAddress} ${usdcAddress} ${treasuryAddress} ${platformFeeBps}`);
+  console.log(`  npx hardhat verify --network ${network} ${tournamentAddress} ${usdcAddress} ${chexAddress} ${treasuryAddress} ${platformFeeBps}`);
   if (network !== "baseMainnet") {
     console.log(`  npx hardhat verify --network ${network} ${usdcAddress}`);
+    console.log(`  npx hardhat verify --network ${network} ${chexAddress} ${deployer.address}`);
   }
 
   // Save deployment info
@@ -73,6 +90,7 @@ async function main() {
     deployer: deployer.address,
     contracts: {
       usdc: usdcAddress,
+      chex: chexAddress,
       tournament: tournamentAddress,
     },
     config: {

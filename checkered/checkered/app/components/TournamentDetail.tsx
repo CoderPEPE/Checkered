@@ -24,8 +24,8 @@ import BlockIcon from "@mui/icons-material/Block";
 import PlayArrowIcon from "@mui/icons-material/PlayArrow";
 import CancelIcon from "@mui/icons-material/Cancel";
 
-function formatUSDC(amount: string) {
-  return (Number(amount) / 1_000_000).toFixed(2);
+function formatTokenAmount(amount: string, decimals: number) {
+  return (Number(amount) / (10 ** decimals)).toFixed(2);
 }
 
 function formatDate(timestamp: number) {
@@ -78,6 +78,9 @@ export default function TournamentDetail({ tournament, isAdmin, onClose, onRefre
   const cfg = STATUS_CONFIG[status] || { color: "default" as const };
   const alreadyRegistered = address ? tournament.players.some((p) => p.wallet.toLowerCase() === address.toLowerCase()) : false;
   const fillPct = tournament.maxPlayers > 0 ? (tournament.registeredCount / tournament.maxPlayers) * 100 : 0;
+  const tokenSymbol = tournament.tokenSymbol || "USDC";
+  const tokenDecimals = tournament.tokenDecimals || 6;
+  const fmt = (amount: string) => formatTokenAmount(amount, tokenDecimals);
 
   return (
     <Overlay open={true} onClose={onClose} title={tournament.name}>
@@ -100,10 +103,10 @@ export default function TournamentDetail({ tournament, isAdmin, onClose, onRefre
                 Entry Fee
               </Typography>
               <Typography variant="h5" sx={{ fontWeight: 700, color: "white", lineHeight: 1, mb: 0.5, fontVariantNumeric: "tabular-nums" }}>
-                ${formatUSDC(tournament.entryFee)}
+                ${fmt(tournament.entryFee)}
               </Typography>
               <Typography variant="caption" sx={{ color: "#52525b", fontWeight: 500, fontSize: "0.6rem" }}>
-                USDC
+                {tokenSymbol}
               </Typography>
             </Paper>
           </Grid>
@@ -131,10 +134,10 @@ export default function TournamentDetail({ tournament, isAdmin, onClose, onRefre
                 Prize Pool
               </Typography>
               <Typography variant="h5" sx={{ fontWeight: 700, color: "white", lineHeight: 1, mb: 0.5, fontVariantNumeric: "tabular-nums" }}>
-                ${formatUSDC(tournament.prizePool)}
+                ${fmt(tournament.prizePool)}
               </Typography>
               <Typography variant="caption" sx={{ color: "#52525b", fontWeight: 500, fontSize: "0.6rem" }}>
-                USDC
+                {tokenSymbol}
               </Typography>
             </Paper>
           </Grid>
@@ -206,7 +209,7 @@ export default function TournamentDetail({ tournament, isAdmin, onClose, onRefre
                       </Typography>
                     </Box>
                     <Typography sx={{ fontSize: "0.8rem", fontWeight: 600, color: "success.main", fontVariantNumeric: "tabular-nums", ml: 1.5, flexShrink: 0 }}>
-                      ${formatUSDC(w.amount)}
+                      ${fmt(w.amount)}
                     </Typography>
                   </Paper>
                 );
@@ -217,7 +220,7 @@ export default function TournamentDetail({ tournament, isAdmin, onClose, onRefre
 
         {/* Registration */}
         {status === "Created" && isConnected && address && !alreadyRegistered && (
-          <RegisterForTournament tournamentId={tournament.id} entryFee={tournament.entryFee} onRegistered={onRefresh} />
+          <RegisterForTournament tournamentId={tournament.id} entryFee={tournament.entryFee} tokenSymbol={tokenSymbol} tokenDecimals={tokenDecimals} paymentToken={tournament.paymentToken} onRegistered={onRefresh} />
         )}
 
         {/* Refund claim for cancelled tournaments */}
@@ -239,7 +242,7 @@ export default function TournamentDetail({ tournament, isAdmin, onClose, onRefre
               ) : (
                 <>
                   <Typography variant="caption" sx={{ color: "#a1a1aa", display: "block", mb: 1.5 }}>
-                    You can claim your ${formatUSDC(tournament.entryFee)} USDC entry fee back.
+                    You can claim your {fmt(tournament.entryFee)} {tokenSymbol} entry fee back.
                   </Typography>
                   <Button
                     onClick={() => {
@@ -257,7 +260,7 @@ export default function TournamentDetail({ tournament, isAdmin, onClose, onRefre
                     size="small"
                     sx={{ fontSize: "0.75rem" }}
                   >
-                    Claim Refund — ${formatUSDC(tournament.entryFee)} USDC
+                    Claim Refund — {fmt(tournament.entryFee)} {tokenSymbol}
                   </Button>
                 </>
               )}

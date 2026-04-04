@@ -9,7 +9,7 @@ import "@openzeppelin/contracts/utils/Pausable.sol";
 
 /**
  * @title IRacingTournament
- * @notice Manages iRacing tournaments with USDC escrow and automated prize distribution on Base
+ * @notice Manages iRacing tournaments with USDC or CHEX escrow and automated prize distribution on Base
  * @dev Uses AccessControl for role management, ReentrancyGuard for security, Pausable for emergency stops
  */
 contract IRacingTournament is AccessControl, ReentrancyGuard, Pausable {
@@ -35,7 +35,7 @@ contract IRacingTournament is AccessControl, ReentrancyGuard, Pausable {
 
     struct Tournament {
         string name;
-        uint256 entryFee;          // USDC amount (6 decimals)
+        uint256 entryFee;          // token amount (USDC=6 decimals, CHEX=18 decimals)
         uint256 maxPlayers;
         uint256 registeredCount;
         uint256 prizePool;
@@ -47,6 +47,7 @@ contract IRacingTournament is AccessControl, ReentrancyGuard, Pausable {
         address creator;
         uint256 createdAt;
         bytes32 resultHash;
+        IERC20 paymentToken;       // which token this tournament uses (USDC or CHEX)
     }
 
     struct PlayerRegistration {
@@ -60,6 +61,7 @@ contract IRacingTournament is AccessControl, ReentrancyGuard, Pausable {
     //  STATE
     // ============================================================
     IERC20 public immutable usdc;
+    IERC20 public immutable chex;
     address public treasury;
     uint256 public platformFeeBps;     // basis points (500 = 5%)
     uint256 public constant MAX_FEE_BPS = 2000; // 20% cap
@@ -112,11 +114,12 @@ contract IRacingTournament is AccessControl, ReentrancyGuard, Pausable {
     // ============================================================
     //  CONSTRUCTOR
     // ============================================================
-    constructor(address _usdc, address _treasury, uint256 _platformFeeBps) {
-        if (_usdc == address(0) || _treasury == address(0)) revert InvalidAddress();
+    constructor(address _usdc, address _chex, address _treasury, uint256 _platformFeeBps) {
+        if (_usdc == address(0) || _chex == address(0) || _treasury == address(0)) revert InvalidAddress();
         if (_platformFeeBps > MAX_FEE_BPS) revert InvalidFee();
 
         usdc = IERC20(_usdc);
+        chex = IERC20(_chex);
         treasury = _treasury;
         platformFeeBps = _platformFeeBps;
 
@@ -132,12 +135,13 @@ contract IRacingTournament is AccessControl, ReentrancyGuard, Pausable {
     /**
      * @notice Create a new tournament
      * @param _name Tournament display name
-     * @param _entryFee USDC entry fee (6 decimals)
+     * @param _entryFee Entry fee in token units (USDC=6 decimals, CHEX=18 decimals)
      * @param _maxPlayers Maximum number of participants
      * @param _prizeSplits Array of basis points for prize distribution (must sum to 10000)
      * @param _subsessionId iRacing subsession ID to link results (0 if using league auto-discovery)
      * @param _leagueId iRacing league ID for auto-discovery (0 for manual subsession mode)
      * @param _seasonId iRacing league season ID (required if _leagueId > 0)
+     * @param _useChex If true, tournament uses CHEX token; if false, uses USDC
      */
     function createTournament(
         string calldata _name,
@@ -146,7 +150,8 @@ contract IRacingTournament is AccessControl, ReentrancyGuard, Pausable {
         uint256[] calldata _prizeSplits,
         uint256 _subsessionId,
         uint256 _leagueId,
-        uint256 _seasonId
+        uint256 _seasonId,
+        bool _useChex
     ) external onlyRole(ADMIN_ROLE) whenNotPaused returns (uint256) {
         // Validate name is non-empty (Milestone 5)
         if (bytes(_name).length == 0) revert InvalidName();
@@ -177,6 +182,7 @@ contract IRacingTournament is AccessControl, ReentrancyGuard, Pausable {
         t.status = TournamentStatus.Created;
         t.creator = msg.sender;
         t.createdAt = block.timestamp;
+        t.paymentToken = _useChex ? chex : usdc;
 
         emit TournamentCreated(tournamentId, _name, _entryFee, _maxPlayers);
         return tournamentId;
@@ -310,7 +316,7 @@ contract IRacingTournament is AccessControl, ReentrancyGuard, Pausable {
         t.status = TournamentStatus.Cancelled;
         delete emergencyWithdrawRequests[_tournamentId];
 
-        usdc.safeTransfer(treasury, amount);
+        t.paymentToken.safeTransfer(treasury, amount);
         emit EmergencyWithdrawExecuted(_tournamentId, amount);
     }
 
@@ -336,8 +342,8 @@ contract IRacingTournament is AccessControl, ReentrancyGuard, Pausable {
         // Validate iRacing customer ID is not zero
         if (_iRacingCustomerId == 0) revert InvalidIRacingId();
 
-        // Transfer USDC entry fee from player to contract
-        usdc.safeTransferFrom(msg.sender, address(this), t.entryFee);
+        // Transfer entry fee (USDC or CHEX) from player to contract
+        t.paymentToken.safeTransferFrom(msg.sender, address(this), t.entryFee);
 
         // Record registration
         registrations[_tournamentId][msg.sender] = PlayerRegistration({
@@ -369,7 +375,7 @@ contract IRacingTournament is AccessControl, ReentrancyGuard, Pausable {
         reg.refundClaimed = true;
         // Decrement prize pool so accounting stays accurate
         t.prizePool -= t.entryFee;
-        usdc.safeTransfer(msg.sender, t.entryFee);
+        t.paymentToken.safeTransfer(msg.sender, t.entryFee);
 
         emit RefundClaimed(_tournamentId, msg.sender, t.entryFee);
     }
@@ -412,8 +418,9 @@ contract IRacingTournament is AccessControl, ReentrancyGuard, Pausable {
         uint256 distributablePool = t.prizePool - feeAmount;
 
         // Transfer platform fee to treasury
+        IERC20 token = t.paymentToken;
         if (feeAmount > 0) {
-            usdc.safeTransfer(treasury, feeAmount);
+            token.safeTransfer(treasury, feeAmount);
         }
 
         // Distribute prizes according to splits
@@ -424,13 +431,13 @@ contract IRacingTournament is AccessControl, ReentrancyGuard, Pausable {
             uint256 prizeAmount = (distributablePool * t.prizeSplits[i]) / 10000;
             amounts[i] = prizeAmount;
             totalDistributed += prizeAmount;
-            usdc.safeTransfer(_winners[i], prizeAmount);
+            token.safeTransfer(_winners[i], prizeAmount);
         }
 
         // Send any dust (rounding remainder) to treasury
         uint256 dust = distributablePool - totalDistributed;
         if (dust > 0) {
-            usdc.safeTransfer(treasury, dust);
+            token.safeTransfer(treasury, dust);
         }
 
         emit ResultsSubmitted(_tournamentId, _resultHash);
@@ -454,18 +461,29 @@ contract IRacingTournament is AccessControl, ReentrancyGuard, Pausable {
             uint256 iRacingSubsessionId,
             TournamentStatus status,
             address creator,
-            uint256 createdAt,
-            uint256 iRacingLeagueId,
-            uint256 iRacingSeasonId
+            uint256 createdAt
         )
     {
         Tournament storage t = tournaments[_tournamentId];
         return (
             t.name, t.entryFee, t.maxPlayers, t.registeredCount,
             t.prizePool, t.prizeSplits, t.iRacingSubsessionId,
-            t.status, t.creator, t.createdAt,
-            t.iRacingLeagueId, t.iRacingSeasonId
+            t.status, t.creator, t.createdAt
         );
+    }
+
+    // Second view to avoid stack-too-deep: returns league info + payment token
+    function getTournamentExtra(uint256 _tournamentId)
+        external
+        view
+        returns (
+            uint256 iRacingLeagueId,
+            uint256 iRacingSeasonId,
+            address paymentToken
+        )
+    {
+        Tournament storage t = tournaments[_tournamentId];
+        return (t.iRacingLeagueId, t.iRacingSeasonId, address(t.paymentToken));
     }
 
     function getTournamentPlayers(uint256 _tournamentId) external view returns (address[] memory) {

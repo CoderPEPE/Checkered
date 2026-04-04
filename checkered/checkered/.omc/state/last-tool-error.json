@@ -1,0 +1,7 @@
+{
+  "tool_name": "Read",
+  "tool_input_preview": "{\"file_path\":\"/Users/nkt/dev/iman/checkered/checkered/test/IRacingTournament.test.js\"}",
+  "error": "File content (12083 tokens) exceeds maximum allowed tokens (10000). Use offset and limit parameters to read specific portions of the file, or search for specific content instead of reading the whole file.",
+  "timestamp": "2026-04-03T01:39:36.711Z",
+  "retry_count": 1
+}

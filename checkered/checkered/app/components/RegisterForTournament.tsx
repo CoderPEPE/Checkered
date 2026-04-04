@@ -13,7 +13,8 @@ import type { LifecycleStatus } from "@coinbase/onchainkit/transaction";
 import { baseSepolia } from "wagmi/chains";
 import { useAccount, useReadContract } from "wagmi";
 import { buildRegisterCalls } from "../calls";
-import { USDC_ADDRESS, ERC20_ABI } from "../contracts";
+import { USDC_ADDRESS, CHEX_ADDRESS, ERC20_ABI } from "../contracts";
+import type { Hex } from "viem";
 
 import Box from "@mui/material/Box";
 import TextField from "@mui/material/TextField";
@@ -26,19 +27,23 @@ import Chip from "@mui/material/Chip";
 interface Props {
   tournamentId: number;
   entryFee: string;
+  tokenSymbol: "USDC" | "CHEX";
+  tokenDecimals: number;
+  paymentToken: string;
   onRegistered: () => void;
 }
 
-export default function RegisterForTournament({ tournamentId, entryFee, onRegistered }: Props) {
+export default function RegisterForTournament({ tournamentId, entryFee, tokenSymbol, tokenDecimals, paymentToken, onRegistered }: Props) {
   const [iRacingId, setIRacingId] = useState("");
   const [toastOpen, setToastOpen] = useState(false);
   const [toastMsg, setToastMsg] = useState("");
 
   const { address } = useAccount();
 
-  // Read the user's USDC balance
-  const { data: usdcBalance } = useReadContract({
-    address: USDC_ADDRESS,
+  // Read the user's token balance (USDC or CHEX depending on tournament)
+  const tokenAddress = paymentToken as Hex;
+  const { data: tokenBalance } = useReadContract({
+    address: tokenAddress,
     abi: ERC20_ABI,
     functionName: "balanceOf",
     args: address ? [address] : undefined,
@@ -50,11 +55,12 @@ export default function RegisterForTournament({ tournamentId, entryFee, onRegist
   const isValid = iRacingId.length > 0 && Number.isInteger(iRacingIdNum) && iRacingIdNum > 0;
 
   // Check if balance is sufficient
-  const balanceNum = usdcBalance !== undefined ? Number(usdcBalance) : null;
+  const balanceNum = tokenBalance !== undefined ? Number(tokenBalance) : null;
   const entryFeeNum = Number(entryFee);
   const hasEnoughBalance = balanceNum !== null && balanceNum >= entryFeeNum;
-  const balanceFormatted = balanceNum !== null ? (balanceNum / 1_000_000).toFixed(2) : "...";
-  const entryFeeFormatted = (entryFeeNum / 1_000_000).toFixed(2);
+  const divisor = 10 ** tokenDecimals;
+  const balanceFormatted = balanceNum !== null ? (balanceNum / divisor).toFixed(2) : "...";
+  const entryFeeFormatted = (entryFeeNum / divisor).toFixed(2);
 
   function handleStatus(status: LifecycleStatus) {
     if (status.statusName === "success") {
@@ -63,7 +69,7 @@ export default function RegisterForTournament({ tournamentId, entryFee, onRegist
     }
     if (status.statusName === "error") {
       // Show toast for any transaction error
-      setToastMsg("Transaction failed. Check your USDC balance and try again.");
+      setToastMsg(`Transaction failed. Check your ${tokenSymbol} balance and try again.`);
       setToastOpen(true);
     }
   }
@@ -72,7 +78,7 @@ export default function RegisterForTournament({ tournamentId, entryFee, onRegist
   function handleRegisterClick() {
     if (!hasEnoughBalance) {
       setToastMsg(
-        `Insufficient USDC balance. You have $${balanceFormatted} but need $${entryFeeFormatted} to register.`
+        `Insufficient ${tokenSymbol} balance. You have ${balanceFormatted} but need ${entryFeeFormatted} to register.`
       );
       setToastOpen(true);
     }
@@ -85,10 +91,10 @@ export default function RegisterForTournament({ tournamentId, entryFee, onRegist
         Register for Tournament
       </Typography>
 
-      {/* USDC Balance display */}
+      {/* Token Balance display */}
       <Box sx={{ display: "flex", alignItems: "center", gap: 1, mb: 2 }}>
         <Typography variant="caption" sx={{ color: "text.secondary" }}>
-          Your USDC Balance:
+          Your {tokenSymbol} Balance:
         </Typography>
         <Chip
           label={`$${balanceFormatted}`}
@@ -108,7 +114,7 @@ export default function RegisterForTournament({ tournamentId, entryFee, onRegist
       {!hasEnoughBalance && balanceNum !== null && (
         <Alert severity="warning" variant="outlined" sx={{ mb: 2, bgcolor: "rgba(245,158,11,0.04)" }}>
           <Typography variant="caption">
-            You need ${entryFeeFormatted} USDC to register. Your balance is ${balanceFormatted} USDC.
+            You need {entryFeeFormatted} {tokenSymbol} to register. Your balance is {balanceFormatted} {tokenSymbol}.
           </Typography>
         </Alert>
       )}
@@ -153,12 +159,12 @@ export default function RegisterForTournament({ tournamentId, entryFee, onRegist
         >
           <Transaction
             chainId={baseSepolia.id}
-            calls={buildRegisterCalls(tournamentId, iRacingIdNum, entryFeeBigInt)}
+            calls={buildRegisterCalls(tournamentId, iRacingIdNum, entryFeeBigInt, tokenAddress)}
             isSponsored
             onStatus={handleStatus}
           >
             <TransactionButton
-              text={`Register — $${entryFeeFormatted} USDC`}
+              text={`Register — ${entryFeeFormatted} ${tokenSymbol}`}
             />
             <TransactionSponsor />
             <TransactionStatus>
@@ -185,7 +191,7 @@ export default function RegisterForTournament({ tournamentId, entryFee, onRegist
             userSelect: "none",
           }}
         >
-          Insufficient USDC — ${ balanceFormatted} / ${entryFeeFormatted} needed
+          Insufficient {tokenSymbol} — {balanceFormatted} / {entryFeeFormatted} needed
         </Box>
       )}
 

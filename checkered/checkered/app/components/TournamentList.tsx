@@ -12,8 +12,8 @@ import Typography from "@mui/material/Typography";
 import FlagIcon from "@mui/icons-material/Flag";
 import type { Tournament } from "../types";
 
-function formatUSDC(amount: string) {
-  const val = Number(amount) / 1_000_000;
+function formatTokenAmount(amount: string, decimals: number) {
+  const val = Number(amount) / (10 ** decimals);
   return val < 1 ? val.toFixed(2) : val % 1 === 0 ? val.toFixed(0) : val.toFixed(2);
 }
 
@@ -110,6 +110,8 @@ export default function TournamentList({ tournaments, loading, onSelect }: Props
         {tournaments.map((t) => {
           const cfg = STATUS_CONFIG[t.statusName] || { color: "default" as const, label: t.statusName };
           const fillPct = t.maxPlayers > 0 ? (t.registeredCount / t.maxPlayers) * 100 : 0;
+          const sym = t.tokenSymbol || "USDC";
+          const dec = t.tokenDecimals || 6;
 
           return (
             <Grid key={t.id} size={{ xs: 12, md: 6, lg: 4 }}>
@@ -156,10 +158,10 @@ export default function TournamentList({ tournaments, loading, onSelect }: Props
                           variant="h4"
                           sx={{ fontWeight: 700, color: "white", fontVariantNumeric: "tabular-nums", lineHeight: 1, letterSpacing: "-0.02em" }}
                         >
-                          ${formatUSDC(t.entryFee)}
+                          {sym === "USDC" ? "$" : ""}{formatTokenAmount(t.entryFee, dec)}
                         </Typography>
                         <Typography variant="caption" sx={{ color: "#52525b", fontWeight: 600, textTransform: "uppercase", fontSize: "0.65rem" }}>
-                          USDC
+                          {sym}
                         </Typography>
                       </Box>
                     </Box>
@@ -193,7 +195,7 @@ export default function TournamentList({ tournaments, loading, onSelect }: Props
                       <Typography variant="caption">
                         <Box component="span" sx={{ color: "#52525b" }}>Pool </Box>
                         <Box component="span" sx={{ color: "text.secondary", fontWeight: 600, fontVariantNumeric: "tabular-nums" }}>
-                          ${formatUSDC(t.prizePool)}
+                          {sym === "USDC" ? "$" : ""}{formatTokenAmount(t.prizePool, dec)} {sym !== "USDC" ? sym : ""}
                         </Box>
                       </Typography>
                     </Box>

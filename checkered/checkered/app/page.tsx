@@ -61,7 +61,11 @@ export default function Home() {
     fetchData();
   }
 
-  const totalPool = tournaments.reduce((sum, t) => sum + Number(t.prizePool), 0);
+  // Normalize prize pools to human-readable amounts using each tournament's decimal count
+  const totalPool = tournaments.reduce((sum, t) => {
+    const decimals = t.tokenDecimals || 6;
+    return sum + Number(t.prizePool) / (10 ** decimals);
+  }, 0);
   const totalPlayers = tournaments.reduce((sum, t) => sum + t.registeredCount, 0);
   const activeTournaments = tournaments.filter(t => t.statusName === "Created" || t.statusName === "Racing").length;
 
@@ -79,7 +83,7 @@ export default function Home() {
             {[
               { value: activeTournaments.toString(), label: "Active" },
               { value: totalPlayers.toString(), label: "Players" },
-              { value: `$${(totalPool / 1_000_000).toFixed(0)}`, label: "Total Pool" },
+              { value: `$${totalPool.toFixed(0)}`, label: "Total Pool" },
             ].map((s) => (
               <Box key={s.label} sx={{ textAlign: "center" }}>
                 <Typography

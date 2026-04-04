@@ -38,6 +38,7 @@ export default function CreateTournament({ open, onClose, onCreated }: Props) {
   const [subsessionId, setSubsessionId] = useState("");
   const [leagueId, setLeagueId] = useState("");
   const [seasonId, setSeasonId] = useState("");
+  const [useChex, setUseChex] = useState(false);
 
   const { writeContract, data: txHash, isPending, error, reset } = useWriteContract();
   const { isLoading: isConfirming, isSuccess: isConfirmed } = useWaitForTransactionReceipt({ hash: txHash });
@@ -53,7 +54,9 @@ export default function CreateTournament({ open, onClose, onCreated }: Props) {
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     reset();
-    const feeInUnits = parseUnits(entryFee, 6);
+    // USDC = 6 decimals, CHEX = 18 decimals
+    const decimals = useChex ? 18 : 6;
+    const feeInUnits = parseUnits(entryFee, decimals);
     const splits = SPLIT_PRESETS[splitIndex].splits;
     writeContract({
       address: TOURNAMENT_ADDRESS,
@@ -67,6 +70,7 @@ export default function CreateTournament({ open, onClose, onCreated }: Props) {
         BigInt(subsessionId || "0"),
         BigInt(leagueId || "0"),
         BigInt(seasonId || "0"),
+        useChex,
       ],
     });
   }
@@ -99,7 +103,7 @@ export default function CreateTournament({ open, onClose, onCreated }: Props) {
               slotProps={{
                 htmlInput: { min: 0, step: "0.01" },
                 input: {
-                  startAdornment: <InputAdornment position="start">$</InputAdornment>,
+                  startAdornment: <InputAdornment position="start">{useChex ? "CHEX" : "$"}</InputAdornment>,
                 },
               }}
               placeholder="10"
@@ -165,6 +169,64 @@ export default function CreateTournament({ open, onClose, onCreated }: Props) {
             />
           </Grid>
         </Grid>
+
+        {/* Payment Token toggle */}
+        <Box>
+          <Typography variant="overline" sx={{ color: "text.secondary", letterSpacing: "0.1em", display: "block", mb: 1, fontWeight: 500 }}>
+            Payment Token
+          </Typography>
+          <Grid container spacing={1}>
+            {[
+              { label: "USDC", desc: "USD Coin (6 decimals)", isChex: false },
+              { label: "CHEX", desc: "Checkered Credits (18 decimals)", isChex: true },
+            ].map((opt) => (
+              <Grid key={opt.label} size={6}>
+                <Button
+                  onClick={() => setUseChex(opt.isChex)}
+                  variant={useChex === opt.isChex ? "outlined" : "text"}
+                  fullWidth
+                  sx={{
+                    justifyContent: "flex-start",
+                    px: 2,
+                    py: 1.2,
+                    borderRadius: "12px",
+                    textAlign: "left",
+                    border: useChex === opt.isChex
+                      ? "1px solid rgba(99,102,241,0.3)"
+                      : "1px solid rgba(63,63,70,0.3)",
+                    bgcolor: useChex === opt.isChex
+                      ? "rgba(99,102,241,0.08)"
+                      : "rgba(24,24,27,0.4)",
+                    color: useChex === opt.isChex ? "primary.light" : "text.secondary",
+                    "&:hover": {
+                      bgcolor: useChex === opt.isChex
+                        ? "rgba(99,102,241,0.12)"
+                        : "rgba(63,63,70,0.2)",
+                      borderColor: useChex === opt.isChex
+                        ? "rgba(99,102,241,0.4)"
+                        : "rgba(63,63,70,0.5)",
+                    },
+                    flexDirection: "column",
+                    alignItems: "flex-start",
+                  }}
+                >
+                  <Typography variant="caption" sx={{ fontWeight: 500, lineHeight: 1.2, fontSize: "0.75rem" }}>
+                    {opt.label}
+                  </Typography>
+                  <Typography
+                    variant="caption"
+                    sx={{
+                      fontSize: "0.6rem",
+                      color: useChex === opt.isChex ? "rgba(129,140,248,0.6)" : "#3f3f46",
+                    }}
+                  >
+                    {opt.desc}
+                  </Typography>
+                </Button>
+              </Grid>
+            ))}
+          </Grid>
+        </Box>
 
         {/* Prize Split presets */}
         <Box>

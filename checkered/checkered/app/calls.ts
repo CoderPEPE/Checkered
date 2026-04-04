@@ -2,13 +2,14 @@ import { encodeFunctionData, type Hex } from "viem";
 import {
   TOURNAMENT_ADDRESS,
   USDC_ADDRESS,
+  CHEX_ADDRESS,
   TOURNAMENT_ABI,
   ERC20_ABI,
 } from "./contracts";
 
 /**
  * Builds the two calls needed to register for a tournament:
- *   1. USDC.approve(tournamentContract, entryFee)
+ *   1. Token.approve(tournamentContract, entryFee) — USDC or CHEX
  *   2. Tournament.register(tournamentId, iRacingCustomerId)
  *
  * The OnchainKit Transaction component will batch these via EIP-5792
@@ -22,18 +23,19 @@ export function buildRegisterCalls(
   tournamentId: number,
   iRacingCustomerId: number,
   entryFee: bigint,
+  tokenAddress: Hex,
 ): Call[] {
   return [
-    // Step 1: Approve the tournament contract to spend the entry fee in USDC
+    // Step 1: Approve the tournament contract to spend the entry fee (USDC or CHEX)
     {
-      to: USDC_ADDRESS,
+      to: tokenAddress,
       data: encodeFunctionData({
         abi: ERC20_ABI,
         functionName: "approve",
         args: [TOURNAMENT_ADDRESS, entryFee],
       }),
     },
-    // Step 2: Register for the tournament (contract pulls the USDC)
+    // Step 2: Register for the tournament (contract pulls the token)
     {
       to: TOURNAMENT_ADDRESS,
       data: encodeFunctionData({
