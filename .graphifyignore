@@ -1,0 +1,56 @@
+# Dependencies
+node_modules/
+vendor/
+.venv/
+venv/
+env/
+__pycache__/
+.mypy_cache/
+.pytest_cache/
+.ruff_cache/
+
+# Build output
+dist/
+build/
+target/
+out/
+.next/
+.nuxt/
+.output/
+coverage/
+*.egg-info/
+
+# Version control & CI
+.git/
+.github/
+.gitlab/
+
+# Graphify output (avoid self-reference)
+graphify-out/
+
+# Lock files (no semantic value)
+*.lock
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+Gemfile.lock
+Pipfile.lock
+poetry.lock
+composer.lock
+
+# Environment & secrets
+.env
+.env.*
+*.pem
+*.key
+
+# Logs & temp
+*.log
+*.tmp
+*.swp
+.DS_Store
+Thumbs.db
+
+# Graphify tooling (not part of the project)
+graphify-setup.py
+CLAUDE.md

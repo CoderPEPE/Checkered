@@ -1,0 +1,1954 @@
+{
+  "directed": false,
+  "multigraph": false,
+  "graph": {},
+  "nodes": [
+    {
+      "label": "hardhat.config.js",
+      "file_type": "code",
+      "source_file": "/Users/nkt/dev/iman/checkered/checkered/hardhat.config.js",
+      "source_location": "L1",
+      "id": "users_nkt_dev_iman_checkered_checkered_hardhat_config_js",
+      "community": 26
+    },
+    {
+      "label": "IRacingTournament.test.js",
+      "file_type": "code",
+      "source_file": "/Users/nkt/dev/iman/checkered/checkered/test/IRacingTournament.test.js",
+      "source_location": "L1",
+      "id": "users_nkt_dev_iman_checkered_checkered_test_iracingtournament_test_js",
+      "community": 2
+    },
+    {
+      "label": "deployFixture()",
+      "file_type": "code",
+      "source_file": "/Users/nkt/dev/iman/checkered/checkered/test/IRacingTournament.test.js",
+      "source_location": "L10",
+      "id": "iracingtournament_test_deployfixture",
+      "community": 2
+    },
+    {
+      "label": "createTournamentFixture()",
+      "file_type": "code",
+      "source_file": "/Users/nkt/dev/iman/checkered/checkered/test/IRacingTournament.test.js",
+      "source_location": "L244",
+      "id": "iracingtournament_test_createtournamentfixture",
+      "community": 2
+    },
+    {
+      "label": "fullTournamentFixture()",
+      "file_type": "code",
+      "source_file": "/Users/nkt/dev/iman/checkered/checkered/test/IRacingTournament.test.js",
+      "source_location": "L349",
+      "id": "iracingtournament_test_fulltournamentfixture",
+      "community": 2
+    },
+    {
+      "label": "stuckTournamentFixture()",
+      "file_type": "code",
+      "source_file": "/Users/nkt/dev/iman/checkered/checkered/test/IRacingTournament.test.js",
+      "source_location": "L590",
+      "id": "iracingtournament_test_stucktournamentfixture",
+      "community": 2
+    },
+    {
+      "label": "api.test.js",
+      "file_type": "code",
+      "source_file": "/Users/nkt/dev/iman/checkered/checkered/backend/test/api.test.js",
+      "source_location": "L1",
+      "id": "users_nkt_dev_iman_checkered_checkered_backend_test_api_test_js",
+      "community": 4
+    },
+    {
+      "label": "mockTournamentData()",
+      "file_type": "code",
+      "source_file": "/Users/nkt/dev/iman/checkered/checkered/backend/test/api.test.js",
+      "source_location": "L17",
+      "id": "api_test_mocktournamentdata",
+      "community": 4
+    },
+    {
+      "label": "mockContract()",
+      "file_type": "code",
+      "source_file": "/Users/nkt/dev/iman/checkered/checkered/backend/test/api.test.js",
+      "source_location": "L34",
+      "id": "api_test_mockcontract",
+      "community": 4
+    },
+    {
+      "label": "buildApp()",
+      "file_type": "code",
+      "source_file": "/Users/nkt/dev/iman/checkered/checkered/backend/test/api.test.js",
+      "source_location": "L57",
+      "id": "api_test_buildapp",
+      "community": 4
+    },
+    {
+      "label": "iracing-integration.js",
+      "file_type": "code",
+      "source_file": "/Users/nkt/dev/iman/checkered/checkered/backend/test/iracing-integration.js",
+      "source_location": "L1",
+      "id": "users_nkt_dev_iman_checkered_checkered_backend_test_iracing_integration_js",
+      "community": 0
+    },
+    {
+      "label": "ok()",
+      "file_type": "code",
+      "source_file": "/Users/nkt/dev/iman/checkered/checkered/backend/test/iracing-integration.js",
+      "source_location": "L25",
+      "id": "iracing_integration_ok",
+      "community": 0
+    },
+    {
+      "label": "fail()",
+      "file_type": "code",
+      "source_file": "/Users/nkt/dev/iman/checkered/checkered/backend/test/iracing-integration.js",
+      "source_location": "L30",
+      "id": "iracing_integration_fail",
+      "community": 0
+    },
+    {
+      "label": "skip()",
+      "file_type": "code",
+      "source_file": "/Users/nkt/dev/iman/checkered/checkered/backend/test/iracing-integration.js",
+      "source_location": "L35",
+      "id": "iracing_integration_skip",
+      "community": 0
+    },
+    {
+      "label": "testIRacingOAuth()",
+      "file_type": "code",
+      "source_file": "/Users/nkt/dev/iman/checkered/checkered/backend/test/iracing-integration.js",
+      "source_location": "L45",
+      "id": "iracing_integration_testiracingoauth",
+      "community": 0
+    },
+    {
+      "label": "testMemberInfo()",
+      "file_type": "code",
+      "source_file": "/Users/nkt/dev/iman/checkered/checkered/backend/test/iracing-integration.js",
+      "source_location": "L85",
+      "id": "iracing_integration_testmemberinfo",
+      "community": 0
+    },
+    {
+      "label": "testRecentRaces()",
+      "file_type": "code",
+      "source_file": "/Users/nkt/dev/iman/checkered/checkered/backend/test/iracing-integration.js",
+      "source_location": "L122",
+      "id": "iracing_integration_testrecentraces",
+      "community": 0
+    },
+    {
+      "label": "testSubsessionResults()",
+      "file_type": "code",
+      "source_file": "/Users/nkt/dev/iman/checkered/checkered/backend/test/iracing-integration.js",
+      "source_location": "L157",
+      "id": "iracing_integration_testsubsessionresults",
+      "community": 0
+    },
+    {
+      "label": "testBackendHealth()",
+      "file_type": "code",
+      "source_file": "/Users/nkt/dev/iman/checkered/checkered/backend/test/iracing-integration.js",
+      "source_location": "L198",
+      "id": "iracing_integration_testbackendhealth",
+      "community": 0
+    },
+    {
+      "label": "testBackendTournaments()",
+      "file_type": "code",
+      "source_file": "/Users/nkt/dev/iman/checkered/checkered/backend/test/iracing-integration.js",
+      "source_location": "L220",
+      "id": "iracing_integration_testbackendtournaments",
+      "community": 0
+    },
+    {
+      "label": "testOracleStatus()",
+      "file_type": "code",
+      "source_file": "/Users/nkt/dev/iman/checkered/checkered/backend/test/iracing-integration.js",
+      "source_location": "L272",
+      "id": "iracing_integration_testoraclestatus",
+      "community": 0
+    },
+    {
+      "label": "testManualPoll()",
+      "file_type": "code",
+      "source_file": "/Users/nkt/dev/iman/checkered/checkered/backend/test/iracing-integration.js",
+      "source_location": "L313",
+      "id": "iracing_integration_testmanualpoll",
+      "community": 0
+    },
+    {
+      "label": "testContractConnection()",
+      "file_type": "code",
+      "source_file": "/Users/nkt/dev/iman/checkered/checkered/backend/test/iracing-integration.js",
+      "source_location": "L343",
+      "id": "iracing_integration_testcontractconnection",
+      "community": 0
+    },
+    {
+      "label": "main()",
+      "file_type": "code",
+      "source_file": "/Users/nkt/dev/iman/checkered/checkered/backend/test/iracing-integration.js",
+      "source_location": "L396",
+      "id": "iracing_integration_main",
+      "community": 0
+    },
+    {
+      "label": "iracing-api.js",
+      "file_type": "code",
+      "source_file": "/Users/nkt/dev/iman/checkered/checkered/backend/src/iracing-api.js",
+      "source_location": "L1",
+      "id": "users_nkt_dev_iman_checkered_checkered_backend_src_iracing_api_js",
+      "community": 1
+    },
+    {
+      "label": "iRacingAuth()",
+      "file_type": "code",
+      "source_file": "/Users/nkt/dev/iman/checkered/checkered/backend/src/iracing-api.js",
+      "source_location": "L30",
+      "id": "iracing_api_iracingauth",
+      "community": 1
+    },
+    {
+      "label": "refreshAccessToken()",
+      "file_type": "code",
+      "source_file": "/Users/nkt/dev/iman/checkered/checkered/backend/src/iracing-api.js",
+      "source_location": "L118",
+      "id": "iracing_api_refreshaccesstoken",
+      "community": 1
+    },
+    {
+      "label": "iRacingFetch()",
+      "file_type": "code",
+      "source_file": "/Users/nkt/dev/iman/checkered/checkered/backend/src/iracing-api.js",
+      "source_location": "L160",
+      "id": "iracing_api_iracingfetch",
+      "community": 1
+    },
+    {
+      "label": "fetchSubsessionResults()",
+      "file_type": "code",
+      "source_file": "/Users/nkt/dev/iman/checkered/checkered/backend/src/iracing-api.js",
+      "source_location": "L203",
+      "id": "iracing_api_fetchsubsessionresults",
+      "community": 1
+    },
+    {
+      "label": "fetchMemberInfo()",
+      "file_type": "code",
+      "source_file": "/Users/nkt/dev/iman/checkered/checkered/backend/src/iracing-api.js",
+      "source_location": "L242",
+      "id": "iracing_api_fetchmemberinfo",
+      "community": 1
+    },
+    {
+      "label": "fetchRecentRaces()",
+      "file_type": "code",
+      "source_file": "/Users/nkt/dev/iman/checkered/checkered/backend/src/iracing-api.js",
+      "source_location": "L253",
+      "id": "iracing_api_fetchrecentraces",
+      "community": 1
+    },
+    {
+      "label": "fetchLeagueSeasonSessions()",
+      "file_type": "code",
+      "source_file": "/Users/nkt/dev/iman/checkered/checkered/backend/src/iracing-api.js",
+      "source_location": "L267",
+      "id": "iracing_api_fetchleagueseasonsessions",
+      "community": 1
+    },
+    {
+      "label": "index.js",
+      "file_type": "code",
+      "source_file": "/Users/nkt/dev/iman/checkered/checkered/backend/src/index.js",
+      "source_location": "L1",
+      "id": "users_nkt_dev_iman_checkered_checkered_backend_src_index_js",
+      "community": 5
+    },
+    {
+      "label": "pollTournaments()",
+      "file_type": "code",
+      "source_file": "/Users/nkt/dev/iman/checkered/checkered/backend/src/index.js",
+      "source_location": "L88",
+      "id": "index_polltournaments",
+      "community": 5
+    },
+    {
+      "label": "submitResults()",
+      "file_type": "code",
+      "source_file": "/Users/nkt/dev/iman/checkered/checkered/backend/src/index.js",
+      "source_location": "L175",
+      "id": "index_submitresults",
+      "community": 5
+    },
+    {
+      "label": "generateMockResults()",
+      "file_type": "code",
+      "source_file": "/Users/nkt/dev/iman/checkered/checkered/backend/src/index.js",
+      "source_location": "L246",
+      "id": "index_generatemockresults",
+      "community": 5
+    },
+    {
+      "label": "app.js",
+      "file_type": "code",
+      "source_file": "/Users/nkt/dev/iman/checkered/checkered/backend/src/app.js",
+      "source_location": "L1",
+      "id": "users_nkt_dev_iman_checkered_checkered_backend_src_app_js",
+      "community": 9
+    },
+    {
+      "label": "createApp()",
+      "file_type": "code",
+      "source_file": "/Users/nkt/dev/iman/checkered/checkered/backend/src/app.js",
+      "source_location": "L24",
+      "id": "app_createapp",
+      "community": 9
+    },
+    {
+      "label": "mint-usdc.js",
+      "file_type": "code",
+      "source_file": "/Users/nkt/dev/iman/checkered/checkered/scripts/mint-usdc.js",
+      "source_location": "L1",
+      "id": "users_nkt_dev_iman_checkered_checkered_scripts_mint_usdc_js",
+      "community": 10
+    },
+    {
+      "label": "main()",
+      "file_type": "code",
+      "source_file": "/Users/nkt/dev/iman/checkered/checkered/scripts/mint-usdc.js",
+      "source_location": "L14",
+      "id": "mint_usdc_main",
+      "community": 10
+    },
+    {
+      "label": "e2e-test.js",
+      "file_type": "code",
+      "source_file": "/Users/nkt/dev/iman/checkered/checkered/scripts/e2e-test.js",
+      "source_location": "L1",
+      "id": "users_nkt_dev_iman_checkered_checkered_scripts_e2e_test_js",
+      "community": 11
+    },
+    {
+      "label": "main()",
+      "file_type": "code",
+      "source_file": "/Users/nkt/dev/iman/checkered/checkered/scripts/e2e-test.js",
+      "source_location": "L10",
+      "id": "e2e_test_main",
+      "community": 11
+    },
+    {
+      "label": "create-and-resolve.js",
+      "file_type": "code",
+      "source_file": "/Users/nkt/dev/iman/checkered/checkered/scripts/create-and-resolve.js",
+      "source_location": "L1",
+      "id": "users_nkt_dev_iman_checkered_checkered_scripts_create_and_resolve_js",
+      "community": 12
+    },
+    {
+      "label": "main()",
+      "file_type": "code",
+      "source_file": "/Users/nkt/dev/iman/checkered/checkered/scripts/create-and-resolve.js",
+      "source_location": "L15",
+      "id": "create_and_resolve_main",
+      "community": 12
+    },
+    {
+      "label": "transfer-chex.js",
+      "file_type": "code",
+      "source_file": "/Users/nkt/dev/iman/checkered/checkered/scripts/transfer-chex.js",
+      "source_location": "L1",
+      "id": "users_nkt_dev_iman_checkered_checkered_scripts_transfer_chex_js",
+      "community": 13
+    },
+    {
+      "label": "main()",
+      "file_type": "code",
+      "source_file": "/Users/nkt/dev/iman/checkered/checkered/scripts/transfer-chex.js",
+      "source_location": "L3",
+      "id": "transfer_chex_main",
+      "community": 13
+    },
+    {
+      "label": "deploy.js",
+      "file_type": "code",
+      "source_file": "/Users/nkt/dev/iman/checkered/checkered/scripts/deploy.js",
+      "source_location": "L1",
+      "id": "users_nkt_dev_iman_checkered_checkered_scripts_deploy_js",
+      "community": 14
+    },
+    {
+      "label": "main()",
+      "file_type": "code",
+      "source_file": "/Users/nkt/dev/iman/checkered/checkered/scripts/deploy.js",
+      "source_location": "L3",
+      "id": "deploy_main",
+      "community": 14
+    },
+    {
+      "label": "create-test-tournament.js",
+      "file_type": "code",
+      "source_file": "/Users/nkt/dev/iman/checkered/checkered/scripts/create-test-tournament.js",
+      "source_location": "L1",
+      "id": "users_nkt_dev_iman_checkered_checkered_scripts_create_test_tournament_js",
+      "community": 15
+    },
+    {
+      "label": "main()",
+      "file_type": "code",
+      "source_file": "/Users/nkt/dev/iman/checkered/checkered/scripts/create-test-tournament.js",
+      "source_location": "L4",
+      "id": "create_test_tournament_main",
+      "community": 15
+    },
+    {
+      "label": "advance-tournament.js",
+      "file_type": "code",
+      "source_file": "/Users/nkt/dev/iman/checkered/checkered/scripts/advance-tournament.js",
+      "source_location": "L1",
+      "id": "users_nkt_dev_iman_checkered_checkered_scripts_advance_tournament_js",
+      "community": 16
+    },
+    {
+      "label": "main()",
+      "file_type": "code",
+      "source_file": "/Users/nkt/dev/iman/checkered/checkered/scripts/advance-tournament.js",
+      "source_location": "L20",
+      "id": "advance_tournament_main",
+      "community": 16
+    },
+    {
+      "label": "create-batch-tournaments.js",
+      "file_type": "code",
+      "source_file": "/Users/nkt/dev/iman/checkered/checkered/scripts/create-batch-tournaments.js",
+      "source_location": "L1",
+      "id": "users_nkt_dev_iman_checkered_checkered_scripts_create_batch_tournaments_js",
+      "community": 17
+    },
+    {
+      "label": "main()",
+      "file_type": "code",
+      "source_file": "/Users/nkt/dev/iman/checkered/checkered/scripts/create-batch-tournaments.js",
+      "source_location": "L19",
+      "id": "create_batch_tournaments_main",
+      "community": 17
+    },
+    {
+      "label": "next-env.d.ts",
+      "file_type": "code",
+      "source_file": "/Users/nkt/dev/iman/checkered/checkered/checkered/next-env.d.ts",
+      "source_location": "L1",
+      "id": "users_nkt_dev_iman_checkered_checkered_checkered_next_env_d_ts",
+      "community": 27
+    },
+    {
+      "label": "next.config.ts",
+      "file_type": "code",
+      "source_file": "/Users/nkt/dev/iman/checkered/checkered/checkered/next.config.ts",
+      "source_location": "L1",
+      "id": "users_nkt_dev_iman_checkered_checkered_checkered_next_config_ts",
+      "community": 28
+    },
+    {
+      "label": "rootProvider.tsx",
+      "file_type": "code",
+      "source_file": "/Users/nkt/dev/iman/checkered/checkered/checkered/app/rootProvider.tsx",
+      "source_location": "L1",
+      "id": "users_nkt_dev_iman_checkered_checkered_checkered_app_rootprovider_tsx",
+      "community": 18
+    },
+    {
+      "label": "RootProvider()",
+      "file_type": "code",
+      "source_file": "/Users/nkt/dev/iman/checkered/checkered/checkered/app/rootProvider.tsx",
+      "source_location": "L10",
+      "id": "rootprovider_rootprovider",
+      "community": 18
+    },
+    {
+      "label": "calls.ts",
+      "file_type": "code",
+      "source_file": "/Users/nkt/dev/iman/checkered/checkered/checkered/app/calls.ts",
+      "source_location": "L1",
+      "id": "users_nkt_dev_iman_checkered_checkered_checkered_app_calls_ts",
+      "community": 19
+    },
+    {
+      "label": "buildRegisterCalls()",
+      "file_type": "code",
+      "source_file": "/Users/nkt/dev/iman/checkered/checkered/checkered/app/calls.ts",
+      "source_location": "L22",
+      "id": "calls_buildregistercalls",
+      "community": 19
+    },
+    {
+      "label": "contracts.ts",
+      "file_type": "code",
+      "source_file": "/Users/nkt/dev/iman/checkered/checkered/checkered/app/contracts.ts",
+      "source_location": "L1",
+      "id": "users_nkt_dev_iman_checkered_checkered_checkered_app_contracts_ts",
+      "community": 29
+    },
+    {
+      "label": "types.ts",
+      "file_type": "code",
+      "source_file": "/Users/nkt/dev/iman/checkered/checkered/checkered/app/types.ts",
+      "source_location": "L1",
+      "id": "users_nkt_dev_iman_checkered_checkered_checkered_app_types_ts",
+      "community": 30
+    },
+    {
+      "label": "layout.tsx",
+      "file_type": "code",
+      "source_file": "/Users/nkt/dev/iman/checkered/checkered/checkered/app/layout.tsx",
+      "source_location": "L1",
+      "id": "users_nkt_dev_iman_checkered_checkered_checkered_app_layout_tsx",
+      "community": 20
+    },
+    {
+      "label": "RootLayout()",
+      "file_type": "code",
+      "source_file": "/Users/nkt/dev/iman/checkered/checkered/checkered/app/layout.tsx",
+      "source_location": "L22",
+      "id": "layout_rootlayout",
+      "community": 20
+    },
+    {
+      "label": "theme.ts",
+      "file_type": "code",
+      "source_file": "/Users/nkt/dev/iman/checkered/checkered/checkered/app/theme.ts",
+      "source_location": "L1",
+      "id": "users_nkt_dev_iman_checkered_checkered_checkered_app_theme_ts",
+      "community": 31
+    },
+    {
+      "label": "page.tsx",
+      "file_type": "code",
+      "source_file": "/Users/nkt/dev/iman/checkered/checkered/checkered/app/page.tsx",
+      "source_location": "L1",
+      "id": "users_nkt_dev_iman_checkered_checkered_checkered_app_page_tsx",
+      "community": 6
+    },
+    {
+      "label": "selectTournament()",
+      "file_type": "code",
+      "source_file": "/Users/nkt/dev/iman/checkered/checkered/checkered/app/page.tsx",
+      "source_location": "L49",
+      "id": "page_selecttournament",
+      "community": 6
+    },
+    {
+      "label": "refreshSelectedTournament()",
+      "file_type": "code",
+      "source_file": "/Users/nkt/dev/iman/checkered/checkered/checkered/app/page.tsx",
+      "source_location": "L59",
+      "id": "page_refreshselectedtournament",
+      "community": 6
+    },
+    {
+      "label": "sanitizeError.ts",
+      "file_type": "code",
+      "source_file": "/Users/nkt/dev/iman/checkered/checkered/checkered/app/utils/sanitizeError.ts",
+      "source_location": "L1",
+      "id": "users_nkt_dev_iman_checkered_checkered_checkered_app_utils_sanitizeerror_ts",
+      "community": 21
+    },
+    {
+      "label": "sanitizeError()",
+      "file_type": "code",
+      "source_file": "/Users/nkt/dev/iman/checkered/checkered/checkered/app/utils/sanitizeError.ts",
+      "source_location": "L35",
+      "id": "sanitizeerror_sanitizeerror",
+      "community": 21
+    },
+    {
+      "label": "OracleStatus.tsx",
+      "file_type": "code",
+      "source_file": "/Users/nkt/dev/iman/checkered/checkered/checkered/app/components/OracleStatus.tsx",
+      "source_location": "L1",
+      "id": "users_nkt_dev_iman_checkered_checkered_checkered_app_components_oraclestatus_tsx",
+      "community": 32
+    },
+    {
+      "label": "CreateTournament.tsx",
+      "file_type": "code",
+      "source_file": "/Users/nkt/dev/iman/checkered/checkered/checkered/app/components/CreateTournament.tsx",
+      "source_location": "L1",
+      "id": "users_nkt_dev_iman_checkered_checkered_checkered_app_components_createtournament_tsx",
+      "community": 22
+    },
+    {
+      "label": "CreateTournament()",
+      "file_type": "code",
+      "source_file": "/Users/nkt/dev/iman/checkered/checkered/checkered/app/components/CreateTournament.tsx",
+      "source_location": "L33",
+      "id": "createtournament_createtournament",
+      "community": 22
+    },
+    {
+      "label": "TournamentDetail.tsx",
+      "file_type": "code",
+      "source_file": "/Users/nkt/dev/iman/checkered/checkered/checkered/app/components/TournamentDetail.tsx",
+      "source_location": "L1",
+      "id": "users_nkt_dev_iman_checkered_checkered_checkered_app_components_tournamentdetail_tsx",
+      "community": 3
+    },
+    {
+      "label": "formatTokenAmount()",
+      "file_type": "code",
+      "source_file": "/Users/nkt/dev/iman/checkered/checkered/checkered/app/components/TournamentDetail.tsx",
+      "source_location": "L27",
+      "id": "tournamentdetail_formattokenamount",
+      "community": 3
+    },
+    {
+      "label": "formatDate()",
+      "file_type": "code",
+      "source_file": "/Users/nkt/dev/iman/checkered/checkered/checkered/app/components/TournamentDetail.tsx",
+      "source_location": "L31",
+      "id": "tournamentdetail_formatdate",
+      "community": 3
+    },
+    {
+      "label": "sendAdminTx()",
+      "file_type": "code",
+      "source_file": "/Users/nkt/dev/iman/checkered/checkered/checkered/app/components/TournamentDetail.tsx",
+      "source_location": "L66",
+      "id": "tournamentdetail_sendadmintx",
+      "community": 3
+    },
+    {
+      "label": "fmt()",
+      "file_type": "code",
+      "source_file": "/Users/nkt/dev/iman/checkered/checkered/checkered/app/components/TournamentDetail.tsx",
+      "source_location": "L83",
+      "id": "tournamentdetail_fmt",
+      "community": 3
+    },
+    {
+      "label": "RegisterForTournament.tsx",
+      "file_type": "code",
+      "source_file": "/Users/nkt/dev/iman/checkered/checkered/checkered/app/components/RegisterForTournament.tsx",
+      "source_location": "L1",
+      "id": "users_nkt_dev_iman_checkered_checkered_checkered_app_components_registerfortournament_tsx",
+      "community": 7
+    },
+    {
+      "label": "handleStatus()",
+      "file_type": "code",
+      "source_file": "/Users/nkt/dev/iman/checkered/checkered/checkered/app/components/RegisterForTournament.tsx",
+      "source_location": "L65",
+      "id": "registerfortournament_handlestatus",
+      "community": 7
+    },
+    {
+      "label": "handleRegisterClick()",
+      "file_type": "code",
+      "source_file": "/Users/nkt/dev/iman/checkered/checkered/checkered/app/components/RegisterForTournament.tsx",
+      "source_location": "L78",
+      "id": "registerfortournament_handleregisterclick",
+      "community": 7
+    },
+    {
+      "label": "Header.tsx",
+      "file_type": "code",
+      "source_file": "/Users/nkt/dev/iman/checkered/checkered/checkered/app/components/Header.tsx",
+      "source_location": "L1",
+      "id": "users_nkt_dev_iman_checkered_checkered_checkered_app_components_header_tsx",
+      "community": 23
+    },
+    {
+      "label": "connectBrowserWallet()",
+      "file_type": "code",
+      "source_file": "/Users/nkt/dev/iman/checkered/checkered/checkered/app/components/Header.tsx",
+      "source_location": "L34",
+      "id": "header_connectbrowserwallet",
+      "community": 23
+    },
+    {
+      "label": "Overlay.tsx",
+      "file_type": "code",
+      "source_file": "/Users/nkt/dev/iman/checkered/checkered/checkered/app/components/Overlay.tsx",
+      "source_location": "L1",
+      "id": "users_nkt_dev_iman_checkered_checkered_checkered_app_components_overlay_tsx",
+      "community": 33
+    },
+    {
+      "label": "TournamentList.tsx",
+      "file_type": "code",
+      "source_file": "/Users/nkt/dev/iman/checkered/checkered/checkered/app/components/TournamentList.tsx",
+      "source_location": "L1",
+      "id": "users_nkt_dev_iman_checkered_checkered_checkered_app_components_tournamentlist_tsx",
+      "community": 24
+    },
+    {
+      "label": "formatTokenAmount()",
+      "file_type": "code",
+      "source_file": "/Users/nkt/dev/iman/checkered/checkered/checkered/app/components/TournamentList.tsx",
+      "source_location": "L15",
+      "id": "tournamentlist_formattokenamount",
+      "community": 24
+    },
+    {
+      "label": "sanitizeError.test.ts",
+      "file_type": "code",
+      "source_file": "/Users/nkt/dev/iman/checkered/checkered/checkered/app/__tests__/sanitizeError.test.ts",
+      "source_location": "L1",
+      "id": "users_nkt_dev_iman_checkered_checkered_checkered_app_tests_sanitizeerror_test_ts",
+      "community": 34
+    },
+    {
+      "label": "calls.test.ts",
+      "file_type": "code",
+      "source_file": "/Users/nkt/dev/iman/checkered/checkered/checkered/app/__tests__/calls.test.ts",
+      "source_location": "L1",
+      "id": "users_nkt_dev_iman_checkered_checkered_checkered_app_tests_calls_test_ts",
+      "community": 35
+    },
+    {
+      "label": "contracts.test.ts",
+      "file_type": "code",
+      "source_file": "/Users/nkt/dev/iman/checkered/checkered/checkered/app/__tests__/contracts.test.ts",
+      "source_location": "L1",
+      "id": "users_nkt_dev_iman_checkered_checkered_checkered_app_tests_contracts_test_ts",
+      "community": 8
+    },
+    {
+      "label": "hasFunction()",
+      "file_type": "code",
+      "source_file": "/Users/nkt/dev/iman/checkered/checkered/checkered/app/__tests__/contracts.test.ts",
+      "source_location": "L46",
+      "id": "contracts_test_hasfunction",
+      "community": 8
+    },
+    {
+      "label": "hasEvent()",
+      "file_type": "code",
+      "source_file": "/Users/nkt/dev/iman/checkered/checkered/checkered/app/__tests__/contracts.test.ts",
+      "source_location": "L52",
+      "id": "contracts_test_hasevent",
+      "community": 8
+    },
+    {
+      "label": "useIsAdmin.ts",
+      "file_type": "code",
+      "source_file": "/Users/nkt/dev/iman/checkered/checkered/checkered/app/hooks/useIsAdmin.ts",
+      "source_location": "L1",
+      "id": "users_nkt_dev_iman_checkered_checkered_checkered_app_hooks_useisadmin_ts",
+      "community": 25
+    },
+    {
+      "label": "useIsAdmin()",
+      "file_type": "code",
+      "source_file": "/Users/nkt/dev/iman/checkered/checkered/checkered/app/hooks/useIsAdmin.ts",
+      "source_location": "L8",
+      "id": "useisadmin_useisadmin",
+      "community": 25
+    }
+  ],
+  "links": [
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "/Users/nkt/dev/iman/checkered/checkered/test/IRacingTournament.test.js",
+      "source_location": "L10",
+      "weight": 1.0,
+      "_src": "users_nkt_dev_iman_checkered_checkered_test_iracingtournament_test_js",
+      "_tgt": "iracingtournament_test_deployfixture",
+      "source": "users_nkt_dev_iman_checkered_checkered_test_iracingtournament_test_js",
+      "target": "iracingtournament_test_deployfixture",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "/Users/nkt/dev/iman/checkered/checkered/test/IRacingTournament.test.js",
+      "source_location": "L244",
+      "weight": 1.0,
+      "_src": "users_nkt_dev_iman_checkered_checkered_test_iracingtournament_test_js",
+      "_tgt": "iracingtournament_test_createtournamentfixture",
+      "source": "users_nkt_dev_iman_checkered_checkered_test_iracingtournament_test_js",
+      "target": "iracingtournament_test_createtournamentfixture",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "/Users/nkt/dev/iman/checkered/checkered/test/IRacingTournament.test.js",
+      "source_location": "L349",
+      "weight": 1.0,
+      "_src": "users_nkt_dev_iman_checkered_checkered_test_iracingtournament_test_js",
+      "_tgt": "iracingtournament_test_fulltournamentfixture",
+      "source": "users_nkt_dev_iman_checkered_checkered_test_iracingtournament_test_js",
+      "target": "iracingtournament_test_fulltournamentfixture",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "/Users/nkt/dev/iman/checkered/checkered/test/IRacingTournament.test.js",
+      "source_location": "L590",
+      "weight": 1.0,
+      "_src": "users_nkt_dev_iman_checkered_checkered_test_iracingtournament_test_js",
+      "_tgt": "iracingtournament_test_stucktournamentfixture",
+      "source": "users_nkt_dev_iman_checkered_checkered_test_iracingtournament_test_js",
+      "target": "iracingtournament_test_stucktournamentfixture",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "/Users/nkt/dev/iman/checkered/checkered/backend/test/api.test.js",
+      "source_location": "L17",
+      "weight": 1.0,
+      "_src": "users_nkt_dev_iman_checkered_checkered_backend_test_api_test_js",
+      "_tgt": "api_test_mocktournamentdata",
+      "source": "users_nkt_dev_iman_checkered_checkered_backend_test_api_test_js",
+      "target": "api_test_mocktournamentdata",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "/Users/nkt/dev/iman/checkered/checkered/backend/test/api.test.js",
+      "source_location": "L34",
+      "weight": 1.0,
+      "_src": "users_nkt_dev_iman_checkered_checkered_backend_test_api_test_js",
+      "_tgt": "api_test_mockcontract",
+      "source": "users_nkt_dev_iman_checkered_checkered_backend_test_api_test_js",
+      "target": "api_test_mockcontract",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "/Users/nkt/dev/iman/checkered/checkered/backend/test/api.test.js",
+      "source_location": "L57",
+      "weight": 1.0,
+      "_src": "users_nkt_dev_iman_checkered_checkered_backend_test_api_test_js",
+      "_tgt": "api_test_buildapp",
+      "source": "users_nkt_dev_iman_checkered_checkered_backend_test_api_test_js",
+      "target": "api_test_buildapp",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "/Users/nkt/dev/iman/checkered/checkered/backend/test/api.test.js",
+      "source_location": "L35",
+      "weight": 1.0,
+      "_src": "api_test_mockcontract",
+      "_tgt": "api_test_mocktournamentdata",
+      "source": "api_test_mocktournamentdata",
+      "target": "api_test_mockcontract",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "/Users/nkt/dev/iman/checkered/checkered/backend/test/api.test.js",
+      "source_location": "L60",
+      "weight": 1.0,
+      "_src": "api_test_buildapp",
+      "_tgt": "api_test_mockcontract",
+      "source": "api_test_mockcontract",
+      "target": "api_test_buildapp",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "/Users/nkt/dev/iman/checkered/checkered/backend/test/iracing-integration.js",
+      "source_location": "L25",
+      "weight": 1.0,
+      "_src": "users_nkt_dev_iman_checkered_checkered_backend_test_iracing_integration_js",
+      "_tgt": "iracing_integration_ok",
+      "source": "users_nkt_dev_iman_checkered_checkered_backend_test_iracing_integration_js",
+      "target": "iracing_integration_ok",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "/Users/nkt/dev/iman/checkered/checkered/backend/test/iracing-integration.js",
+      "source_location": "L30",
+      "weight": 1.0,
+      "_src": "users_nkt_dev_iman_checkered_checkered_backend_test_iracing_integration_js",
+      "_tgt": "iracing_integration_fail",
+      "source": "users_nkt_dev_iman_checkered_checkered_backend_test_iracing_integration_js",
+      "target": "iracing_integration_fail",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "/Users/nkt/dev/iman/checkered/checkered/backend/test/iracing-integration.js",
+      "source_location": "L35",
+      "weight": 1.0,
+      "_src": "users_nkt_dev_iman_checkered_checkered_backend_test_iracing_integration_js",
+      "_tgt": "iracing_integration_skip",
+      "source": "users_nkt_dev_iman_checkered_checkered_backend_test_iracing_integration_js",
+      "target": "iracing_integration_skip",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "/Users/nkt/dev/iman/checkered/checkered/backend/test/iracing-integration.js",
+      "source_location": "L45",
+      "weight": 1.0,
+      "_src": "users_nkt_dev_iman_checkered_checkered_backend_test_iracing_integration_js",
+      "_tgt": "iracing_integration_testiracingoauth",
+      "source": "users_nkt_dev_iman_checkered_checkered_backend_test_iracing_integration_js",
+      "target": "iracing_integration_testiracingoauth",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "/Users/nkt/dev/iman/checkered/checkered/backend/test/iracing-integration.js",
+      "source_location": "L85",
+      "weight": 1.0,
+      "_src": "users_nkt_dev_iman_checkered_checkered_backend_test_iracing_integration_js",
+      "_tgt": "iracing_integration_testmemberinfo",
+      "source": "users_nkt_dev_iman_checkered_checkered_backend_test_iracing_integration_js",
+      "target": "iracing_integration_testmemberinfo",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "/Users/nkt/dev/iman/checkered/checkered/backend/test/iracing-integration.js",
+      "source_location": "L122",
+      "weight": 1.0,
+      "_src": "users_nkt_dev_iman_checkered_checkered_backend_test_iracing_integration_js",
+      "_tgt": "iracing_integration_testrecentraces",
+      "source": "users_nkt_dev_iman_checkered_checkered_backend_test_iracing_integration_js",
+      "target": "iracing_integration_testrecentraces",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "/Users/nkt/dev/iman/checkered/checkered/backend/test/iracing-integration.js",
+      "source_location": "L157",
+      "weight": 1.0,
+      "_src": "users_nkt_dev_iman_checkered_checkered_backend_test_iracing_integration_js",
+      "_tgt": "iracing_integration_testsubsessionresults",
+      "source": "users_nkt_dev_iman_checkered_checkered_backend_test_iracing_integration_js",
+      "target": "iracing_integration_testsubsessionresults",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "/Users/nkt/dev/iman/checkered/checkered/backend/test/iracing-integration.js",
+      "source_location": "L198",
+      "weight": 1.0,
+      "_src": "users_nkt_dev_iman_checkered_checkered_backend_test_iracing_integration_js",
+      "_tgt": "iracing_integration_testbackendhealth",
+      "source": "users_nkt_dev_iman_checkered_checkered_backend_test_iracing_integration_js",
+      "target": "iracing_integration_testbackendhealth",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "/Users/nkt/dev/iman/checkered/checkered/backend/test/iracing-integration.js",
+      "source_location": "L220",
+      "weight": 1.0,
+      "_src": "users_nkt_dev_iman_checkered_checkered_backend_test_iracing_integration_js",
+      "_tgt": "iracing_integration_testbackendtournaments",
+      "source": "users_nkt_dev_iman_checkered_checkered_backend_test_iracing_integration_js",
+      "target": "iracing_integration_testbackendtournaments",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "/Users/nkt/dev/iman/checkered/checkered/backend/test/iracing-integration.js",
+      "source_location": "L272",
+      "weight": 1.0,
+      "_src": "users_nkt_dev_iman_checkered_checkered_backend_test_iracing_integration_js",
+      "_tgt": "iracing_integration_testoraclestatus",
+      "source": "users_nkt_dev_iman_checkered_checkered_backend_test_iracing_integration_js",
+      "target": "iracing_integration_testoraclestatus",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "/Users/nkt/dev/iman/checkered/checkered/backend/test/iracing-integration.js",
+      "source_location": "L313",
+      "weight": 1.0,
+      "_src": "users_nkt_dev_iman_checkered_checkered_backend_test_iracing_integration_js",
+      "_tgt": "iracing_integration_testmanualpoll",
+      "source": "users_nkt_dev_iman_checkered_checkered_backend_test_iracing_integration_js",
+      "target": "iracing_integration_testmanualpoll",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "/Users/nkt/dev/iman/checkered/checkered/backend/test/iracing-integration.js",
+      "source_location": "L343",
+      "weight": 1.0,
+      "_src": "users_nkt_dev_iman_checkered_checkered_backend_test_iracing_integration_js",
+      "_tgt": "iracing_integration_testcontractconnection",
+      "source": "users_nkt_dev_iman_checkered_checkered_backend_test_iracing_integration_js",
+      "target": "iracing_integration_testcontractconnection",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "/Users/nkt/dev/iman/checkered/checkered/backend/test/iracing-integration.js",
+      "source_location": "L396",
+      "weight": 1.0,
+      "_src": "users_nkt_dev_iman_checkered_checkered_backend_test_iracing_integration_js",
+      "_tgt": "iracing_integration_main",
+      "source": "users_nkt_dev_iman_checkered_checkered_backend_test_iracing_integration_js",
+      "target": "iracing_integration_main",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "/Users/nkt/dev/iman/checkered/checkered/backend/test/iracing-integration.js",
+      "source_location": "L73",
+      "weight": 1.0,
+      "_src": "iracing_integration_testiracingoauth",
+      "_tgt": "iracing_integration_ok",
+      "source": "iracing_integration_ok",
+      "target": "iracing_integration_testiracingoauth",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "/Users/nkt/dev/iman/checkered/checkered/backend/test/iracing-integration.js",
+      "source_location": "L114",
+      "weight": 1.0,
+      "_src": "iracing_integration_testmemberinfo",
+      "_tgt": "iracing_integration_ok",
+      "source": "iracing_integration_ok",
+      "target": "iracing_integration_testmemberinfo",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "/Users/nkt/dev/iman/checkered/checkered/backend/test/iracing-integration.js",
+      "source_location": "L137",
+      "weight": 1.0,
+      "_src": "iracing_integration_testrecentraces",
+      "_tgt": "iracing_integration_ok",
+      "source": "iracing_integration_ok",
+      "target": "iracing_integration_testrecentraces",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "/Users/nkt/dev/iman/checkered/checkered/backend/test/iracing-integration.js",
+      "source_location": "L177",
+      "weight": 1.0,
+      "_src": "iracing_integration_testsubsessionresults",
+      "_tgt": "iracing_integration_ok",
+      "source": "iracing_integration_ok",
+      "target": "iracing_integration_testsubsessionresults",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "/Users/nkt/dev/iman/checkered/checkered/backend/test/iracing-integration.js",
+      "source_location": "L209",
+      "weight": 1.0,
+      "_src": "iracing_integration_testbackendhealth",
+      "_tgt": "iracing_integration_ok",
+      "source": "iracing_integration_ok",
+      "target": "iracing_integration_testbackendhealth",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "/Users/nkt/dev/iman/checkered/checkered/backend/test/iracing-integration.js",
+      "source_location": "L242",
+      "weight": 1.0,
+      "_src": "iracing_integration_testbackendtournaments",
+      "_tgt": "iracing_integration_ok",
+      "source": "iracing_integration_ok",
+      "target": "iracing_integration_testbackendtournaments",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "/Users/nkt/dev/iman/checkered/checkered/backend/test/iracing-integration.js",
+      "source_location": "L279",
+      "weight": 1.0,
+      "_src": "iracing_integration_testoraclestatus",
+      "_tgt": "iracing_integration_ok",
+      "source": "iracing_integration_ok",
+      "target": "iracing_integration_testoraclestatus",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "/Users/nkt/dev/iman/checkered/checkered/backend/test/iracing-integration.js",
+      "source_location": "L320",
+      "weight": 1.0,
+      "_src": "iracing_integration_testmanualpoll",
+      "_tgt": "iracing_integration_ok",
+      "source": "iracing_integration_ok",
+      "target": "iracing_integration_testmanualpoll",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "/Users/nkt/dev/iman/checkered/checkered/backend/test/iracing-integration.js",
+      "source_location": "L352",
+      "weight": 1.0,
+      "_src": "iracing_integration_testcontractconnection",
+      "_tgt": "iracing_integration_ok",
+      "source": "iracing_integration_ok",
+      "target": "iracing_integration_testcontractconnection",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "/Users/nkt/dev/iman/checkered/checkered/backend/test/iracing-integration.js",
+      "source_location": "L76",
+      "weight": 1.0,
+      "_src": "iracing_integration_testiracingoauth",
+      "_tgt": "iracing_integration_fail",
+      "source": "iracing_integration_fail",
+      "target": "iracing_integration_testiracingoauth",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "/Users/nkt/dev/iman/checkered/checkered/backend/test/iracing-integration.js",
+      "source_location": "L98",
+      "weight": 1.0,
+      "_src": "iracing_integration_testmemberinfo",
+      "_tgt": "iracing_integration_fail",
+      "source": "iracing_integration_fail",
+      "target": "iracing_integration_testmemberinfo",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "/Users/nkt/dev/iman/checkered/checkered/backend/test/iracing-integration.js",
+      "source_location": "L152",
+      "weight": 1.0,
+      "_src": "iracing_integration_testrecentraces",
+      "_tgt": "iracing_integration_fail",
+      "source": "iracing_integration_fail",
+      "target": "iracing_integration_testrecentraces",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "/Users/nkt/dev/iman/checkered/checkered/backend/test/iracing-integration.js",
+      "source_location": "L189",
+      "weight": 1.0,
+      "_src": "iracing_integration_testsubsessionresults",
+      "_tgt": "iracing_integration_fail",
+      "source": "iracing_integration_fail",
+      "target": "iracing_integration_testsubsessionresults",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "/Users/nkt/dev/iman/checkered/checkered/backend/test/iracing-integration.js",
+      "source_location": "L204",
+      "weight": 1.0,
+      "_src": "iracing_integration_testbackendhealth",
+      "_tgt": "iracing_integration_fail",
+      "source": "iracing_integration_fail",
+      "target": "iracing_integration_testbackendhealth",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "/Users/nkt/dev/iman/checkered/checkered/backend/test/iracing-integration.js",
+      "source_location": "L226",
+      "weight": 1.0,
+      "_src": "iracing_integration_testbackendtournaments",
+      "_tgt": "iracing_integration_fail",
+      "source": "iracing_integration_fail",
+      "target": "iracing_integration_testbackendtournaments",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "/Users/nkt/dev/iman/checkered/checkered/backend/test/iracing-integration.js",
+      "source_location": "L281",
+      "weight": 1.0,
+      "_src": "iracing_integration_testoraclestatus",
+      "_tgt": "iracing_integration_fail",
+      "source": "iracing_integration_fail",
+      "target": "iracing_integration_testoraclestatus",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "/Users/nkt/dev/iman/checkered/checkered/backend/test/iracing-integration.js",
+      "source_location": "L329",
+      "weight": 1.0,
+      "_src": "iracing_integration_testmanualpoll",
+      "_tgt": "iracing_integration_fail",
+      "source": "iracing_integration_fail",
+      "target": "iracing_integration_testmanualpoll",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "/Users/nkt/dev/iman/checkered/checkered/backend/test/iracing-integration.js",
+      "source_location": "L388",
+      "weight": 1.0,
+      "_src": "iracing_integration_testcontractconnection",
+      "_tgt": "iracing_integration_fail",
+      "source": "iracing_integration_fail",
+      "target": "iracing_integration_testcontractconnection",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "/Users/nkt/dev/iman/checkered/checkered/backend/test/iracing-integration.js",
+      "source_location": "L49",
+      "weight": 1.0,
+      "_src": "iracing_integration_testiracingoauth",
+      "_tgt": "iracing_integration_skip",
+      "source": "iracing_integration_skip",
+      "target": "iracing_integration_testiracingoauth",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "/Users/nkt/dev/iman/checkered/checkered/backend/test/iracing-integration.js",
+      "source_location": "L89",
+      "weight": 1.0,
+      "_src": "iracing_integration_testmemberinfo",
+      "_tgt": "iracing_integration_skip",
+      "source": "iracing_integration_skip",
+      "target": "iracing_integration_testmemberinfo",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "/Users/nkt/dev/iman/checkered/checkered/backend/test/iracing-integration.js",
+      "source_location": "L126",
+      "weight": 1.0,
+      "_src": "iracing_integration_testrecentraces",
+      "_tgt": "iracing_integration_skip",
+      "source": "iracing_integration_skip",
+      "target": "iracing_integration_testrecentraces",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "/Users/nkt/dev/iman/checkered/checkered/backend/test/iracing-integration.js",
+      "source_location": "L161",
+      "weight": 1.0,
+      "_src": "iracing_integration_testsubsessionresults",
+      "_tgt": "iracing_integration_skip",
+      "source": "iracing_integration_skip",
+      "target": "iracing_integration_testsubsessionresults",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "/Users/nkt/dev/iman/checkered/checkered/backend/test/iracing-integration.js",
+      "source_location": "L410",
+      "weight": 1.0,
+      "_src": "iracing_integration_main",
+      "_tgt": "iracing_integration_testiracingoauth",
+      "source": "iracing_integration_testiracingoauth",
+      "target": "iracing_integration_main",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "/Users/nkt/dev/iman/checkered/checkered/backend/test/iracing-integration.js",
+      "source_location": "L411",
+      "weight": 1.0,
+      "_src": "iracing_integration_main",
+      "_tgt": "iracing_integration_testmemberinfo",
+      "source": "iracing_integration_testmemberinfo",
+      "target": "iracing_integration_main",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "/Users/nkt/dev/iman/checkered/checkered/backend/test/iracing-integration.js",
+      "source_location": "L412",
+      "weight": 1.0,
+      "_src": "iracing_integration_main",
+      "_tgt": "iracing_integration_testrecentraces",
+      "source": "iracing_integration_testrecentraces",
+      "target": "iracing_integration_main",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "/Users/nkt/dev/iman/checkered/checkered/backend/test/iracing-integration.js",
+      "source_location": "L414",
+      "weight": 1.0,
+      "_src": "iracing_integration_main",
+      "_tgt": "iracing_integration_testsubsessionresults",
+      "source": "iracing_integration_testsubsessionresults",
+      "target": "iracing_integration_main",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "/Users/nkt/dev/iman/checkered/checkered/backend/test/iracing-integration.js",
+      "source_location": "L417",
+      "weight": 1.0,
+      "_src": "iracing_integration_main",
+      "_tgt": "iracing_integration_testbackendhealth",
+      "source": "iracing_integration_testbackendhealth",
+      "target": "iracing_integration_main",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "/Users/nkt/dev/iman/checkered/checkered/backend/test/iracing-integration.js",
+      "source_location": "L419",
+      "weight": 1.0,
+      "_src": "iracing_integration_main",
+      "_tgt": "iracing_integration_testbackendtournaments",
+      "source": "iracing_integration_testbackendtournaments",
+      "target": "iracing_integration_main",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "/Users/nkt/dev/iman/checkered/checkered/backend/test/iracing-integration.js",
+      "source_location": "L420",
+      "weight": 1.0,
+      "_src": "iracing_integration_main",
+      "_tgt": "iracing_integration_testoraclestatus",
+      "source": "iracing_integration_testoraclestatus",
+      "target": "iracing_integration_main",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "/Users/nkt/dev/iman/checkered/checkered/backend/test/iracing-integration.js",
+      "source_location": "L421",
+      "weight": 1.0,
+      "_src": "iracing_integration_main",
+      "_tgt": "iracing_integration_testmanualpoll",
+      "source": "iracing_integration_testmanualpoll",
+      "target": "iracing_integration_main",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "/Users/nkt/dev/iman/checkered/checkered/backend/test/iracing-integration.js",
+      "source_location": "L407",
+      "weight": 1.0,
+      "_src": "iracing_integration_main",
+      "_tgt": "iracing_integration_testcontractconnection",
+      "source": "iracing_integration_testcontractconnection",
+      "target": "iracing_integration_main",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "/Users/nkt/dev/iman/checkered/checkered/backend/src/iracing-api.js",
+      "source_location": "L30",
+      "weight": 1.0,
+      "_src": "users_nkt_dev_iman_checkered_checkered_backend_src_iracing_api_js",
+      "_tgt": "iracing_api_iracingauth",
+      "source": "users_nkt_dev_iman_checkered_checkered_backend_src_iracing_api_js",
+      "target": "iracing_api_iracingauth",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "/Users/nkt/dev/iman/checkered/checkered/backend/src/iracing-api.js",
+      "source_location": "L118",
+      "weight": 1.0,
+      "_src": "users_nkt_dev_iman_checkered_checkered_backend_src_iracing_api_js",
+      "_tgt": "iracing_api_refreshaccesstoken",
+      "source": "users_nkt_dev_iman_checkered_checkered_backend_src_iracing_api_js",
+      "target": "iracing_api_refreshaccesstoken",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "/Users/nkt/dev/iman/checkered/checkered/backend/src/iracing-api.js",
+      "source_location": "L160",
+      "weight": 1.0,
+      "_src": "users_nkt_dev_iman_checkered_checkered_backend_src_iracing_api_js",
+      "_tgt": "iracing_api_iracingfetch",
+      "source": "users_nkt_dev_iman_checkered_checkered_backend_src_iracing_api_js",
+      "target": "iracing_api_iracingfetch",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "/Users/nkt/dev/iman/checkered/checkered/backend/src/iracing-api.js",
+      "source_location": "L203",
+      "weight": 1.0,
+      "_src": "users_nkt_dev_iman_checkered_checkered_backend_src_iracing_api_js",
+      "_tgt": "iracing_api_fetchsubsessionresults",
+      "source": "users_nkt_dev_iman_checkered_checkered_backend_src_iracing_api_js",
+      "target": "iracing_api_fetchsubsessionresults",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "/Users/nkt/dev/iman/checkered/checkered/backend/src/iracing-api.js",
+      "source_location": "L242",
+      "weight": 1.0,
+      "_src": "users_nkt_dev_iman_checkered_checkered_backend_src_iracing_api_js",
+      "_tgt": "iracing_api_fetchmemberinfo",
+      "source": "users_nkt_dev_iman_checkered_checkered_backend_src_iracing_api_js",
+      "target": "iracing_api_fetchmemberinfo",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "/Users/nkt/dev/iman/checkered/checkered/backend/src/iracing-api.js",
+      "source_location": "L253",
+      "weight": 1.0,
+      "_src": "users_nkt_dev_iman_checkered_checkered_backend_src_iracing_api_js",
+      "_tgt": "iracing_api_fetchrecentraces",
+      "source": "users_nkt_dev_iman_checkered_checkered_backend_src_iracing_api_js",
+      "target": "iracing_api_fetchrecentraces",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "/Users/nkt/dev/iman/checkered/checkered/backend/src/iracing-api.js",
+      "source_location": "L267",
+      "weight": 1.0,
+      "_src": "users_nkt_dev_iman_checkered_checkered_backend_src_iracing_api_js",
+      "_tgt": "iracing_api_fetchleagueseasonsessions",
+      "source": "users_nkt_dev_iman_checkered_checkered_backend_src_iracing_api_js",
+      "target": "iracing_api_fetchleagueseasonsessions",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "/Users/nkt/dev/iman/checkered/checkered/backend/src/iracing-api.js",
+      "source_location": "L46",
+      "weight": 1.0,
+      "_src": "iracing_api_iracingauth",
+      "_tgt": "iracing_api_refreshaccesstoken",
+      "source": "iracing_api_iracingauth",
+      "target": "iracing_api_refreshaccesstoken",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "/Users/nkt/dev/iman/checkered/checkered/backend/src/iracing-api.js",
+      "source_location": "L161",
+      "weight": 1.0,
+      "_src": "iracing_api_iracingfetch",
+      "_tgt": "iracing_api_iracingauth",
+      "source": "iracing_api_iracingauth",
+      "target": "iracing_api_iracingfetch",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "/Users/nkt/dev/iman/checkered/checkered/backend/src/iracing-api.js",
+      "source_location": "L209",
+      "weight": 1.0,
+      "_src": "iracing_api_fetchsubsessionresults",
+      "_tgt": "iracing_api_iracingfetch",
+      "source": "iracing_api_iracingfetch",
+      "target": "iracing_api_fetchsubsessionresults",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "/Users/nkt/dev/iman/checkered/checkered/backend/src/iracing-api.js",
+      "source_location": "L246",
+      "weight": 1.0,
+      "_src": "iracing_api_fetchmemberinfo",
+      "_tgt": "iracing_api_iracingfetch",
+      "source": "iracing_api_iracingfetch",
+      "target": "iracing_api_fetchmemberinfo",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "/Users/nkt/dev/iman/checkered/checkered/backend/src/iracing-api.js",
+      "source_location": "L257",
+      "weight": 1.0,
+      "_src": "iracing_api_fetchrecentraces",
+      "_tgt": "iracing_api_iracingfetch",
+      "source": "iracing_api_iracingfetch",
+      "target": "iracing_api_fetchrecentraces",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "/Users/nkt/dev/iman/checkered/checkered/backend/src/iracing-api.js",
+      "source_location": "L275",
+      "weight": 1.0,
+      "_src": "iracing_api_fetchleagueseasonsessions",
+      "_tgt": "iracing_api_iracingfetch",
+      "source": "iracing_api_iracingfetch",
+      "target": "iracing_api_fetchleagueseasonsessions",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "/Users/nkt/dev/iman/checkered/checkered/backend/src/index.js",
+      "source_location": "L88",
+      "weight": 1.0,
+      "_src": "users_nkt_dev_iman_checkered_checkered_backend_src_index_js",
+      "_tgt": "index_polltournaments",
+      "source": "users_nkt_dev_iman_checkered_checkered_backend_src_index_js",
+      "target": "index_polltournaments",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "/Users/nkt/dev/iman/checkered/checkered/backend/src/index.js",
+      "source_location": "L175",
+      "weight": 1.0,
+      "_src": "users_nkt_dev_iman_checkered_checkered_backend_src_index_js",
+      "_tgt": "index_submitresults",
+      "source": "users_nkt_dev_iman_checkered_checkered_backend_src_index_js",
+      "target": "index_submitresults",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "/Users/nkt/dev/iman/checkered/checkered/backend/src/index.js",
+      "source_location": "L246",
+      "weight": 1.0,
+      "_src": "users_nkt_dev_iman_checkered_checkered_backend_src_index_js",
+      "_tgt": "index_generatemockresults",
+      "source": "users_nkt_dev_iman_checkered_checkered_backend_src_index_js",
+      "target": "index_generatemockresults",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "/Users/nkt/dev/iman/checkered/checkered/backend/src/index.js",
+      "source_location": "L151",
+      "weight": 1.0,
+      "_src": "index_polltournaments",
+      "_tgt": "index_generatemockresults",
+      "source": "index_polltournaments",
+      "target": "index_generatemockresults",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "/Users/nkt/dev/iman/checkered/checkered/backend/src/index.js",
+      "source_location": "L157",
+      "weight": 1.0,
+      "_src": "index_polltournaments",
+      "_tgt": "index_submitresults",
+      "source": "index_polltournaments",
+      "target": "index_submitresults",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "/Users/nkt/dev/iman/checkered/checkered/backend/src/app.js",
+      "source_location": "L24",
+      "weight": 1.0,
+      "_src": "users_nkt_dev_iman_checkered_checkered_backend_src_app_js",
+      "_tgt": "app_createapp",
+      "source": "users_nkt_dev_iman_checkered_checkered_backend_src_app_js",
+      "target": "app_createapp",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "/Users/nkt/dev/iman/checkered/checkered/scripts/mint-usdc.js",
+      "source_location": "L14",
+      "weight": 1.0,
+      "_src": "users_nkt_dev_iman_checkered_checkered_scripts_mint_usdc_js",
+      "_tgt": "mint_usdc_main",
+      "source": "users_nkt_dev_iman_checkered_checkered_scripts_mint_usdc_js",
+      "target": "mint_usdc_main",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "/Users/nkt/dev/iman/checkered/checkered/scripts/e2e-test.js",
+      "source_location": "L10",
+      "weight": 1.0,
+      "_src": "users_nkt_dev_iman_checkered_checkered_scripts_e2e_test_js",
+      "_tgt": "e2e_test_main",
+      "source": "users_nkt_dev_iman_checkered_checkered_scripts_e2e_test_js",
+      "target": "e2e_test_main",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "/Users/nkt/dev/iman/checkered/checkered/scripts/create-and-resolve.js",
+      "source_location": "L15",
+      "weight": 1.0,
+      "_src": "users_nkt_dev_iman_checkered_checkered_scripts_create_and_resolve_js",
+      "_tgt": "create_and_resolve_main",
+      "source": "users_nkt_dev_iman_checkered_checkered_scripts_create_and_resolve_js",
+      "target": "create_and_resolve_main",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "/Users/nkt/dev/iman/checkered/checkered/scripts/transfer-chex.js",
+      "source_location": "L3",
+      "weight": 1.0,
+      "_src": "users_nkt_dev_iman_checkered_checkered_scripts_transfer_chex_js",
+      "_tgt": "transfer_chex_main",
+      "source": "users_nkt_dev_iman_checkered_checkered_scripts_transfer_chex_js",
+      "target": "transfer_chex_main",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "/Users/nkt/dev/iman/checkered/checkered/scripts/deploy.js",
+      "source_location": "L3",
+      "weight": 1.0,
+      "_src": "users_nkt_dev_iman_checkered_checkered_scripts_deploy_js",
+      "_tgt": "deploy_main",
+      "source": "users_nkt_dev_iman_checkered_checkered_scripts_deploy_js",
+      "target": "deploy_main",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "/Users/nkt/dev/iman/checkered/checkered/scripts/create-test-tournament.js",
+      "source_location": "L4",
+      "weight": 1.0,
+      "_src": "users_nkt_dev_iman_checkered_checkered_scripts_create_test_tournament_js",
+      "_tgt": "create_test_tournament_main",
+      "source": "users_nkt_dev_iman_checkered_checkered_scripts_create_test_tournament_js",
+      "target": "create_test_tournament_main",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "/Users/nkt/dev/iman/checkered/checkered/scripts/advance-tournament.js",
+      "source_location": "L20",
+      "weight": 1.0,
+      "_src": "users_nkt_dev_iman_checkered_checkered_scripts_advance_tournament_js",
+      "_tgt": "advance_tournament_main",
+      "source": "users_nkt_dev_iman_checkered_checkered_scripts_advance_tournament_js",
+      "target": "advance_tournament_main",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "/Users/nkt/dev/iman/checkered/checkered/scripts/create-batch-tournaments.js",
+      "source_location": "L19",
+      "weight": 1.0,
+      "_src": "users_nkt_dev_iman_checkered_checkered_scripts_create_batch_tournaments_js",
+      "_tgt": "create_batch_tournaments_main",
+      "source": "users_nkt_dev_iman_checkered_checkered_scripts_create_batch_tournaments_js",
+      "target": "create_batch_tournaments_main",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "/Users/nkt/dev/iman/checkered/checkered/checkered/app/rootProvider.tsx",
+      "source_location": "L10",
+      "weight": 1.0,
+      "_src": "users_nkt_dev_iman_checkered_checkered_checkered_app_rootprovider_tsx",
+      "_tgt": "rootprovider_rootprovider",
+      "source": "users_nkt_dev_iman_checkered_checkered_checkered_app_rootprovider_tsx",
+      "target": "rootprovider_rootprovider",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "/Users/nkt/dev/iman/checkered/checkered/checkered/app/calls.ts",
+      "source_location": "L22",
+      "weight": 1.0,
+      "_src": "users_nkt_dev_iman_checkered_checkered_checkered_app_calls_ts",
+      "_tgt": "calls_buildregistercalls",
+      "source": "users_nkt_dev_iman_checkered_checkered_checkered_app_calls_ts",
+      "target": "calls_buildregistercalls",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "/Users/nkt/dev/iman/checkered/checkered/checkered/app/layout.tsx",
+      "source_location": "L22",
+      "weight": 1.0,
+      "_src": "users_nkt_dev_iman_checkered_checkered_checkered_app_layout_tsx",
+      "_tgt": "layout_rootlayout",
+      "source": "users_nkt_dev_iman_checkered_checkered_checkered_app_layout_tsx",
+      "target": "layout_rootlayout",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "/Users/nkt/dev/iman/checkered/checkered/checkered/app/page.tsx",
+      "source_location": "L49",
+      "weight": 1.0,
+      "_src": "users_nkt_dev_iman_checkered_checkered_checkered_app_page_tsx",
+      "_tgt": "page_selecttournament",
+      "source": "users_nkt_dev_iman_checkered_checkered_checkered_app_page_tsx",
+      "target": "page_selecttournament",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "/Users/nkt/dev/iman/checkered/checkered/checkered/app/page.tsx",
+      "source_location": "L59",
+      "weight": 1.0,
+      "_src": "users_nkt_dev_iman_checkered_checkered_checkered_app_page_tsx",
+      "_tgt": "page_refreshselectedtournament",
+      "source": "users_nkt_dev_iman_checkered_checkered_checkered_app_page_tsx",
+      "target": "page_refreshselectedtournament",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "/Users/nkt/dev/iman/checkered/checkered/checkered/app/page.tsx",
+      "source_location": "L60",
+      "weight": 1.0,
+      "_src": "page_refreshselectedtournament",
+      "_tgt": "page_selecttournament",
+      "source": "page_selecttournament",
+      "target": "page_refreshselectedtournament",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "/Users/nkt/dev/iman/checkered/checkered/checkered/app/utils/sanitizeError.ts",
+      "source_location": "L35",
+      "weight": 1.0,
+      "_src": "users_nkt_dev_iman_checkered_checkered_checkered_app_utils_sanitizeerror_ts",
+      "_tgt": "sanitizeerror_sanitizeerror",
+      "source": "users_nkt_dev_iman_checkered_checkered_checkered_app_utils_sanitizeerror_ts",
+      "target": "sanitizeerror_sanitizeerror",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "/Users/nkt/dev/iman/checkered/checkered/checkered/app/components/CreateTournament.tsx",
+      "source_location": "L33",
+      "weight": 1.0,
+      "_src": "users_nkt_dev_iman_checkered_checkered_checkered_app_components_createtournament_tsx",
+      "_tgt": "createtournament_createtournament",
+      "source": "users_nkt_dev_iman_checkered_checkered_checkered_app_components_createtournament_tsx",
+      "target": "createtournament_createtournament",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "/Users/nkt/dev/iman/checkered/checkered/checkered/app/components/TournamentDetail.tsx",
+      "source_location": "L27",
+      "weight": 1.0,
+      "_src": "users_nkt_dev_iman_checkered_checkered_checkered_app_components_tournamentdetail_tsx",
+      "_tgt": "tournamentdetail_formattokenamount",
+      "source": "users_nkt_dev_iman_checkered_checkered_checkered_app_components_tournamentdetail_tsx",
+      "target": "tournamentdetail_formattokenamount",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "/Users/nkt/dev/iman/checkered/checkered/checkered/app/components/TournamentDetail.tsx",
+      "source_location": "L31",
+      "weight": 1.0,
+      "_src": "users_nkt_dev_iman_checkered_checkered_checkered_app_components_tournamentdetail_tsx",
+      "_tgt": "tournamentdetail_formatdate",
+      "source": "users_nkt_dev_iman_checkered_checkered_checkered_app_components_tournamentdetail_tsx",
+      "target": "tournamentdetail_formatdate",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "/Users/nkt/dev/iman/checkered/checkered/checkered/app/components/TournamentDetail.tsx",
+      "source_location": "L66",
+      "weight": 1.0,
+      "_src": "users_nkt_dev_iman_checkered_checkered_checkered_app_components_tournamentdetail_tsx",
+      "_tgt": "tournamentdetail_sendadmintx",
+      "source": "users_nkt_dev_iman_checkered_checkered_checkered_app_components_tournamentdetail_tsx",
+      "target": "tournamentdetail_sendadmintx",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "/Users/nkt/dev/iman/checkered/checkered/checkered/app/components/TournamentDetail.tsx",
+      "source_location": "L83",
+      "weight": 1.0,
+      "_src": "users_nkt_dev_iman_checkered_checkered_checkered_app_components_tournamentdetail_tsx",
+      "_tgt": "tournamentdetail_fmt",
+      "source": "users_nkt_dev_iman_checkered_checkered_checkered_app_components_tournamentdetail_tsx",
+      "target": "tournamentdetail_fmt",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "/Users/nkt/dev/iman/checkered/checkered/checkered/app/components/TournamentDetail.tsx",
+      "source_location": "L83",
+      "weight": 1.0,
+      "_src": "tournamentdetail_fmt",
+      "_tgt": "tournamentdetail_formattokenamount",
+      "source": "tournamentdetail_formattokenamount",
+      "target": "tournamentdetail_fmt",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "/Users/nkt/dev/iman/checkered/checkered/checkered/app/components/RegisterForTournament.tsx",
+      "source_location": "L65",
+      "weight": 1.0,
+      "_src": "users_nkt_dev_iman_checkered_checkered_checkered_app_components_registerfortournament_tsx",
+      "_tgt": "registerfortournament_handlestatus",
+      "source": "users_nkt_dev_iman_checkered_checkered_checkered_app_components_registerfortournament_tsx",
+      "target": "registerfortournament_handlestatus",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "/Users/nkt/dev/iman/checkered/checkered/checkered/app/components/RegisterForTournament.tsx",
+      "source_location": "L78",
+      "weight": 1.0,
+      "_src": "users_nkt_dev_iman_checkered_checkered_checkered_app_components_registerfortournament_tsx",
+      "_tgt": "registerfortournament_handleregisterclick",
+      "source": "users_nkt_dev_iman_checkered_checkered_checkered_app_components_registerfortournament_tsx",
+      "target": "registerfortournament_handleregisterclick",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "/Users/nkt/dev/iman/checkered/checkered/checkered/app/components/Header.tsx",
+      "source_location": "L34",
+      "weight": 1.0,
+      "_src": "users_nkt_dev_iman_checkered_checkered_checkered_app_components_header_tsx",
+      "_tgt": "header_connectbrowserwallet",
+      "source": "users_nkt_dev_iman_checkered_checkered_checkered_app_components_header_tsx",
+      "target": "header_connectbrowserwallet",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "/Users/nkt/dev/iman/checkered/checkered/checkered/app/components/TournamentList.tsx",
+      "source_location": "L198",
+      "weight": 1.0,
+      "_src": "users_nkt_dev_iman_checkered_checkered_checkered_app_components_tournamentlist_tsx",
+      "_tgt": "tournamentlist_formattokenamount",
+      "source": "users_nkt_dev_iman_checkered_checkered_checkered_app_components_tournamentlist_tsx",
+      "target": "tournamentlist_formattokenamount",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "/Users/nkt/dev/iman/checkered/checkered/checkered/app/__tests__/contracts.test.ts",
+      "source_location": "L46",
+      "weight": 1.0,
+      "_src": "users_nkt_dev_iman_checkered_checkered_checkered_app_tests_contracts_test_ts",
+      "_tgt": "contracts_test_hasfunction",
+      "source": "users_nkt_dev_iman_checkered_checkered_checkered_app_tests_contracts_test_ts",
+      "target": "contracts_test_hasfunction",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "/Users/nkt/dev/iman/checkered/checkered/checkered/app/__tests__/contracts.test.ts",
+      "source_location": "L52",
+      "weight": 1.0,
+      "_src": "users_nkt_dev_iman_checkered_checkered_checkered_app_tests_contracts_test_ts",
+      "_tgt": "contracts_test_hasevent",
+      "source": "users_nkt_dev_iman_checkered_checkered_checkered_app_tests_contracts_test_ts",
+      "target": "contracts_test_hasevent",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "/Users/nkt/dev/iman/checkered/checkered/checkered/app/hooks/useIsAdmin.ts",
+      "source_location": "L8",
+      "weight": 1.0,
+      "_src": "users_nkt_dev_iman_checkered_checkered_checkered_app_hooks_useisadmin_ts",
+      "_tgt": "useisadmin_useisadmin",
+      "source": "users_nkt_dev_iman_checkered_checkered_checkered_app_hooks_useisadmin_ts",
+      "target": "useisadmin_useisadmin",
+      "confidence_score": 1.0
+    }
+  ],
+  "hyperedges": []
+}

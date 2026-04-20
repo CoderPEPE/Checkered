@@ -1,0 +1,109 @@
+# testBackendTournaments()
+
+## Nodes
+
+- **fail()** — `/Users/nkt/dev/iman/checkered/checkered/backend/test/iracing-integration.js`
+- **main()** — `/Users/nkt/dev/iman/checkered/checkered/backend/test/iracing-integration.js`
+- **ok()** — `/Users/nkt/dev/iman/checkered/checkered/backend/test/iracing-integration.js`
+- **skip()** — `/Users/nkt/dev/iman/checkered/checkered/backend/test/iracing-integration.js`
+- **testBackendHealth()** — `/Users/nkt/dev/iman/checkered/checkered/backend/test/iracing-integration.js`
+- **testBackendTournaments()** — `/Users/nkt/dev/iman/checkered/checkered/backend/test/iracing-integration.js`
+- **testContractConnection()** — `/Users/nkt/dev/iman/checkered/checkered/backend/test/iracing-integration.js`
+- **testIRacingOAuth()** — `/Users/nkt/dev/iman/checkered/checkered/backend/test/iracing-integration.js`
+- **testManualPoll()** — `/Users/nkt/dev/iman/checkered/checkered/backend/test/iracing-integration.js`
+- **testMemberInfo()** — `/Users/nkt/dev/iman/checkered/checkered/backend/test/iracing-integration.js`
+- **testOracleStatus()** — `/Users/nkt/dev/iman/checkered/checkered/backend/test/iracing-integration.js`
+- **testRecentRaces()** — `/Users/nkt/dev/iman/checkered/checkered/backend/test/iracing-integration.js`
+- **testSubsessionResults()** — `/Users/nkt/dev/iman/checkered/checkered/backend/test/iracing-integration.js`
+- **iracing-integration.js** — `/Users/nkt/dev/iman/checkered/checkered/backend/test/iracing-integration.js`
+
+## Relationships
+
+- fail() --**contains**--> iracing-integration.js [EXTRACTED]
+- fail() --**calls**--> testIRacingOAuth() [EXTRACTED]
+- fail() --**calls**--> testMemberInfo() [EXTRACTED]
+- fail() --**calls**--> testRecentRaces() [EXTRACTED]
+- fail() --**calls**--> testSubsessionResults() [EXTRACTED]
+- fail() --**calls**--> testBackendHealth() [EXTRACTED]
+- fail() --**calls**--> testBackendTournaments() [EXTRACTED]
+- fail() --**calls**--> testOracleStatus() [EXTRACTED]
+- fail() --**calls**--> testManualPoll() [EXTRACTED]
+- fail() --**calls**--> testContractConnection() [EXTRACTED]
+- main() --**contains**--> iracing-integration.js [EXTRACTED]
+- main() --**calls**--> testContractConnection() [EXTRACTED]
+- main() --**calls**--> testIRacingOAuth() [EXTRACTED]
+- main() --**calls**--> testMemberInfo() [EXTRACTED]
+- main() --**calls**--> testRecentRaces() [EXTRACTED]
+- main() --**calls**--> testSubsessionResults() [EXTRACTED]
+- main() --**calls**--> testBackendHealth() [EXTRACTED]
+- main() --**calls**--> testBackendTournaments() [EXTRACTED]
+- main() --**calls**--> testOracleStatus() [EXTRACTED]
+- main() --**calls**--> testManualPoll() [EXTRACTED]
+- ok() --**contains**--> iracing-integration.js [EXTRACTED]
+- ok() --**calls**--> testIRacingOAuth() [EXTRACTED]
+- ok() --**calls**--> testMemberInfo() [EXTRACTED]
+- ok() --**calls**--> testRecentRaces() [EXTRACTED]
+- ok() --**calls**--> testSubsessionResults() [EXTRACTED]
+- ok() --**calls**--> testBackendHealth() [EXTRACTED]
+- ok() --**calls**--> testBackendTournaments() [EXTRACTED]
+- ok() --**calls**--> testOracleStatus() [EXTRACTED]
+- ok() --**calls**--> testManualPoll() [EXTRACTED]
+- ok() --**calls**--> testContractConnection() [EXTRACTED]
+- skip() --**contains**--> iracing-integration.js [EXTRACTED]
+- skip() --**calls**--> testIRacingOAuth() [EXTRACTED]
+- skip() --**calls**--> testMemberInfo() [EXTRACTED]
+- skip() --**calls**--> testRecentRaces() [EXTRACTED]
+- skip() --**calls**--> testSubsessionResults() [EXTRACTED]
+- testBackendHealth() --**contains**--> iracing-integration.js [EXTRACTED]
+- testBackendHealth() --**calls**--> fail() [EXTRACTED]
+- testBackendHealth() --**calls**--> ok() [EXTRACTED]
+- testBackendHealth() --**calls**--> main() [EXTRACTED]
+- testBackendTournaments() --**contains**--> iracing-integration.js [EXTRACTED]
+- testBackendTournaments() --**calls**--> fail() [EXTRACTED]
+- testBackendTournaments() --**calls**--> ok() [EXTRACTED]
+- testBackendTournaments() --**calls**--> main() [EXTRACTED]
+- testContractConnection() --**contains**--> iracing-integration.js [EXTRACTED]
+- testContractConnection() --**calls**--> ok() [EXTRACTED]
+- testContractConnection() --**calls**--> fail() [EXTRACTED]
+- testContractConnection() --**calls**--> main() [EXTRACTED]
+- testIRacingOAuth() --**contains**--> iracing-integration.js [EXTRACTED]
+- testIRacingOAuth() --**calls**--> skip() [EXTRACTED]
+- testIRacingOAuth() --**calls**--> ok() [EXTRACTED]
+- testIRacingOAuth() --**calls**--> fail() [EXTRACTED]
+- testIRacingOAuth() --**calls**--> main() [EXTRACTED]
+- testManualPoll() --**contains**--> iracing-integration.js [EXTRACTED]
+- testManualPoll() --**calls**--> ok() [EXTRACTED]
+- testManualPoll() --**calls**--> fail() [EXTRACTED]
+- testManualPoll() --**calls**--> main() [EXTRACTED]
+- testMemberInfo() --**contains**--> iracing-integration.js [EXTRACTED]
+- testMemberInfo() --**calls**--> skip() [EXTRACTED]
+- testMemberInfo() --**calls**--> fail() [EXTRACTED]
+- testMemberInfo() --**calls**--> ok() [EXTRACTED]
+- testMemberInfo() --**calls**--> main() [EXTRACTED]
+- testOracleStatus() --**contains**--> iracing-integration.js [EXTRACTED]
+- testOracleStatus() --**calls**--> ok() [EXTRACTED]
+- testOracleStatus() --**calls**--> fail() [EXTRACTED]
+- testOracleStatus() --**calls**--> main() [EXTRACTED]
+- testRecentRaces() --**contains**--> iracing-integration.js [EXTRACTED]
+- testRecentRaces() --**calls**--> skip() [EXTRACTED]
+- testRecentRaces() --**calls**--> ok() [EXTRACTED]
+- testRecentRaces() --**calls**--> fail() [EXTRACTED]
+- testRecentRaces() --**calls**--> main() [EXTRACTED]
+- testSubsessionResults() --**contains**--> iracing-integration.js [EXTRACTED]
+- testSubsessionResults() --**calls**--> skip() [EXTRACTED]
+- testSubsessionResults() --**calls**--> ok() [EXTRACTED]
+- testSubsessionResults() --**calls**--> fail() [EXTRACTED]
+- testSubsessionResults() --**calls**--> main() [EXTRACTED]
+- iracing-integration.js --**contains**--> ok() [EXTRACTED]
+- iracing-integration.js --**contains**--> fail() [EXTRACTED]
+- iracing-integration.js --**contains**--> skip() [EXTRACTED]
+- iracing-integration.js --**contains**--> testIRacingOAuth() [EXTRACTED]
+- iracing-integration.js --**contains**--> testMemberInfo() [EXTRACTED]
+- iracing-integration.js --**contains**--> testRecentRaces() [EXTRACTED]
+- iracing-integration.js --**contains**--> testSubsessionResults() [EXTRACTED]
+- iracing-integration.js --**contains**--> testBackendHealth() [EXTRACTED]
+- iracing-integration.js --**contains**--> testBackendTournaments() [EXTRACTED]
+- iracing-integration.js --**contains**--> testOracleStatus() [EXTRACTED]
+- iracing-integration.js --**contains**--> testManualPoll() [EXTRACTED]
+- iracing-integration.js --**contains**--> testContractConnection() [EXTRACTED]
+- iracing-integration.js --**contains**--> main() [EXTRACTED]

@@ -1,0 +1,113 @@
+
+⏺ Bash(node scripts/check-league.js 132296 2>&1 | head -80)
+  ⎿  === League 132296 ===
+     auth: OK
+     league/get -> HTTP 404: {
+     … +5 lines (ctrl+o to expand)
+
+⏺ Concrete result from iRacing:
+
+  HTTP 404 — "League with ID 132296 could not be found."
+
+  OAuth is fine (auth: OK). The league ID itself is invalid — iRacing has no league 132296.
+
+  This explains the customer's experience completely:
+  - He may be reading the number off the wrong place in the iRacing UI (e.g., a season ID, club ID, or roster ID — not the league
+   ID)
+  - Or the league was deleted
+  - Or the league exists but is private and the bot account lvluplabsrace@gmail.com isn't a member (in which case iRacing returns
+   404 to mask its existence)
+
+  What to ask the customer
+
+  1. Verify the league ID. On iRacing, go to League → My Leagues → click the league. The URL bar will show …/league/132296 — that
+   number is the league ID. Confirm what number actually appears there.
+  2. Confirm the bot account is a member. Private leagues return 404 to non-members. The bot is lvluplabsrace@gmail.com — they
+  need to invite that account to the league (or the bot needs to use league-owner credentials).
+
+  Once we have a real league ID and confirmed access, I can re-run the script and we'll see the actual seasons + sessions. Then
+  we can decide whether to build the auto-create-tournaments-from-league feature you described.
+
+✻ Baked for 1m 20s                                            
+                                                                                          
+❯ 14250 this is leaue id [Image #2]                                                                                              
+  ⎿  [Image #2]                                                                                                                  
+  ⎿  ⧉ Selected 1 lines from .env in Visual Studio Code                                                                          
+                                                                                                                                 
+⏺ Bash(node scripts/check-league.js 14250 2>&1 | head -100)                                                                      
+  ⎿  === League 14250 ===                                                                                                        
+     auth: OK                                                                                                                    
+     Name: Checkered                                                                                                             
+     … +9 lines (ctrl+o to expand)                                                                                               
+                                                                                                                                 
+⏺ That clears it up completely. The number 132296 is the season ID, not the league ID. The actual league ID is 14250.            
+                                                                                                                                 
+  Here's what's in league 14250 right now:                                                                                       
+                                                                                                                               
+  League: "Checkered" (owner: Alexander Covington3)                                                                              
+  Season: "Test Season 1" (season_id=132296, active)                                                                             
+    Session 1: subsession_id=84743724  track=Tsukuba  launch 2026-04-04  has_results=false                                       
+    Session 2: subsession_id=84973367  track=Tsukuba  launch 2026-04-13  has_results=false                                       
+                                                                                                                                 
+  Two things to note                                                                                                             
+                                                                                                                                 
+  1. Neither session has results yet. has_results=false on both — meaning iRacing never recorded race results for them (typically
+   because no one actually raced, or <2 drivers). The oracle's league discovery filters to has_results=true (iracing-api.js:281),
+   so even with the correct IDs, nothing would be picked up until someone actually races and finishes.                           
+                                                                            
+  2. Auto-create-tournaments-from-league does not exist in the current code. Today's flow is:                                    
+  - Admin manually creates a tournament on the website, entering leagueId=14250, seasonId=132296
+  - When the tournament's status is advanced to Racing, oracle polls iRacing, finds the most recent finished session in that     
+  season, and fills in the subsession ID on-chain                                                                           
+                                                                                                                                 
+  To get the behavior you're describing ("backend should auto pull and auto create tournaments"), the backend would need new
+  logic that:                                                                                                                    
+  - Polls each configured league periodically                     
+  - For every session with has_results=true that doesn't already have a tournament, creates one on-chain (via admin role)        
+  - Decides entry fee / max players / prize splits somehow — this is the interesting design question                     
+                                                                                                                                 
+  Question before building                                                                                                       
+                                                                                                                                 
+  Who decides a new session should become a tournament, and what entry fee / prize split does it get? Options:                   
+                                                                            
+  - All-or-nothing: every new finished session in a whitelisted league becomes a tournament with fixed defaults (e.g., $5 entry, 
+  top-3 split)                                                           
+  - Template per league: admin configures "when a new session appears in league 14250, create a tournament with these params"    
+  - Still-manual-but-easier: website shows a list of recent league sessions and admin clicks "Create tournament from this        
+  session"                                                                                                                       
+                                                                                                                                 
+  Which one matches what you want?         
+
+
+
+
+
+                                                                                                                                                    
+  Searched for 1 pattern (ctrl+o to expand)                                                                                                       
+                                                                                                                                                  
+⏺ The screenshot is from the iRacing website itself. Here's the full picture of what's working and what isn't:                                    
+                                                                                                                                                  
+  Working:                                                                                                                                        
+  - Backend running on port 3002                                                                                                                  
+  - iRacing OAuth auth ✓ (cust_id 1450841 — "Alexander Covington3")                                                                               
+  - Oracle wallet now has both ADMIN_ROLE + ORACLE_ROLE on the contract ✓                                                                         
+                                                                                                                                                  
+  Blocked — one step needed:                                                                                                                      
+  The oracle's iRacing account (lvluplabsrace@gmail.com / Alexander Covington3) is not a member of league 132296. The API returns "subscribed":   
+  false and empty seasons. iRacing only shows league data to members.                                                                             
+                                                                                                                                                
+  Fix: A league admin needs to add lvluplabsrace@gmail.com to league 132296 through the iRacing website (League Management → Roster → Invite).    
+  Once that account is in the league, the auto-create will kick in on the next hourly poll — or you can trigger it immediately with:            
+                                                                                                                                                  
+  curl -X POST http://localhost:3002/api/admin/sync-league \                                                                                    
+    -H "X-API-Key: checkered-admin-dev-key"
+                                                                                                                                                  
+  Alternatively, if you want to use your own personal iRacing account credentials instead (since you're already in the league), update            
+  backend/.env:                                                                                                                                   
+  IRACING_EMAIL=your-personal@email.com                                                                                                           
+  IRACING_PASSWORD=your-password                                                                                                                
+                                                                                                                                                  
+  Everything else is in place — once the account has league access, the backend will automatically create tournaments with 100 CHEX entry,
+  60/30/10 splits for every session it finds.                                                                                                     
+                                                                                                                                                
+✻ Crunched for 6m 56s · 1 shell still running   

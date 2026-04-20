@@ -21,7 +21,7 @@ const rateLimit = require("express-rate-limit");
  * @param {function} deps.iRacingAuth - iRacing OAuth auth function (optional)
  * @param {function} deps.fetchMemberInfo - iRacing member info function (optional)
  */
-function createApp({ adminApiKey, tournamentContract, oracleWallet, mockMode, logger, pollTournaments, provider, iRacingAuth, fetchMemberInfo }) {
+function createApp({ adminApiKey, tournamentContract, oracleWallet, mockMode, logger, pollTournaments, pollLeagueTournaments, provider, iRacingAuth, fetchMemberInfo }) {
   const app = express();
 
   // Security headers — explicit config for readability (Milestone 7)
@@ -212,13 +212,30 @@ function createApp({ adminApiKey, tournamentContract, oracleWallet, mockMode, lo
     });
   });
 
-  // Manual poll trigger — protected
+  // Manual oracle poll trigger — protected
   app.post("/api/oracle/poll", requireApiKey, async (_req, res) => {
     try {
       await pollTournaments();
       res.json({ status: "poll complete" });
     } catch (err) {
       logger.error(`POST /api/oracle/poll error: ${err.message}`);
+      res.status(500).json({ error: "Internal server error" });
+    }
+  });
+
+  // Manual trigger: sync iRacing league sessions → create missing tournaments — protected
+  app.post("/api/admin/sync-league", requireApiKey, async (_req, res) => {
+    if (mockMode) {
+      return res.json({ status: "skipped", reason: "mock mode enabled" });
+    }
+    if (!pollLeagueTournaments) {
+      return res.status(501).json({ error: "Auto-create not configured" });
+    }
+    try {
+      await pollLeagueTournaments();
+      res.json({ status: "sync complete" });
+    } catch (err) {
+      logger.error(`POST /api/admin/sync-league error: ${err.message}`);
       res.status(500).json({ error: "Internal server error" });
     }
   });

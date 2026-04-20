@@ -1,0 +1,1803 @@
+{
+  "nodes": [
+    {
+      "id": "g0",
+      "type": "group",
+      "label": "testBackendTournaments()",
+      "x": 0,
+      "y": 0,
+      "width": 880,
+      "height": 620,
+      "color": "1"
+    },
+    {
+      "id": "n_iracing_integration_fail",
+      "type": "file",
+      "file": "graphify/obsidian/fail().md",
+      "x": 20,
+      "y": 80,
+      "width": 180,
+      "height": 60
+    },
+    {
+      "id": "n_users_nkt_dev_iman_checkered_checkered_backend_test_iracing_integration_js",
+      "type": "file",
+      "file": "graphify/obsidian/iracing-integration.js.md",
+      "x": 220,
+      "y": 80,
+      "width": 180,
+      "height": 60
+    },
+    {
+      "id": "n_iracing_integration_main",
+      "type": "file",
+      "file": "graphify/obsidian/main().md",
+      "x": 420,
+      "y": 80,
+      "width": 180,
+      "height": 60
+    },
+    {
+      "id": "n_iracing_integration_ok",
+      "type": "file",
+      "file": "graphify/obsidian/ok().md",
+      "x": 20,
+      "y": 160,
+      "width": 180,
+      "height": 60
+    },
+    {
+      "id": "n_iracing_integration_skip",
+      "type": "file",
+      "file": "graphify/obsidian/skip().md",
+      "x": 220,
+      "y": 160,
+      "width": 180,
+      "height": 60
+    },
+    {
+      "id": "n_iracing_integration_testbackendhealth",
+      "type": "file",
+      "file": "graphify/obsidian/testBackendHealth().md",
+      "x": 420,
+      "y": 160,
+      "width": 180,
+      "height": 60
+    },
+    {
+      "id": "n_iracing_integration_testbackendtournaments",
+      "type": "file",
+      "file": "graphify/obsidian/testBackendTournaments().md",
+      "x": 20,
+      "y": 240,
+      "width": 180,
+      "height": 60
+    },
+    {
+      "id": "n_iracing_integration_testcontractconnection",
+      "type": "file",
+      "file": "graphify/obsidian/testContractConnection().md",
+      "x": 220,
+      "y": 240,
+      "width": 180,
+      "height": 60
+    },
+    {
+      "id": "n_iracing_integration_testiracingoauth",
+      "type": "file",
+      "file": "graphify/obsidian/testIRacingOAuth().md",
+      "x": 420,
+      "y": 240,
+      "width": 180,
+      "height": 60
+    },
+    {
+      "id": "n_iracing_integration_testmanualpoll",
+      "type": "file",
+      "file": "graphify/obsidian/testManualPoll().md",
+      "x": 20,
+      "y": 320,
+      "width": 180,
+      "height": 60
+    },
+    {
+      "id": "n_iracing_integration_testmemberinfo",
+      "type": "file",
+      "file": "graphify/obsidian/testMemberInfo().md",
+      "x": 220,
+      "y": 320,
+      "width": 180,
+      "height": 60
+    },
+    {
+      "id": "n_iracing_integration_testoraclestatus",
+      "type": "file",
+      "file": "graphify/obsidian/testOracleStatus().md",
+      "x": 420,
+      "y": 320,
+      "width": 180,
+      "height": 60
+    },
+    {
+      "id": "n_iracing_integration_testrecentraces",
+      "type": "file",
+      "file": "graphify/obsidian/testRecentRaces().md",
+      "x": 20,
+      "y": 400,
+      "width": 180,
+      "height": 60
+    },
+    {
+      "id": "n_iracing_integration_testsubsessionresults",
+      "type": "file",
+      "file": "graphify/obsidian/testSubsessionResults().md",
+      "x": 220,
+      "y": 400,
+      "width": 180,
+      "height": 60
+    },
+    {
+      "id": "g1",
+      "type": "group",
+      "label": "fetchLeagueSeasonSessions()",
+      "x": 960,
+      "y": 0,
+      "width": 660,
+      "height": 420,
+      "color": "2"
+    },
+    {
+      "id": "n_iracing_api_fetchleagueseasonsessions",
+      "type": "file",
+      "file": "graphify/obsidian/fetchLeagueSeasonSessions().md",
+      "x": 980,
+      "y": 80,
+      "width": 180,
+      "height": 60
+    },
+    {
+      "id": "n_iracing_api_fetchmemberinfo",
+      "type": "file",
+      "file": "graphify/obsidian/fetchMemberInfo().md",
+      "x": 1180,
+      "y": 80,
+      "width": 180,
+      "height": 60
+    },
+    {
+      "id": "n_iracing_api_fetchrecentraces",
+      "type": "file",
+      "file": "graphify/obsidian/fetchRecentRaces().md",
+      "x": 1380,
+      "y": 80,
+      "width": 180,
+      "height": 60
+    },
+    {
+      "id": "n_iracing_api_fetchsubsessionresults",
+      "type": "file",
+      "file": "graphify/obsidian/fetchSubsessionResults().md",
+      "x": 980,
+      "y": 160,
+      "width": 180,
+      "height": 60
+    },
+    {
+      "id": "n_iracing_api_iracingauth",
+      "type": "file",
+      "file": "graphify/obsidian/iRacingAuth().md",
+      "x": 1180,
+      "y": 160,
+      "width": 180,
+      "height": 60
+    },
+    {
+      "id": "n_iracing_api_iracingfetch",
+      "type": "file",
+      "file": "graphify/obsidian/iRacingFetch().md",
+      "x": 1380,
+      "y": 160,
+      "width": 180,
+      "height": 60
+    },
+    {
+      "id": "n_users_nkt_dev_iman_checkered_checkered_backend_src_iracing_api_js",
+      "type": "file",
+      "file": "graphify/obsidian/iracing-api.js.md",
+      "x": 980,
+      "y": 240,
+      "width": 180,
+      "height": 60
+    },
+    {
+      "id": "n_iracing_api_refreshaccesstoken",
+      "type": "file",
+      "file": "graphify/obsidian/refreshAccessToken().md",
+      "x": 1180,
+      "y": 240,
+      "width": 180,
+      "height": 60
+    },
+    {
+      "id": "g2",
+      "type": "group",
+      "label": "createTournamentFixture()",
+      "x": 1700,
+      "y": 0,
+      "width": 660,
+      "height": 400,
+      "color": "3"
+    },
+    {
+      "id": "n_users_nkt_dev_iman_checkered_checkered_test_iracingtournament_test_js",
+      "type": "file",
+      "file": "graphify/obsidian/IRacingTournament.test.js.md",
+      "x": 1720,
+      "y": 80,
+      "width": 180,
+      "height": 60
+    },
+    {
+      "id": "n_iracingtournament_test_createtournamentfixture",
+      "type": "file",
+      "file": "graphify/obsidian/createTournamentFixture().md",
+      "x": 1920,
+      "y": 80,
+      "width": 180,
+      "height": 60
+    },
+    {
+      "id": "n_iracingtournament_test_deployfixture",
+      "type": "file",
+      "file": "graphify/obsidian/deployFixture().md",
+      "x": 2120,
+      "y": 80,
+      "width": 180,
+      "height": 60
+    },
+    {
+      "id": "n_iracingtournament_test_fulltournamentfixture",
+      "type": "file",
+      "file": "graphify/obsidian/fullTournamentFixture().md",
+      "x": 1720,
+      "y": 160,
+      "width": 180,
+      "height": 60
+    },
+    {
+      "id": "n_iracingtournament_test_stucktournamentfixture",
+      "type": "file",
+      "file": "graphify/obsidian/stuckTournamentFixture().md",
+      "x": 1920,
+      "y": 160,
+      "width": 180,
+      "height": 60
+    },
+    {
+      "id": "g3",
+      "type": "group",
+      "label": "formatTokenAmount() (TournamentDetail)",
+      "x": 2440,
+      "y": 0,
+      "width": 660,
+      "height": 400,
+      "color": "4"
+    },
+    {
+      "id": "n_users_nkt_dev_iman_checkered_checkered_checkered_app_components_tournamentdetail_tsx",
+      "type": "file",
+      "file": "graphify/obsidian/TournamentDetail.tsx.md",
+      "x": 2460,
+      "y": 80,
+      "width": 180,
+      "height": 60
+    },
+    {
+      "id": "n_tournamentdetail_fmt",
+      "type": "file",
+      "file": "graphify/obsidian/fmt().md",
+      "x": 2660,
+      "y": 80,
+      "width": 180,
+      "height": 60
+    },
+    {
+      "id": "n_tournamentdetail_formatdate",
+      "type": "file",
+      "file": "graphify/obsidian/formatDate().md",
+      "x": 2860,
+      "y": 80,
+      "width": 180,
+      "height": 60
+    },
+    {
+      "id": "n_tournamentdetail_formattokenamount",
+      "type": "file",
+      "file": "graphify/obsidian/formatTokenAmount().md",
+      "x": 2460,
+      "y": 160,
+      "width": 180,
+      "height": 60
+    },
+    {
+      "id": "n_tournamentdetail_sendadmintx",
+      "type": "file",
+      "file": "graphify/obsidian/sendAdminTx().md",
+      "x": 2660,
+      "y": 160,
+      "width": 180,
+      "height": 60
+    },
+    {
+      "id": "g4",
+      "type": "group",
+      "label": "mockTournamentData()",
+      "x": 3180,
+      "y": 0,
+      "width": 600,
+      "height": 400,
+      "color": "5"
+    },
+    {
+      "id": "n_users_nkt_dev_iman_checkered_checkered_backend_test_api_test_js",
+      "type": "file",
+      "file": "graphify/obsidian/api.test.js.md",
+      "x": 3200,
+      "y": 80,
+      "width": 180,
+      "height": 60
+    },
+    {
+      "id": "n_api_test_buildapp",
+      "type": "file",
+      "file": "graphify/obsidian/buildApp().md",
+      "x": 3400,
+      "y": 80,
+      "width": 180,
+      "height": 60
+    },
+    {
+      "id": "n_api_test_mockcontract",
+      "type": "file",
+      "file": "graphify/obsidian/mockContract().md",
+      "x": 3600,
+      "y": 80,
+      "width": 180,
+      "height": 60
+    },
+    {
+      "id": "n_api_test_mocktournamentdata",
+      "type": "file",
+      "file": "graphify/obsidian/mockTournamentData().md",
+      "x": 3200,
+      "y": 160,
+      "width": 180,
+      "height": 60
+    },
+    {
+      "id": "g5",
+      "type": "group",
+      "label": "generateMockResults()",
+      "x": 3860,
+      "y": 0,
+      "width": 600,
+      "height": 400,
+      "color": "6"
+    },
+    {
+      "id": "n_index_generatemockresults",
+      "type": "file",
+      "file": "graphify/obsidian/generateMockResults().md",
+      "x": 3880,
+      "y": 80,
+      "width": 180,
+      "height": 60
+    },
+    {
+      "id": "n_users_nkt_dev_iman_checkered_checkered_backend_src_index_js",
+      "type": "file",
+      "file": "graphify/obsidian/index.js.md",
+      "x": 4080,
+      "y": 80,
+      "width": 180,
+      "height": 60
+    },
+    {
+      "id": "n_index_polltournaments",
+      "type": "file",
+      "file": "graphify/obsidian/pollTournaments().md",
+      "x": 4280,
+      "y": 80,
+      "width": 180,
+      "height": 60
+    },
+    {
+      "id": "n_index_submitresults",
+      "type": "file",
+      "file": "graphify/obsidian/submitResults().md",
+      "x": 3880,
+      "y": 160,
+      "width": 180,
+      "height": 60
+    },
+    {
+      "id": "g6",
+      "type": "group",
+      "label": "refreshSelectedTournament()",
+      "x": 0,
+      "y": 700,
+      "width": 600,
+      "height": 400,
+      "color": "1"
+    },
+    {
+      "id": "n_users_nkt_dev_iman_checkered_checkered_checkered_app_page_tsx",
+      "type": "file",
+      "file": "graphify/obsidian/page.tsx.md",
+      "x": 20,
+      "y": 780,
+      "width": 180,
+      "height": 60
+    },
+    {
+      "id": "n_page_refreshselectedtournament",
+      "type": "file",
+      "file": "graphify/obsidian/refreshSelectedTournament().md",
+      "x": 220,
+      "y": 780,
+      "width": 180,
+      "height": 60
+    },
+    {
+      "id": "n_page_selecttournament",
+      "type": "file",
+      "file": "graphify/obsidian/selectTournament().md",
+      "x": 420,
+      "y": 780,
+      "width": 180,
+      "height": 60
+    },
+    {
+      "id": "g7",
+      "type": "group",
+      "label": "handleRegisterClick()",
+      "x": 960,
+      "y": 700,
+      "width": 600,
+      "height": 400,
+      "color": "2"
+    },
+    {
+      "id": "n_users_nkt_dev_iman_checkered_checkered_checkered_app_components_registerfortournament_tsx",
+      "type": "file",
+      "file": "graphify/obsidian/RegisterForTournament.tsx.md",
+      "x": 980,
+      "y": 780,
+      "width": 180,
+      "height": 60
+    },
+    {
+      "id": "n_registerfortournament_handleregisterclick",
+      "type": "file",
+      "file": "graphify/obsidian/handleRegisterClick().md",
+      "x": 1180,
+      "y": 780,
+      "width": 180,
+      "height": 60
+    },
+    {
+      "id": "n_registerfortournament_handlestatus",
+      "type": "file",
+      "file": "graphify/obsidian/handleStatus().md",
+      "x": 1380,
+      "y": 780,
+      "width": 180,
+      "height": 60
+    },
+    {
+      "id": "g8",
+      "type": "group",
+      "label": "hasFunction()",
+      "x": 1700,
+      "y": 700,
+      "width": 600,
+      "height": 400,
+      "color": "3"
+    },
+    {
+      "id": "n_users_nkt_dev_iman_checkered_checkered_checkered_app_tests_contracts_test_ts",
+      "type": "file",
+      "file": "graphify/obsidian/contracts.test.ts.md",
+      "x": 1720,
+      "y": 780,
+      "width": 180,
+      "height": 60
+    },
+    {
+      "id": "n_contracts_test_hasevent",
+      "type": "file",
+      "file": "graphify/obsidian/hasEvent().md",
+      "x": 1920,
+      "y": 780,
+      "width": 180,
+      "height": 60
+    },
+    {
+      "id": "n_contracts_test_hasfunction",
+      "type": "file",
+      "file": "graphify/obsidian/hasFunction().md",
+      "x": 2120,
+      "y": 780,
+      "width": 180,
+      "height": 60
+    },
+    {
+      "id": "g9",
+      "type": "group",
+      "label": "createApp()",
+      "x": 2440,
+      "y": 700,
+      "width": 600,
+      "height": 400,
+      "color": "4"
+    },
+    {
+      "id": "n_users_nkt_dev_iman_checkered_checkered_backend_src_app_js",
+      "type": "file",
+      "file": "graphify/obsidian/app.js.md",
+      "x": 2460,
+      "y": 780,
+      "width": 180,
+      "height": 60
+    },
+    {
+      "id": "n_app_createapp",
+      "type": "file",
+      "file": "graphify/obsidian/createApp().md",
+      "x": 2660,
+      "y": 780,
+      "width": 180,
+      "height": 60
+    },
+    {
+      "id": "g10",
+      "type": "group",
+      "label": "mint-usdc/main()",
+      "x": 3180,
+      "y": 700,
+      "width": 600,
+      "height": 400,
+      "color": "5"
+    },
+    {
+      "id": "n_mint_usdc_main",
+      "type": "file",
+      "file": "graphify/obsidian/main()_1.md",
+      "x": 3200,
+      "y": 780,
+      "width": 180,
+      "height": 60
+    },
+    {
+      "id": "n_users_nkt_dev_iman_checkered_checkered_scripts_mint_usdc_js",
+      "type": "file",
+      "file": "graphify/obsidian/mint-usdc.js.md",
+      "x": 3400,
+      "y": 780,
+      "width": 180,
+      "height": 60
+    },
+    {
+      "id": "g11",
+      "type": "group",
+      "label": "e2e-test/main()",
+      "x": 3860,
+      "y": 700,
+      "width": 600,
+      "height": 400,
+      "color": "6"
+    },
+    {
+      "id": "n_users_nkt_dev_iman_checkered_checkered_scripts_e2e_test_js",
+      "type": "file",
+      "file": "graphify/obsidian/e2e-test.js.md",
+      "x": 3880,
+      "y": 780,
+      "width": 180,
+      "height": 60
+    },
+    {
+      "id": "n_e2e_test_main",
+      "type": "file",
+      "file": "graphify/obsidian/main()_2.md",
+      "x": 4080,
+      "y": 780,
+      "width": 180,
+      "height": 60
+    },
+    {
+      "id": "g12",
+      "type": "group",
+      "label": "create-and-resolve/main()",
+      "x": 0,
+      "y": 1180,
+      "width": 600,
+      "height": 400,
+      "color": "1"
+    },
+    {
+      "id": "n_users_nkt_dev_iman_checkered_checkered_scripts_create_and_resolve_js",
+      "type": "file",
+      "file": "graphify/obsidian/create-and-resolve.js.md",
+      "x": 20,
+      "y": 1260,
+      "width": 180,
+      "height": 60
+    },
+    {
+      "id": "n_create_and_resolve_main",
+      "type": "file",
+      "file": "graphify/obsidian/main()_3.md",
+      "x": 220,
+      "y": 1260,
+      "width": 180,
+      "height": 60
+    },
+    {
+      "id": "g13",
+      "type": "group",
+      "label": "transfer-chex/main()",
+      "x": 960,
+      "y": 1180,
+      "width": 600,
+      "height": 400,
+      "color": "2"
+    },
+    {
+      "id": "n_transfer_chex_main",
+      "type": "file",
+      "file": "graphify/obsidian/main()_4.md",
+      "x": 980,
+      "y": 1260,
+      "width": 180,
+      "height": 60
+    },
+    {
+      "id": "n_users_nkt_dev_iman_checkered_checkered_scripts_transfer_chex_js",
+      "type": "file",
+      "file": "graphify/obsidian/transfer-chex.js.md",
+      "x": 1180,
+      "y": 1260,
+      "width": 180,
+      "height": 60
+    },
+    {
+      "id": "g14",
+      "type": "group",
+      "label": "deploy/main()",
+      "x": 1700,
+      "y": 1180,
+      "width": 600,
+      "height": 400,
+      "color": "3"
+    },
+    {
+      "id": "n_users_nkt_dev_iman_checkered_checkered_scripts_deploy_js",
+      "type": "file",
+      "file": "graphify/obsidian/deploy.js.md",
+      "x": 1720,
+      "y": 1260,
+      "width": 180,
+      "height": 60
+    },
+    {
+      "id": "n_deploy_main",
+      "type": "file",
+      "file": "graphify/obsidian/main()_5.md",
+      "x": 1920,
+      "y": 1260,
+      "width": 180,
+      "height": 60
+    },
+    {
+      "id": "g15",
+      "type": "group",
+      "label": "create-test-tournament/main()",
+      "x": 2440,
+      "y": 1180,
+      "width": 600,
+      "height": 400,
+      "color": "4"
+    },
+    {
+      "id": "n_users_nkt_dev_iman_checkered_checkered_scripts_create_test_tournament_js",
+      "type": "file",
+      "file": "graphify/obsidian/create-test-tournament.js.md",
+      "x": 2460,
+      "y": 1260,
+      "width": 180,
+      "height": 60
+    },
+    {
+      "id": "n_create_test_tournament_main",
+      "type": "file",
+      "file": "graphify/obsidian/main()_6.md",
+      "x": 2660,
+      "y": 1260,
+      "width": 180,
+      "height": 60
+    },
+    {
+      "id": "g16",
+      "type": "group",
+      "label": "advance-tournament/main()",
+      "x": 3180,
+      "y": 1180,
+      "width": 600,
+      "height": 400,
+      "color": "5"
+    },
+    {
+      "id": "n_users_nkt_dev_iman_checkered_checkered_scripts_advance_tournament_js",
+      "type": "file",
+      "file": "graphify/obsidian/advance-tournament.js.md",
+      "x": 3200,
+      "y": 1260,
+      "width": 180,
+      "height": 60
+    },
+    {
+      "id": "n_advance_tournament_main",
+      "type": "file",
+      "file": "graphify/obsidian/main()_7.md",
+      "x": 3400,
+      "y": 1260,
+      "width": 180,
+      "height": 60
+    },
+    {
+      "id": "g17",
+      "type": "group",
+      "label": "create-batch-tournaments/main()",
+      "x": 3860,
+      "y": 1180,
+      "width": 600,
+      "height": 400,
+      "color": "6"
+    },
+    {
+      "id": "n_users_nkt_dev_iman_checkered_checkered_scripts_create_batch_tournaments_js",
+      "type": "file",
+      "file": "graphify/obsidian/create-batch-tournaments.js.md",
+      "x": 3880,
+      "y": 1260,
+      "width": 180,
+      "height": 60
+    },
+    {
+      "id": "n_create_batch_tournaments_main",
+      "type": "file",
+      "file": "graphify/obsidian/main()_8.md",
+      "x": 4080,
+      "y": 1260,
+      "width": 180,
+      "height": 60
+    },
+    {
+      "id": "g18",
+      "type": "group",
+      "label": "RootProvider()",
+      "x": 0,
+      "y": 1660,
+      "width": 600,
+      "height": 400,
+      "color": "1"
+    },
+    {
+      "id": "n_rootprovider_rootprovider",
+      "type": "file",
+      "file": "graphify/obsidian/RootProvider().md",
+      "x": 20,
+      "y": 1740,
+      "width": 180,
+      "height": 60
+    },
+    {
+      "id": "n_users_nkt_dev_iman_checkered_checkered_checkered_app_rootprovider_tsx",
+      "type": "file",
+      "file": "graphify/obsidian/rootProvider.tsx.md",
+      "x": 220,
+      "y": 1740,
+      "width": 180,
+      "height": 60
+    },
+    {
+      "id": "g19",
+      "type": "group",
+      "label": "buildRegisterCalls()",
+      "x": 960,
+      "y": 1660,
+      "width": 600,
+      "height": 400,
+      "color": "2"
+    },
+    {
+      "id": "n_calls_buildregistercalls",
+      "type": "file",
+      "file": "graphify/obsidian/buildRegisterCalls().md",
+      "x": 980,
+      "y": 1740,
+      "width": 180,
+      "height": 60
+    },
+    {
+      "id": "n_users_nkt_dev_iman_checkered_checkered_checkered_app_calls_ts",
+      "type": "file",
+      "file": "graphify/obsidian/calls.ts.md",
+      "x": 1180,
+      "y": 1740,
+      "width": 180,
+      "height": 60
+    },
+    {
+      "id": "g20",
+      "type": "group",
+      "label": "RootLayout()",
+      "x": 1700,
+      "y": 1660,
+      "width": 600,
+      "height": 400,
+      "color": "3"
+    },
+    {
+      "id": "n_layout_rootlayout",
+      "type": "file",
+      "file": "graphify/obsidian/RootLayout().md",
+      "x": 1720,
+      "y": 1740,
+      "width": 180,
+      "height": 60
+    },
+    {
+      "id": "n_users_nkt_dev_iman_checkered_checkered_checkered_app_layout_tsx",
+      "type": "file",
+      "file": "graphify/obsidian/layout.tsx.md",
+      "x": 1920,
+      "y": 1740,
+      "width": 180,
+      "height": 60
+    },
+    {
+      "id": "g21",
+      "type": "group",
+      "label": "sanitizeError()",
+      "x": 2440,
+      "y": 1660,
+      "width": 600,
+      "height": 400,
+      "color": "4"
+    },
+    {
+      "id": "n_sanitizeerror_sanitizeerror",
+      "type": "file",
+      "file": "graphify/obsidian/sanitizeError().md",
+      "x": 2460,
+      "y": 1740,
+      "width": 180,
+      "height": 60
+    },
+    {
+      "id": "n_users_nkt_dev_iman_checkered_checkered_checkered_app_utils_sanitizeerror_ts",
+      "type": "file",
+      "file": "graphify/obsidian/sanitizeError.ts.md",
+      "x": 2660,
+      "y": 1740,
+      "width": 180,
+      "height": 60
+    },
+    {
+      "id": "g22",
+      "type": "group",
+      "label": "CreateTournament()",
+      "x": 3180,
+      "y": 1660,
+      "width": 600,
+      "height": 400,
+      "color": "5"
+    },
+    {
+      "id": "n_createtournament_createtournament",
+      "type": "file",
+      "file": "graphify/obsidian/CreateTournament().md",
+      "x": 3200,
+      "y": 1740,
+      "width": 180,
+      "height": 60
+    },
+    {
+      "id": "n_users_nkt_dev_iman_checkered_checkered_checkered_app_components_createtournament_tsx",
+      "type": "file",
+      "file": "graphify/obsidian/CreateTournament.tsx.md",
+      "x": 3400,
+      "y": 1740,
+      "width": 180,
+      "height": 60
+    },
+    {
+      "id": "g23",
+      "type": "group",
+      "label": "connectBrowserWallet()",
+      "x": 3860,
+      "y": 1660,
+      "width": 600,
+      "height": 400,
+      "color": "6"
+    },
+    {
+      "id": "n_users_nkt_dev_iman_checkered_checkered_checkered_app_components_header_tsx",
+      "type": "file",
+      "file": "graphify/obsidian/Header.tsx.md",
+      "x": 3880,
+      "y": 1740,
+      "width": 180,
+      "height": 60
+    },
+    {
+      "id": "n_header_connectbrowserwallet",
+      "type": "file",
+      "file": "graphify/obsidian/connectBrowserWallet().md",
+      "x": 4080,
+      "y": 1740,
+      "width": 180,
+      "height": 60
+    },
+    {
+      "id": "g24",
+      "type": "group",
+      "label": "formatTokenAmount() (TournamentList)",
+      "x": 0,
+      "y": 2140,
+      "width": 600,
+      "height": 400,
+      "color": "1"
+    },
+    {
+      "id": "n_users_nkt_dev_iman_checkered_checkered_checkered_app_components_tournamentlist_tsx",
+      "type": "file",
+      "file": "graphify/obsidian/TournamentList.tsx.md",
+      "x": 20,
+      "y": 2220,
+      "width": 180,
+      "height": 60
+    },
+    {
+      "id": "n_tournamentlist_formattokenamount",
+      "type": "file",
+      "file": "graphify/obsidian/formatTokenAmount()_1.md",
+      "x": 220,
+      "y": 2220,
+      "width": 180,
+      "height": 60
+    },
+    {
+      "id": "g25",
+      "type": "group",
+      "label": "useIsAdmin()",
+      "x": 960,
+      "y": 2140,
+      "width": 600,
+      "height": 400,
+      "color": "2"
+    },
+    {
+      "id": "n_useisadmin_useisadmin",
+      "type": "file",
+      "file": "graphify/obsidian/useIsAdmin().md",
+      "x": 980,
+      "y": 2220,
+      "width": 180,
+      "height": 60
+    },
+    {
+      "id": "n_users_nkt_dev_iman_checkered_checkered_checkered_app_hooks_useisadmin_ts",
+      "type": "file",
+      "file": "graphify/obsidian/useIsAdmin.ts.md",
+      "x": 1180,
+      "y": 2220,
+      "width": 180,
+      "height": 60
+    },
+    {
+      "id": "g26",
+      "type": "group",
+      "label": "hardhat.config",
+      "x": 1700,
+      "y": 2140,
+      "width": 600,
+      "height": 400,
+      "color": "3"
+    },
+    {
+      "id": "n_users_nkt_dev_iman_checkered_checkered_hardhat_config_js",
+      "type": "file",
+      "file": "graphify/obsidian/hardhat.config.js.md",
+      "x": 1720,
+      "y": 2220,
+      "width": 180,
+      "height": 60
+    },
+    {
+      "id": "g27",
+      "type": "group",
+      "label": "next-env.d",
+      "x": 2440,
+      "y": 2140,
+      "width": 600,
+      "height": 400,
+      "color": "4"
+    },
+    {
+      "id": "n_users_nkt_dev_iman_checkered_checkered_checkered_next_env_d_ts",
+      "type": "file",
+      "file": "graphify/obsidian/next-env.d.ts.md",
+      "x": 2460,
+      "y": 2220,
+      "width": 180,
+      "height": 60
+    },
+    {
+      "id": "g28",
+      "type": "group",
+      "label": "next.config",
+      "x": 3180,
+      "y": 2140,
+      "width": 600,
+      "height": 400,
+      "color": "5"
+    },
+    {
+      "id": "n_users_nkt_dev_iman_checkered_checkered_checkered_next_config_ts",
+      "type": "file",
+      "file": "graphify/obsidian/next.config.ts.md",
+      "x": 3200,
+      "y": 2220,
+      "width": 180,
+      "height": 60
+    },
+    {
+      "id": "g29",
+      "type": "group",
+      "label": "contracts",
+      "x": 3860,
+      "y": 2140,
+      "width": 600,
+      "height": 400,
+      "color": "6"
+    },
+    {
+      "id": "n_users_nkt_dev_iman_checkered_checkered_checkered_app_contracts_ts",
+      "type": "file",
+      "file": "graphify/obsidian/contracts.ts.md",
+      "x": 3880,
+      "y": 2220,
+      "width": 180,
+      "height": 60
+    },
+    {
+      "id": "g30",
+      "type": "group",
+      "label": "types",
+      "x": 0,
+      "y": 2620,
+      "width": 600,
+      "height": 400,
+      "color": "1"
+    },
+    {
+      "id": "n_users_nkt_dev_iman_checkered_checkered_checkered_app_types_ts",
+      "type": "file",
+      "file": "graphify/obsidian/types.ts.md",
+      "x": 20,
+      "y": 2700,
+      "width": 180,
+      "height": 60
+    },
+    {
+      "id": "g31",
+      "type": "group",
+      "label": "theme",
+      "x": 960,
+      "y": 2620,
+      "width": 600,
+      "height": 400,
+      "color": "2"
+    },
+    {
+      "id": "n_users_nkt_dev_iman_checkered_checkered_checkered_app_theme_ts",
+      "type": "file",
+      "file": "graphify/obsidian/theme.ts.md",
+      "x": 980,
+      "y": 2700,
+      "width": 180,
+      "height": 60
+    },
+    {
+      "id": "g32",
+      "type": "group",
+      "label": "OracleStatus",
+      "x": 1700,
+      "y": 2620,
+      "width": 600,
+      "height": 400,
+      "color": "3"
+    },
+    {
+      "id": "n_users_nkt_dev_iman_checkered_checkered_checkered_app_components_oraclestatus_tsx",
+      "type": "file",
+      "file": "graphify/obsidian/OracleStatus.tsx.md",
+      "x": 1720,
+      "y": 2700,
+      "width": 180,
+      "height": 60
+    },
+    {
+      "id": "g33",
+      "type": "group",
+      "label": "Overlay",
+      "x": 2440,
+      "y": 2620,
+      "width": 600,
+      "height": 400,
+      "color": "4"
+    },
+    {
+      "id": "n_users_nkt_dev_iman_checkered_checkered_checkered_app_components_overlay_tsx",
+      "type": "file",
+      "file": "graphify/obsidian/Overlay.tsx.md",
+      "x": 2460,
+      "y": 2700,
+      "width": 180,
+      "height": 60
+    },
+    {
+      "id": "g34",
+      "type": "group",
+      "label": "sanitizeError.test",
+      "x": 3180,
+      "y": 2620,
+      "width": 600,
+      "height": 400,
+      "color": "5"
+    },
+    {
+      "id": "n_users_nkt_dev_iman_checkered_checkered_checkered_app_tests_sanitizeerror_test_ts",
+      "type": "file",
+      "file": "graphify/obsidian/sanitizeError.test.ts.md",
+      "x": 3200,
+      "y": 2700,
+      "width": 180,
+      "height": 60
+    },
+    {
+      "id": "g35",
+      "type": "group",
+      "label": "calls.test",
+      "x": 3860,
+      "y": 2620,
+      "width": 600,
+      "height": 400,
+      "color": "6"
+    },
+    {
+      "id": "n_users_nkt_dev_iman_checkered_checkered_checkered_app_tests_calls_test_ts",
+      "type": "file",
+      "file": "graphify/obsidian/calls.test.ts.md",
+      "x": 3880,
+      "y": 2700,
+      "width": 180,
+      "height": 60
+    }
+  ],
+  "edges": [
+    {
+      "id": "e_users_nkt_dev_iman_checkered_checkered_test_iracingtournament_test_js_iracingtournament_test_deployfixture",
+      "fromNode": "n_users_nkt_dev_iman_checkered_checkered_test_iracingtournament_test_js",
+      "toNode": "n_iracingtournament_test_deployfixture",
+      "label": "contains [EXTRACTED]"
+    },
+    {
+      "id": "e_users_nkt_dev_iman_checkered_checkered_test_iracingtournament_test_js_iracingtournament_test_createtournamentfixture",
+      "fromNode": "n_users_nkt_dev_iman_checkered_checkered_test_iracingtournament_test_js",
+      "toNode": "n_iracingtournament_test_createtournamentfixture",
+      "label": "contains [EXTRACTED]"
+    },
+    {
+      "id": "e_users_nkt_dev_iman_checkered_checkered_test_iracingtournament_test_js_iracingtournament_test_fulltournamentfixture",
+      "fromNode": "n_users_nkt_dev_iman_checkered_checkered_test_iracingtournament_test_js",
+      "toNode": "n_iracingtournament_test_fulltournamentfixture",
+      "label": "contains [EXTRACTED]"
+    },
+    {
+      "id": "e_users_nkt_dev_iman_checkered_checkered_test_iracingtournament_test_js_iracingtournament_test_stucktournamentfixture",
+      "fromNode": "n_users_nkt_dev_iman_checkered_checkered_test_iracingtournament_test_js",
+      "toNode": "n_iracingtournament_test_stucktournamentfixture",
+      "label": "contains [EXTRACTED]"
+    },
+    {
+      "id": "e_users_nkt_dev_iman_checkered_checkered_backend_test_api_test_js_api_test_mocktournamentdata",
+      "fromNode": "n_users_nkt_dev_iman_checkered_checkered_backend_test_api_test_js",
+      "toNode": "n_api_test_mocktournamentdata",
+      "label": "contains [EXTRACTED]"
+    },
+    {
+      "id": "e_users_nkt_dev_iman_checkered_checkered_backend_test_api_test_js_api_test_mockcontract",
+      "fromNode": "n_users_nkt_dev_iman_checkered_checkered_backend_test_api_test_js",
+      "toNode": "n_api_test_mockcontract",
+      "label": "contains [EXTRACTED]"
+    },
+    {
+      "id": "e_users_nkt_dev_iman_checkered_checkered_backend_test_api_test_js_api_test_buildapp",
+      "fromNode": "n_users_nkt_dev_iman_checkered_checkered_backend_test_api_test_js",
+      "toNode": "n_api_test_buildapp",
+      "label": "contains [EXTRACTED]"
+    },
+    {
+      "id": "e_api_test_mocktournamentdata_api_test_mockcontract",
+      "fromNode": "n_api_test_mocktournamentdata",
+      "toNode": "n_api_test_mockcontract",
+      "label": "calls [EXTRACTED]"
+    },
+    {
+      "id": "e_api_test_mockcontract_api_test_buildapp",
+      "fromNode": "n_api_test_mockcontract",
+      "toNode": "n_api_test_buildapp",
+      "label": "calls [EXTRACTED]"
+    },
+    {
+      "id": "e_users_nkt_dev_iman_checkered_checkered_backend_test_iracing_integration_js_iracing_integration_ok",
+      "fromNode": "n_users_nkt_dev_iman_checkered_checkered_backend_test_iracing_integration_js",
+      "toNode": "n_iracing_integration_ok",
+      "label": "contains [EXTRACTED]"
+    },
+    {
+      "id": "e_users_nkt_dev_iman_checkered_checkered_backend_test_iracing_integration_js_iracing_integration_fail",
+      "fromNode": "n_users_nkt_dev_iman_checkered_checkered_backend_test_iracing_integration_js",
+      "toNode": "n_iracing_integration_fail",
+      "label": "contains [EXTRACTED]"
+    },
+    {
+      "id": "e_users_nkt_dev_iman_checkered_checkered_backend_test_iracing_integration_js_iracing_integration_skip",
+      "fromNode": "n_users_nkt_dev_iman_checkered_checkered_backend_test_iracing_integration_js",
+      "toNode": "n_iracing_integration_skip",
+      "label": "contains [EXTRACTED]"
+    },
+    {
+      "id": "e_users_nkt_dev_iman_checkered_checkered_backend_test_iracing_integration_js_iracing_integration_testiracingoauth",
+      "fromNode": "n_users_nkt_dev_iman_checkered_checkered_backend_test_iracing_integration_js",
+      "toNode": "n_iracing_integration_testiracingoauth",
+      "label": "contains [EXTRACTED]"
+    },
+    {
+      "id": "e_users_nkt_dev_iman_checkered_checkered_backend_test_iracing_integration_js_iracing_integration_testmemberinfo",
+      "fromNode": "n_users_nkt_dev_iman_checkered_checkered_backend_test_iracing_integration_js",
+      "toNode": "n_iracing_integration_testmemberinfo",
+      "label": "contains [EXTRACTED]"
+    },
+    {
+      "id": "e_users_nkt_dev_iman_checkered_checkered_backend_test_iracing_integration_js_iracing_integration_testrecentraces",
+      "fromNode": "n_users_nkt_dev_iman_checkered_checkered_backend_test_iracing_integration_js",
+      "toNode": "n_iracing_integration_testrecentraces",
+      "label": "contains [EXTRACTED]"
+    },
+    {
+      "id": "e_users_nkt_dev_iman_checkered_checkered_backend_test_iracing_integration_js_iracing_integration_testsubsessionresults",
+      "fromNode": "n_users_nkt_dev_iman_checkered_checkered_backend_test_iracing_integration_js",
+      "toNode": "n_iracing_integration_testsubsessionresults",
+      "label": "contains [EXTRACTED]"
+    },
+    {
+      "id": "e_users_nkt_dev_iman_checkered_checkered_backend_test_iracing_integration_js_iracing_integration_testbackendhealth",
+      "fromNode": "n_users_nkt_dev_iman_checkered_checkered_backend_test_iracing_integration_js",
+      "toNode": "n_iracing_integration_testbackendhealth",
+      "label": "contains [EXTRACTED]"
+    },
+    {
+      "id": "e_users_nkt_dev_iman_checkered_checkered_backend_test_iracing_integration_js_iracing_integration_testbackendtournaments",
+      "fromNode": "n_users_nkt_dev_iman_checkered_checkered_backend_test_iracing_integration_js",
+      "toNode": "n_iracing_integration_testbackendtournaments",
+      "label": "contains [EXTRACTED]"
+    },
+    {
+      "id": "e_users_nkt_dev_iman_checkered_checkered_backend_test_iracing_integration_js_iracing_integration_testoraclestatus",
+      "fromNode": "n_users_nkt_dev_iman_checkered_checkered_backend_test_iracing_integration_js",
+      "toNode": "n_iracing_integration_testoraclestatus",
+      "label": "contains [EXTRACTED]"
+    },
+    {
+      "id": "e_users_nkt_dev_iman_checkered_checkered_backend_test_iracing_integration_js_iracing_integration_testmanualpoll",
+      "fromNode": "n_users_nkt_dev_iman_checkered_checkered_backend_test_iracing_integration_js",
+      "toNode": "n_iracing_integration_testmanualpoll",
+      "label": "contains [EXTRACTED]"
+    },
+    {
+      "id": "e_users_nkt_dev_iman_checkered_checkered_backend_test_iracing_integration_js_iracing_integration_testcontractconnection",
+      "fromNode": "n_users_nkt_dev_iman_checkered_checkered_backend_test_iracing_integration_js",
+      "toNode": "n_iracing_integration_testcontractconnection",
+      "label": "contains [EXTRACTED]"
+    },
+    {
+      "id": "e_users_nkt_dev_iman_checkered_checkered_backend_test_iracing_integration_js_iracing_integration_main",
+      "fromNode": "n_users_nkt_dev_iman_checkered_checkered_backend_test_iracing_integration_js",
+      "toNode": "n_iracing_integration_main",
+      "label": "contains [EXTRACTED]"
+    },
+    {
+      "id": "e_iracing_integration_ok_iracing_integration_testiracingoauth",
+      "fromNode": "n_iracing_integration_ok",
+      "toNode": "n_iracing_integration_testiracingoauth",
+      "label": "calls [EXTRACTED]"
+    },
+    {
+      "id": "e_iracing_integration_ok_iracing_integration_testmemberinfo",
+      "fromNode": "n_iracing_integration_ok",
+      "toNode": "n_iracing_integration_testmemberinfo",
+      "label": "calls [EXTRACTED]"
+    },
+    {
+      "id": "e_iracing_integration_ok_iracing_integration_testrecentraces",
+      "fromNode": "n_iracing_integration_ok",
+      "toNode": "n_iracing_integration_testrecentraces",
+      "label": "calls [EXTRACTED]"
+    },
+    {
+      "id": "e_iracing_integration_ok_iracing_integration_testsubsessionresults",
+      "fromNode": "n_iracing_integration_ok",
+      "toNode": "n_iracing_integration_testsubsessionresults",
+      "label": "calls [EXTRACTED]"
+    },
+    {
+      "id": "e_iracing_integration_ok_iracing_integration_testbackendhealth",
+      "fromNode": "n_iracing_integration_ok",
+      "toNode": "n_iracing_integration_testbackendhealth",
+      "label": "calls [EXTRACTED]"
+    },
+    {
+      "id": "e_iracing_integration_ok_iracing_integration_testbackendtournaments",
+      "fromNode": "n_iracing_integration_ok",
+      "toNode": "n_iracing_integration_testbackendtournaments",
+      "label": "calls [EXTRACTED]"
+    },
+    {
+      "id": "e_iracing_integration_ok_iracing_integration_testoraclestatus",
+      "fromNode": "n_iracing_integration_ok",
+      "toNode": "n_iracing_integration_testoraclestatus",
+      "label": "calls [EXTRACTED]"
+    },
+    {
+      "id": "e_iracing_integration_ok_iracing_integration_testmanualpoll",
+      "fromNode": "n_iracing_integration_ok",
+      "toNode": "n_iracing_integration_testmanualpoll",
+      "label": "calls [EXTRACTED]"
+    },
+    {
+      "id": "e_iracing_integration_ok_iracing_integration_testcontractconnection",
+      "fromNode": "n_iracing_integration_ok",
+      "toNode": "n_iracing_integration_testcontractconnection",
+      "label": "calls [EXTRACTED]"
+    },
+    {
+      "id": "e_iracing_integration_fail_iracing_integration_testiracingoauth",
+      "fromNode": "n_iracing_integration_fail",
+      "toNode": "n_iracing_integration_testiracingoauth",
+      "label": "calls [EXTRACTED]"
+    },
+    {
+      "id": "e_iracing_integration_fail_iracing_integration_testmemberinfo",
+      "fromNode": "n_iracing_integration_fail",
+      "toNode": "n_iracing_integration_testmemberinfo",
+      "label": "calls [EXTRACTED]"
+    },
+    {
+      "id": "e_iracing_integration_fail_iracing_integration_testrecentraces",
+      "fromNode": "n_iracing_integration_fail",
+      "toNode": "n_iracing_integration_testrecentraces",
+      "label": "calls [EXTRACTED]"
+    },
+    {
+      "id": "e_iracing_integration_fail_iracing_integration_testsubsessionresults",
+      "fromNode": "n_iracing_integration_fail",
+      "toNode": "n_iracing_integration_testsubsessionresults",
+      "label": "calls [EXTRACTED]"
+    },
+    {
+      "id": "e_iracing_integration_fail_iracing_integration_testbackendhealth",
+      "fromNode": "n_iracing_integration_fail",
+      "toNode": "n_iracing_integration_testbackendhealth",
+      "label": "calls [EXTRACTED]"
+    },
+    {
+      "id": "e_iracing_integration_fail_iracing_integration_testbackendtournaments",
+      "fromNode": "n_iracing_integration_fail",
+      "toNode": "n_iracing_integration_testbackendtournaments",
+      "label": "calls [EXTRACTED]"
+    },
+    {
+      "id": "e_iracing_integration_fail_iracing_integration_testoraclestatus",
+      "fromNode": "n_iracing_integration_fail",
+      "toNode": "n_iracing_integration_testoraclestatus",
+      "label": "calls [EXTRACTED]"
+    },
+    {
+      "id": "e_iracing_integration_fail_iracing_integration_testmanualpoll",
+      "fromNode": "n_iracing_integration_fail",
+      "toNode": "n_iracing_integration_testmanualpoll",
+      "label": "calls [EXTRACTED]"
+    },
+    {
+      "id": "e_iracing_integration_fail_iracing_integration_testcontractconnection",
+      "fromNode": "n_iracing_integration_fail",
+      "toNode": "n_iracing_integration_testcontractconnection",
+      "label": "calls [EXTRACTED]"
+    },
+    {
+      "id": "e_iracing_integration_skip_iracing_integration_testiracingoauth",
+      "fromNode": "n_iracing_integration_skip",
+      "toNode": "n_iracing_integration_testiracingoauth",
+      "label": "calls [EXTRACTED]"
+    },
+    {
+      "id": "e_iracing_integration_skip_iracing_integration_testmemberinfo",
+      "fromNode": "n_iracing_integration_skip",
+      "toNode": "n_iracing_integration_testmemberinfo",
+      "label": "calls [EXTRACTED]"
+    },
+    {
+      "id": "e_iracing_integration_skip_iracing_integration_testrecentraces",
+      "fromNode": "n_iracing_integration_skip",
+      "toNode": "n_iracing_integration_testrecentraces",
+      "label": "calls [EXTRACTED]"
+    },
+    {
+      "id": "e_iracing_integration_skip_iracing_integration_testsubsessionresults",
+      "fromNode": "n_iracing_integration_skip",
+      "toNode": "n_iracing_integration_testsubsessionresults",
+      "label": "calls [EXTRACTED]"
+    },
+    {
+      "id": "e_iracing_integration_testiracingoauth_iracing_integration_main",
+      "fromNode": "n_iracing_integration_testiracingoauth",
+      "toNode": "n_iracing_integration_main",
+      "label": "calls [EXTRACTED]"
+    },
+    {
+      "id": "e_iracing_integration_testmemberinfo_iracing_integration_main",
+      "fromNode": "n_iracing_integration_testmemberinfo",
+      "toNode": "n_iracing_integration_main",
+      "label": "calls [EXTRACTED]"
+    },
+    {
+      "id": "e_iracing_integration_testrecentraces_iracing_integration_main",
+      "fromNode": "n_iracing_integration_testrecentraces",
+      "toNode": "n_iracing_integration_main",
+      "label": "calls [EXTRACTED]"
+    },
+    {
+      "id": "e_iracing_integration_testsubsessionresults_iracing_integration_main",
+      "fromNode": "n_iracing_integration_testsubsessionresults",
+      "toNode": "n_iracing_integration_main",
+      "label": "calls [EXTRACTED]"
+    },
+    {
+      "id": "e_iracing_integration_testbackendhealth_iracing_integration_main",
+      "fromNode": "n_iracing_integration_testbackendhealth",
+      "toNode": "n_iracing_integration_main",
+      "label": "calls [EXTRACTED]"
+    },
+    {
+      "id": "e_iracing_integration_testbackendtournaments_iracing_integration_main",
+      "fromNode": "n_iracing_integration_testbackendtournaments",
+      "toNode": "n_iracing_integration_main",
+      "label": "calls [EXTRACTED]"
+    },
+    {
+      "id": "e_iracing_integration_testoraclestatus_iracing_integration_main",
+      "fromNode": "n_iracing_integration_testoraclestatus",
+      "toNode": "n_iracing_integration_main",
+      "label": "calls [EXTRACTED]"
+    },
+    {
+      "id": "e_iracing_integration_testmanualpoll_iracing_integration_main",
+      "fromNode": "n_iracing_integration_testmanualpoll",
+      "toNode": "n_iracing_integration_main",
+      "label": "calls [EXTRACTED]"
+    },
+    {
+      "id": "e_iracing_integration_testcontractconnection_iracing_integration_main",
+      "fromNode": "n_iracing_integration_testcontractconnection",
+      "toNode": "n_iracing_integration_main",
+      "label": "calls [EXTRACTED]"
+    },
+    {
+      "id": "e_users_nkt_dev_iman_checkered_checkered_backend_src_iracing_api_js_iracing_api_iracingauth",
+      "fromNode": "n_users_nkt_dev_iman_checkered_checkered_backend_src_iracing_api_js",
+      "toNode": "n_iracing_api_iracingauth",
+      "label": "contains [EXTRACTED]"
+    },
+    {
+      "id": "e_users_nkt_dev_iman_checkered_checkered_backend_src_iracing_api_js_iracing_api_refreshaccesstoken",
+      "fromNode": "n_users_nkt_dev_iman_checkered_checkered_backend_src_iracing_api_js",
+      "toNode": "n_iracing_api_refreshaccesstoken",
+      "label": "contains [EXTRACTED]"
+    },
+    {
+      "id": "e_users_nkt_dev_iman_checkered_checkered_backend_src_iracing_api_js_iracing_api_iracingfetch",
+      "fromNode": "n_users_nkt_dev_iman_checkered_checkered_backend_src_iracing_api_js",
+      "toNode": "n_iracing_api_iracingfetch",
+      "label": "contains [EXTRACTED]"
+    },
+    {
+      "id": "e_users_nkt_dev_iman_checkered_checkered_backend_src_iracing_api_js_iracing_api_fetchsubsessionresults",
+      "fromNode": "n_users_nkt_dev_iman_checkered_checkered_backend_src_iracing_api_js",
+      "toNode": "n_iracing_api_fetchsubsessionresults",
+      "label": "contains [EXTRACTED]"
+    },
+    {
+      "id": "e_users_nkt_dev_iman_checkered_checkered_backend_src_iracing_api_js_iracing_api_fetchmemberinfo",
+      "fromNode": "n_users_nkt_dev_iman_checkered_checkered_backend_src_iracing_api_js",
+      "toNode": "n_iracing_api_fetchmemberinfo",
+      "label": "contains [EXTRACTED]"
+    },
+    {
+      "id": "e_users_nkt_dev_iman_checkered_checkered_backend_src_iracing_api_js_iracing_api_fetchrecentraces",
+      "fromNode": "n_users_nkt_dev_iman_checkered_checkered_backend_src_iracing_api_js",
+      "toNode": "n_iracing_api_fetchrecentraces",
+      "label": "contains [EXTRACTED]"
+    },
+    {
+      "id": "e_users_nkt_dev_iman_checkered_checkered_backend_src_iracing_api_js_iracing_api_fetchleagueseasonsessions",
+      "fromNode": "n_users_nkt_dev_iman_checkered_checkered_backend_src_iracing_api_js",
+      "toNode": "n_iracing_api_fetchleagueseasonsessions",
+      "label": "contains [EXTRACTED]"
+    },
+    {
+      "id": "e_iracing_api_iracingauth_iracing_api_refreshaccesstoken",
+      "fromNode": "n_iracing_api_iracingauth",
+      "toNode": "n_iracing_api_refreshaccesstoken",
+      "label": "calls [EXTRACTED]"
+    },
+    {
+      "id": "e_iracing_api_iracingauth_iracing_api_iracingfetch",
+      "fromNode": "n_iracing_api_iracingauth",
+      "toNode": "n_iracing_api_iracingfetch",
+      "label": "calls [EXTRACTED]"
+    },
+    {
+      "id": "e_iracing_api_iracingfetch_iracing_api_fetchsubsessionresults",
+      "fromNode": "n_iracing_api_iracingfetch",
+      "toNode": "n_iracing_api_fetchsubsessionresults",
+      "label": "calls [EXTRACTED]"
+    },
+    {
+      "id": "e_iracing_api_iracingfetch_iracing_api_fetchmemberinfo",
+      "fromNode": "n_iracing_api_iracingfetch",
+      "toNode": "n_iracing_api_fetchmemberinfo",
+      "label": "calls [EXTRACTED]"
+    },
+    {
+      "id": "e_iracing_api_iracingfetch_iracing_api_fetchrecentraces",
+      "fromNode": "n_iracing_api_iracingfetch",
+      "toNode": "n_iracing_api_fetchrecentraces",
+      "label": "calls [EXTRACTED]"
+    },
+    {
+      "id": "e_iracing_api_iracingfetch_iracing_api_fetchleagueseasonsessions",
+      "fromNode": "n_iracing_api_iracingfetch",
+      "toNode": "n_iracing_api_fetchleagueseasonsessions",
+      "label": "calls [EXTRACTED]"
+    },
+    {
+      "id": "e_users_nkt_dev_iman_checkered_checkered_backend_src_index_js_index_polltournaments",
+      "fromNode": "n_users_nkt_dev_iman_checkered_checkered_backend_src_index_js",
+      "toNode": "n_index_polltournaments",
+      "label": "contains [EXTRACTED]"
+    },
+    {
+      "id": "e_users_nkt_dev_iman_checkered_checkered_backend_src_index_js_index_submitresults",
+      "fromNode": "n_users_nkt_dev_iman_checkered_checkered_backend_src_index_js",
+      "toNode": "n_index_submitresults",
+      "label": "contains [EXTRACTED]"
+    },
+    {
+      "id": "e_users_nkt_dev_iman_checkered_checkered_backend_src_index_js_index_generatemockresults",
+      "fromNode": "n_users_nkt_dev_iman_checkered_checkered_backend_src_index_js",
+      "toNode": "n_index_generatemockresults",
+      "label": "contains [EXTRACTED]"
+    },
+    {
+      "id": "e_index_polltournaments_index_generatemockresults",
+      "fromNode": "n_index_polltournaments",
+      "toNode": "n_index_generatemockresults",
+      "label": "calls [EXTRACTED]"
+    },
+    {
+      "id": "e_index_polltournaments_index_submitresults",
+      "fromNode": "n_index_polltournaments",
+      "toNode": "n_index_submitresults",
+      "label": "calls [EXTRACTED]"
+    },
+    {
+      "id": "e_users_nkt_dev_iman_checkered_checkered_backend_src_app_js_app_createapp",
+      "fromNode": "n_users_nkt_dev_iman_checkered_checkered_backend_src_app_js",
+      "toNode": "n_app_createapp",
+      "label": "contains [EXTRACTED]"
+    },
+    {
+      "id": "e_users_nkt_dev_iman_checkered_checkered_scripts_mint_usdc_js_mint_usdc_main",
+      "fromNode": "n_users_nkt_dev_iman_checkered_checkered_scripts_mint_usdc_js",
+      "toNode": "n_mint_usdc_main",
+      "label": "contains [EXTRACTED]"
+    },
+    {
+      "id": "e_users_nkt_dev_iman_checkered_checkered_scripts_e2e_test_js_e2e_test_main",
+      "fromNode": "n_users_nkt_dev_iman_checkered_checkered_scripts_e2e_test_js",
+      "toNode": "n_e2e_test_main",
+      "label": "contains [EXTRACTED]"
+    },
+    {
+      "id": "e_users_nkt_dev_iman_checkered_checkered_scripts_create_and_resolve_js_create_and_resolve_main",
+      "fromNode": "n_users_nkt_dev_iman_checkered_checkered_scripts_create_and_resolve_js",
+      "toNode": "n_create_and_resolve_main",
+      "label": "contains [EXTRACTED]"
+    },
+    {
+      "id": "e_users_nkt_dev_iman_checkered_checkered_scripts_transfer_chex_js_transfer_chex_main",
+      "fromNode": "n_users_nkt_dev_iman_checkered_checkered_scripts_transfer_chex_js",
+      "toNode": "n_transfer_chex_main",
+      "label": "contains [EXTRACTED]"
+    },
+    {
+      "id": "e_users_nkt_dev_iman_checkered_checkered_scripts_deploy_js_deploy_main",
+      "fromNode": "n_users_nkt_dev_iman_checkered_checkered_scripts_deploy_js",
+      "toNode": "n_deploy_main",
+      "label": "contains [EXTRACTED]"
+    },
+    {
+      "id": "e_users_nkt_dev_iman_checkered_checkered_scripts_create_test_tournament_js_create_test_tournament_main",
+      "fromNode": "n_users_nkt_dev_iman_checkered_checkered_scripts_create_test_tournament_js",
+      "toNode": "n_create_test_tournament_main",
+      "label": "contains [EXTRACTED]"
+    },
+    {
+      "id": "e_users_nkt_dev_iman_checkered_checkered_scripts_advance_tournament_js_advance_tournament_main",
+      "fromNode": "n_users_nkt_dev_iman_checkered_checkered_scripts_advance_tournament_js",
+      "toNode": "n_advance_tournament_main",
+      "label": "contains [EXTRACTED]"
+    },
+    {
+      "id": "e_users_nkt_dev_iman_checkered_checkered_scripts_create_batch_tournaments_js_create_batch_tournaments_main",
+      "fromNode": "n_users_nkt_dev_iman_checkered_checkered_scripts_create_batch_tournaments_js",
+      "toNode": "n_create_batch_tournaments_main",
+      "label": "contains [EXTRACTED]"
+    },
+    {
+      "id": "e_users_nkt_dev_iman_checkered_checkered_checkered_app_rootprovider_tsx_rootprovider_rootprovider",
+      "fromNode": "n_users_nkt_dev_iman_checkered_checkered_checkered_app_rootprovider_tsx",
+      "toNode": "n_rootprovider_rootprovider",
+      "label": "contains [EXTRACTED]"
+    },
+    {
+      "id": "e_users_nkt_dev_iman_checkered_checkered_checkered_app_calls_ts_calls_buildregistercalls",
+      "fromNode": "n_users_nkt_dev_iman_checkered_checkered_checkered_app_calls_ts",
+      "toNode": "n_calls_buildregistercalls",
+      "label": "contains [EXTRACTED]"
+    },
+    {
+      "id": "e_users_nkt_dev_iman_checkered_checkered_checkered_app_layout_tsx_layout_rootlayout",
+      "fromNode": "n_users_nkt_dev_iman_checkered_checkered_checkered_app_layout_tsx",
+      "toNode": "n_layout_rootlayout",
+      "label": "contains [EXTRACTED]"
+    },
+    {
+      "id": "e_users_nkt_dev_iman_checkered_checkered_checkered_app_page_tsx_page_selecttournament",
+      "fromNode": "n_users_nkt_dev_iman_checkered_checkered_checkered_app_page_tsx",
+      "toNode": "n_page_selecttournament",
+      "label": "contains [EXTRACTED]"
+    },
+    {
+      "id": "e_users_nkt_dev_iman_checkered_checkered_checkered_app_page_tsx_page_refreshselectedtournament",
+      "fromNode": "n_users_nkt_dev_iman_checkered_checkered_checkered_app_page_tsx",
+      "toNode": "n_page_refreshselectedtournament",
+      "label": "contains [EXTRACTED]"
+    },
+    {
+      "id": "e_page_selecttournament_page_refreshselectedtournament",
+      "fromNode": "n_page_selecttournament",
+      "toNode": "n_page_refreshselectedtournament",
+      "label": "calls [EXTRACTED]"
+    },
+    {
+      "id": "e_users_nkt_dev_iman_checkered_checkered_checkered_app_utils_sanitizeerror_ts_sanitizeerror_sanitizeerror",
+      "fromNode": "n_users_nkt_dev_iman_checkered_checkered_checkered_app_utils_sanitizeerror_ts",
+      "toNode": "n_sanitizeerror_sanitizeerror",
+      "label": "contains [EXTRACTED]"
+    },
+    {
+      "id": "e_users_nkt_dev_iman_checkered_checkered_checkered_app_components_createtournament_tsx_createtournament_createtournament",
+      "fromNode": "n_users_nkt_dev_iman_checkered_checkered_checkered_app_components_createtournament_tsx",
+      "toNode": "n_createtournament_createtournament",
+      "label": "contains [EXTRACTED]"
+    },
+    {
+      "id": "e_users_nkt_dev_iman_checkered_checkered_checkered_app_components_tournamentdetail_tsx_tournamentdetail_formattokenamount",
+      "fromNode": "n_users_nkt_dev_iman_checkered_checkered_checkered_app_components_tournamentdetail_tsx",
+      "toNode": "n_tournamentdetail_formattokenamount",
+      "label": "contains [EXTRACTED]"
+    },
+    {
+      "id": "e_users_nkt_dev_iman_checkered_checkered_checkered_app_components_tournamentdetail_tsx_tournamentdetail_formatdate",
+      "fromNode": "n_users_nkt_dev_iman_checkered_checkered_checkered_app_components_tournamentdetail_tsx",
+      "toNode": "n_tournamentdetail_formatdate",
+      "label": "contains [EXTRACTED]"
+    },
+    {
+      "id": "e_users_nkt_dev_iman_checkered_checkered_checkered_app_components_tournamentdetail_tsx_tournamentdetail_sendadmintx",
+      "fromNode": "n_users_nkt_dev_iman_checkered_checkered_checkered_app_components_tournamentdetail_tsx",
+      "toNode": "n_tournamentdetail_sendadmintx",
+      "label": "contains [EXTRACTED]"
+    },
+    {
+      "id": "e_users_nkt_dev_iman_checkered_checkered_checkered_app_components_tournamentdetail_tsx_tournamentdetail_fmt",
+      "fromNode": "n_users_nkt_dev_iman_checkered_checkered_checkered_app_components_tournamentdetail_tsx",
+      "toNode": "n_tournamentdetail_fmt",
+      "label": "contains [EXTRACTED]"
+    },
+    {
+      "id": "e_tournamentdetail_formattokenamount_tournamentdetail_fmt",
+      "fromNode": "n_tournamentdetail_formattokenamount",
+      "toNode": "n_tournamentdetail_fmt",
+      "label": "calls [EXTRACTED]"
+    },
+    {
+      "id": "e_users_nkt_dev_iman_checkered_checkered_checkered_app_components_registerfortournament_tsx_registerfortournament_handlestatus",
+      "fromNode": "n_users_nkt_dev_iman_checkered_checkered_checkered_app_components_registerfortournament_tsx",
+      "toNode": "n_registerfortournament_handlestatus",
+      "label": "contains [EXTRACTED]"
+    },
+    {
+      "id": "e_users_nkt_dev_iman_checkered_checkered_checkered_app_components_registerfortournament_tsx_registerfortournament_handleregisterclick",
+      "fromNode": "n_users_nkt_dev_iman_checkered_checkered_checkered_app_components_registerfortournament_tsx",
+      "toNode": "n_registerfortournament_handleregisterclick",
+      "label": "contains [EXTRACTED]"
+    },
+    {
+      "id": "e_users_nkt_dev_iman_checkered_checkered_checkered_app_components_header_tsx_header_connectbrowserwallet",
+      "fromNode": "n_users_nkt_dev_iman_checkered_checkered_checkered_app_components_header_tsx",
+      "toNode": "n_header_connectbrowserwallet",
+      "label": "contains [EXTRACTED]"
+    },
+    {
+      "id": "e_users_nkt_dev_iman_checkered_checkered_checkered_app_components_tournamentlist_tsx_tournamentlist_formattokenamount",
+      "fromNode": "n_users_nkt_dev_iman_checkered_checkered_checkered_app_components_tournamentlist_tsx",
+      "toNode": "n_tournamentlist_formattokenamount",
+      "label": "contains [EXTRACTED]"
+    },
+    {
+      "id": "e_users_nkt_dev_iman_checkered_checkered_checkered_app_tests_contracts_test_ts_contracts_test_hasfunction",
+      "fromNode": "n_users_nkt_dev_iman_checkered_checkered_checkered_app_tests_contracts_test_ts",
+      "toNode": "n_contracts_test_hasfunction",
+      "label": "contains [EXTRACTED]"
+    },
+    {
+      "id": "e_users_nkt_dev_iman_checkered_checkered_checkered_app_tests_contracts_test_ts_contracts_test_hasevent",
+      "fromNode": "n_users_nkt_dev_iman_checkered_checkered_checkered_app_tests_contracts_test_ts",
+      "toNode": "n_contracts_test_hasevent",
+      "label": "contains [EXTRACTED]"
+    },
+    {
+      "id": "e_users_nkt_dev_iman_checkered_checkered_checkered_app_hooks_useisadmin_ts_useisadmin_useisadmin",
+      "fromNode": "n_users_nkt_dev_iman_checkered_checkered_checkered_app_hooks_useisadmin_ts",
+      "toNode": "n_useisadmin_useisadmin",
+      "label": "contains [EXTRACTED]"
+    }
+  ]
+}

@@ -1,0 +1,267 @@
+{
+  "communities": {
+    "0": [
+      "iracing_integration_fail",
+      "iracing_integration_main",
+      "iracing_integration_ok",
+      "iracing_integration_skip",
+      "iracing_integration_testbackendhealth",
+      "iracing_integration_testbackendtournaments",
+      "iracing_integration_testcontractconnection",
+      "iracing_integration_testiracingoauth",
+      "iracing_integration_testmanualpoll",
+      "iracing_integration_testmemberinfo",
+      "iracing_integration_testoraclestatus",
+      "iracing_integration_testrecentraces",
+      "iracing_integration_testsubsessionresults",
+      "users_nkt_dev_iman_checkered_checkered_backend_test_iracing_integration_js"
+    ],
+    "1": [
+      "iracing_api_fetchleagueseasonsessions",
+      "iracing_api_fetchmemberinfo",
+      "iracing_api_fetchrecentraces",
+      "iracing_api_fetchsubsessionresults",
+      "iracing_api_iracingauth",
+      "iracing_api_iracingfetch",
+      "iracing_api_refreshaccesstoken",
+      "users_nkt_dev_iman_checkered_checkered_backend_src_iracing_api_js"
+    ],
+    "2": [
+      "iracingtournament_test_createtournamentfixture",
+      "iracingtournament_test_deployfixture",
+      "iracingtournament_test_fulltournamentfixture",
+      "iracingtournament_test_stucktournamentfixture",
+      "users_nkt_dev_iman_checkered_checkered_test_iracingtournament_test_js"
+    ],
+    "3": [
+      "tournamentdetail_fmt",
+      "tournamentdetail_formatdate",
+      "tournamentdetail_formattokenamount",
+      "tournamentdetail_sendadmintx",
+      "users_nkt_dev_iman_checkered_checkered_checkered_app_components_tournamentdetail_tsx"
+    ],
+    "4": [
+      "api_test_buildapp",
+      "api_test_mockcontract",
+      "api_test_mocktournamentdata",
+      "users_nkt_dev_iman_checkered_checkered_backend_test_api_test_js"
+    ],
+    "5": [
+      "index_generatemockresults",
+      "index_polltournaments",
+      "index_submitresults",
+      "users_nkt_dev_iman_checkered_checkered_backend_src_index_js"
+    ],
+    "6": [
+      "page_refreshselectedtournament",
+      "page_selecttournament",
+      "users_nkt_dev_iman_checkered_checkered_checkered_app_page_tsx"
+    ],
+    "7": [
+      "registerfortournament_handleregisterclick",
+      "registerfortournament_handlestatus",
+      "users_nkt_dev_iman_checkered_checkered_checkered_app_components_registerfortournament_tsx"
+    ],
+    "8": [
+      "contracts_test_hasevent",
+      "contracts_test_hasfunction",
+      "users_nkt_dev_iman_checkered_checkered_checkered_app_tests_contracts_test_ts"
+    ],
+    "9": [
+      "app_createapp",
+      "users_nkt_dev_iman_checkered_checkered_backend_src_app_js"
+    ],
+    "10": [
+      "mint_usdc_main",
+      "users_nkt_dev_iman_checkered_checkered_scripts_mint_usdc_js"
+    ],
+    "11": [
+      "e2e_test_main",
+      "users_nkt_dev_iman_checkered_checkered_scripts_e2e_test_js"
+    ],
+    "12": [
+      "create_and_resolve_main",
+      "users_nkt_dev_iman_checkered_checkered_scripts_create_and_resolve_js"
+    ],
+    "13": [
+      "transfer_chex_main",
+      "users_nkt_dev_iman_checkered_checkered_scripts_transfer_chex_js"
+    ],
+    "14": [
+      "deploy_main",
+      "users_nkt_dev_iman_checkered_checkered_scripts_deploy_js"
+    ],
+    "15": [
+      "create_test_tournament_main",
+      "users_nkt_dev_iman_checkered_checkered_scripts_create_test_tournament_js"
+    ],
+    "16": [
+      "advance_tournament_main",
+      "users_nkt_dev_iman_checkered_checkered_scripts_advance_tournament_js"
+    ],
+    "17": [
+      "create_batch_tournaments_main",
+      "users_nkt_dev_iman_checkered_checkered_scripts_create_batch_tournaments_js"
+    ],
+    "18": [
+      "rootprovider_rootprovider",
+      "users_nkt_dev_iman_checkered_checkered_checkered_app_rootprovider_tsx"
+    ],
+    "19": [
+      "calls_buildregistercalls",
+      "users_nkt_dev_iman_checkered_checkered_checkered_app_calls_ts"
+    ],
+    "20": [
+      "layout_rootlayout",
+      "users_nkt_dev_iman_checkered_checkered_checkered_app_layout_tsx"
+    ],
+    "21": [
+      "sanitizeerror_sanitizeerror",
+      "users_nkt_dev_iman_checkered_checkered_checkered_app_utils_sanitizeerror_ts"
+    ],
+    "22": [
+      "createtournament_createtournament",
+      "users_nkt_dev_iman_checkered_checkered_checkered_app_components_createtournament_tsx"
+    ],
+    "23": [
+      "header_connectbrowserwallet",
+      "users_nkt_dev_iman_checkered_checkered_checkered_app_components_header_tsx"
+    ],
+    "24": [
+      "tournamentlist_formattokenamount",
+      "users_nkt_dev_iman_checkered_checkered_checkered_app_components_tournamentlist_tsx"
+    ],
+    "25": [
+      "useisadmin_useisadmin",
+      "users_nkt_dev_iman_checkered_checkered_checkered_app_hooks_useisadmin_ts"
+    ],
+    "26": [
+      "users_nkt_dev_iman_checkered_checkered_hardhat_config_js"
+    ],
+    "27": [
+      "users_nkt_dev_iman_checkered_checkered_checkered_next_env_d_ts"
+    ],
+    "28": [
+      "users_nkt_dev_iman_checkered_checkered_checkered_next_config_ts"
+    ],
+    "29": [
+      "users_nkt_dev_iman_checkered_checkered_checkered_app_contracts_ts"
+    ],
+    "30": [
+      "users_nkt_dev_iman_checkered_checkered_checkered_app_types_ts"
+    ],
+    "31": [
+      "users_nkt_dev_iman_checkered_checkered_checkered_app_theme_ts"
+    ],
+    "32": [
+      "users_nkt_dev_iman_checkered_checkered_checkered_app_components_oraclestatus_tsx"
+    ],
+    "33": [
+      "users_nkt_dev_iman_checkered_checkered_checkered_app_components_overlay_tsx"
+    ],
+    "34": [
+      "users_nkt_dev_iman_checkered_checkered_checkered_app_tests_sanitizeerror_test_ts"
+    ],
+    "35": [
+      "users_nkt_dev_iman_checkered_checkered_checkered_app_tests_calls_test_ts"
+    ]
+  },
+  "cohesion": {
+    "0": 0.48,
+    "1": 0.46,
+    "2": 0.4,
+    "3": 0.5,
+    "4": 0.83,
+    "5": 0.83,
+    "6": 1.0,
+    "7": 0.67,
+    "8": 0.67,
+    "9": 1.0,
+    "10": 1.0,
+    "11": 1.0,
+    "12": 1.0,
+    "13": 1.0,
+    "14": 1.0,
+    "15": 1.0,
+    "16": 1.0,
+    "17": 1.0,
+    "18": 1.0,
+    "19": 1.0,
+    "20": 1.0,
+    "21": 1.0,
+    "22": 1.0,
+    "23": 1.0,
+    "24": 1.0,
+    "25": 1.0,
+    "26": 1.0,
+    "27": 1.0,
+    "28": 1.0,
+    "29": 1.0,
+    "30": 1.0,
+    "31": 1.0,
+    "32": 1.0,
+    "33": 1.0,
+    "34": 1.0,
+    "35": 1.0
+  },
+  "gods": [
+    {
+      "id": "iracing_integration_ok",
+      "label": "ok()",
+      "edges": 10
+    },
+    {
+      "id": "iracing_integration_fail",
+      "label": "fail()",
+      "edges": 10
+    },
+    {
+      "id": "iracing_integration_main",
+      "label": "main()",
+      "edges": 10
+    },
+    {
+      "id": "iracing_api_iracingfetch",
+      "label": "iRacingFetch()",
+      "edges": 6
+    },
+    {
+      "id": "iracing_integration_skip",
+      "label": "skip()",
+      "edges": 5
+    },
+    {
+      "id": "iracing_integration_testiracingoauth",
+      "label": "testIRacingOAuth()",
+      "edges": 5
+    },
+    {
+      "id": "iracing_integration_testmemberinfo",
+      "label": "testMemberInfo()",
+      "edges": 5
+    },
+    {
+      "id": "iracing_integration_testrecentraces",
+      "label": "testRecentRaces()",
+      "edges": 5
+    },
+    {
+      "id": "iracing_integration_testsubsessionresults",
+      "label": "testSubsessionResults()",
+      "edges": 5
+    },
+    {
+      "id": "iracing_integration_testbackendhealth",
+      "label": "testBackendHealth()",
+      "edges": 4
+    }
+  ],
+  "surprises": [],
+  "questions": [
+    {
+      "type": "no_signal",
+      "question": null,
+      "why": "Not enough signal to generate questions. This usually means the corpus has no AMBIGUOUS edges, no bridge nodes, no INFERRED relationships, and all communities are tightly cohesive. Add more files or run with --mode deep to extract richer edges."
+    }
+  ]
+}

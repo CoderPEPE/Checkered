@@ -2,7 +2,7 @@ require("dotenv").config();
 const { ethers } = require("ethers");
 const winston = require("winston");
 require("winston-daily-rotate-file");
-const { iRacingAuth, fetchSubsessionResults, fetchMemberInfo, fetchLeagueSeasonSessions } = require("./iracing-api");
+const { iRacingAuth, fetchSubsessionResults, fetchMemberInfo, fetchLeagueSeasonSessions, fetchLeagueAllSessions, fetchLeagueSeasons } = require("./iracing-api");
 const { createApp } = require("./app");
 
 // ============================================================
@@ -51,6 +51,7 @@ const oracleWallet = new ethers.Wallet(process.env.ORACLE_PRIVATE_KEY, provider)
 
 // Minimal ABI for the functions we call
 const TOURNAMENT_ABI = [
+  "function createTournament(string, uint256, uint256, uint256[], uint256, uint256, uint256, bool) external returns (uint256)",
   "function getTournament(uint256) view returns (string name, uint256 entryFee, uint256 maxPlayers, uint256 registeredCount, uint256 prizePool, uint256[] prizeSplits, uint256 iRacingSubsessionId, uint8 status, address creator, uint256 createdAt)",
   "function getTournamentExtra(uint256) view returns (uint256 iRacingLeagueId, uint256 iRacingSeasonId, address paymentToken)",
   "function getTournamentPlayers(uint256) view returns (address[])",
@@ -252,6 +253,90 @@ function generateMockResults(tournamentId) {
 }
 
 // ============================================================
+//  AUTO-CREATE TOURNAMENTS FROM IRACING LEAGUE
+// ============================================================
+// Reads env vars:
+//   AUTO_CREATE_LEAGUE_ID    — iRacing league ID to watch (default: 132296)
+//   AUTO_CREATE_SEASON_ID    — pin to a specific season ID (0 = auto-discover active seasons)
+//   AUTO_CREATE_ENTRY_FEE    — entry fee in CHEX whole tokens (default: 100)
+//   AUTO_CREATE_MAX_PLAYERS  — max players per tournament (default: 50)
+//   AUTO_CREATE_INTERVAL     — polling interval in ms (default: 3600000 = 1 hour)
+async function pollLeagueTournaments() {
+  const leagueId = parseInt(process.env.AUTO_CREATE_LEAGUE_ID || "132296");
+  if (!leagueId || MOCK_MODE) return;
+
+  try {
+    logger.info(`Auto-create: scanning league ${leagueId} for new sessions`);
+
+    // Build a set of subsession IDs that already have a tournament on-chain
+    const count = await tournamentContract.tournamentCount();
+    const existingSubsessions = new Set();
+    for (let i = 0; i < count; i++) {
+      const t = await tournamentContract.getTournament(i);
+      const sid = Number(t.iRacingSubsessionId);
+      if (sid > 0) existingSubsessions.add(sid);
+    }
+
+    // Determine which seasons to scan
+    const configuredSeasonId = parseInt(process.env.AUTO_CREATE_SEASON_ID || "0");
+    let seasons;
+    if (configuredSeasonId > 0) {
+      seasons = [{ seasonId: configuredSeasonId, seasonName: `season-${configuredSeasonId}` }];
+    } else {
+      const all = await fetchLeagueSeasons(leagueId);
+      seasons = all.filter((s) => s.active);
+      if (seasons.length === 0) {
+        logger.info(`Auto-create: no active seasons for league ${leagueId}`);
+        return;
+      }
+    }
+
+    const entryFee = ethers.parseUnits(process.env.AUTO_CREATE_ENTRY_FEE || "100", 18);
+    const maxPlayers = parseInt(process.env.AUTO_CREATE_MAX_PLAYERS || "50");
+    const prizeSplits = [6000, 3000, 1000]; // 60/30/10
+
+    for (const season of seasons) {
+      const sessions = await fetchLeagueAllSessions(leagueId, season.seasonId);
+      if (!sessions || sessions.length === 0) continue;
+
+      for (const session of sessions) {
+        if (existingSubsessions.has(session.subsessionId)) continue;
+
+        const raceDate = new Date(session.launchAt);
+        const dateStr = raceDate.toLocaleDateString("en-US", {
+          month: "short", day: "numeric", year: "numeric",
+        });
+        const name = `${session.trackName} — ${dateStr}`;
+
+        logger.info(
+          `Auto-create: new session ${session.subsessionId} at "${session.trackName}" on ${dateStr} — creating tournament`
+        );
+
+        try {
+          const tx = await tournamentContract.createTournament(
+            name,
+            entryFee,
+            maxPlayers,
+            prizeSplits,
+            session.subsessionId,
+            leagueId,
+            season.seasonId,
+            true // useChex
+          );
+          const receipt = await tx.wait();
+          logger.info(`Auto-create: tournament created for subsession ${session.subsessionId} — TX: ${receipt.hash}`);
+          existingSubsessions.add(session.subsessionId);
+        } catch (err) {
+          logger.error(`Auto-create: failed for subsession ${session.subsessionId}: ${err.message}`);
+        }
+      }
+    }
+  } catch (err) {
+    logger.error(`Auto-create poll error: ${err.message}`);
+  }
+}
+
+// ============================================================
 //  CREATE & START APP
 // ============================================================
 const app = createApp({
@@ -261,6 +346,7 @@ const app = createApp({
   mockMode: MOCK_MODE,
   logger,
   pollTournaments,
+  pollLeagueTournaments,
   provider,
   iRacingAuth,
   fetchMemberInfo,
@@ -272,9 +358,18 @@ app.listen(PORT, () => {
   logger.info(`Contract: ${process.env.TOURNAMENT_CONTRACT_ADDRESS}`);
   logger.info(`Mock mode: ${MOCK_MODE}`);
 
-  // Run first poll immediately, then repeat on interval
+  // Oracle result polling — runs every POLL_INTERVAL (default 30s)
   const interval = parseInt(process.env.POLL_INTERVAL || "30000");
   pollTournaments();
   setInterval(pollTournaments, interval);
-  logger.info(`Polling every ${interval / 1000} seconds`);
+  logger.info(`Oracle polling every ${interval / 1000} seconds`);
+
+  // Auto-create tournaments from iRacing league — runs every AUTO_CREATE_INTERVAL (default 1h)
+  const autoCreateInterval = parseInt(process.env.AUTO_CREATE_INTERVAL || "3600000");
+  const autoCreateLeagueId = parseInt(process.env.AUTO_CREATE_LEAGUE_ID || "132296");
+  if (!MOCK_MODE && autoCreateLeagueId > 0) {
+    pollLeagueTournaments();
+    setInterval(pollLeagueTournaments, autoCreateInterval);
+    logger.info(`Auto-create polling league ${autoCreateLeagueId} every ${autoCreateInterval / 1000} seconds`);
+  }
 });

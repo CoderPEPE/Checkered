@@ -287,11 +287,64 @@ async function fetchLeagueSeasonSessions(leagueId, seasonId) {
     .sort((a, b) => new Date(b.launchAt) - new Date(a.launchAt));
 }
 
+/**
+ * Fetch ALL sessions for a league season (including upcoming, not just completed).
+ * Used by the auto-create poller to discover new sessions before they start.
+ * @param {number} leagueId iRacing league ID
+ * @param {number} seasonId iRacing league season ID
+ * @returns {Array|null} Array of { subsessionId, launchAt, trackName, hasResults } sorted by date asc
+ */
+async function fetchLeagueAllSessions(leagueId, seasonId) {
+  if (!Number.isInteger(leagueId) || leagueId <= 0) {
+    throw new Error(`Invalid league ID: ${leagueId}`);
+  }
+  if (!Number.isInteger(seasonId) || seasonId <= 0) {
+    throw new Error(`Invalid season ID: ${seasonId}`);
+  }
+
+  const data = await iRacingFetch(
+    `/data/league/season_sessions?league_id=${leagueId}&season_id=${seasonId}`
+  );
+  if (!data || !data.sessions) return null;
+
+  return data.sessions
+    .filter((s) => s.subsession_id > 0)
+    .map((s) => ({
+      subsessionId: s.subsession_id,
+      launchAt: s.launch_at,
+      trackName: s.track?.track_name || "Unknown",
+      hasResults: s.has_results || false,
+    }))
+    .sort((a, b) => new Date(a.launchAt) - new Date(b.launchAt));
+}
+
+/**
+ * Fetch active seasons for a league.
+ * @param {number} leagueId iRacing league ID
+ * @returns {Array} Array of { seasonId, seasonName, active }
+ */
+async function fetchLeagueSeasons(leagueId) {
+  if (!Number.isInteger(leagueId) || leagueId <= 0) {
+    throw new Error(`Invalid league ID: ${leagueId}`);
+  }
+
+  const data = await iRacingFetch(`/data/league/seasons?league_id=${leagueId}&retired=false`);
+  if (!data || !data.seasons) return [];
+
+  return data.seasons.map((s) => ({
+    seasonId: s.season_id,
+    seasonName: s.season_name,
+    active: s.active,
+  }));
+}
+
 module.exports = {
   iRacingAuth,
   fetchSubsessionResults,
   fetchMemberInfo,
   fetchRecentRaces,
   fetchLeagueSeasonSessions,
+  fetchLeagueAllSessions,
+  fetchLeagueSeasons,
   iRacingFetch,
 };
