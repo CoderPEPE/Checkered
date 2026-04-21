@@ -49,6 +49,9 @@ function createApp({ adminApiKey, tournamentContract, oracleWallet, mockMode, lo
     : ["http://localhost:3000"];
   app.use(cors({ origin: ALLOWED_ORIGINS, methods: ["GET", "POST"] }));
 
+  // Trust proxy for accurate IP detection behind reverse proxies
+  app.set("trust proxy", 1);
+
   // Global rate limit — 60 requests per minute per IP (Milestone 2)
   app.use(rateLimit({
     windowMs: 60 * 1000,
