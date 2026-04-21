@@ -338,6 +338,96 @@ async function fetchLeagueSeasons(leagueId) {
   }));
 }
 
+/**
+ * Fetch the league roster and return the first available member cust_id.
+ * Works even when the oracle account is not subscribed to the league.
+ * @param {number} leagueId iRacing league ID
+ * @returns {number|null} A member cust_id, or null if roster is inaccessible
+ */
+async function fetchLeagueRosterMember(leagueId) {
+  if (!Number.isInteger(leagueId) || leagueId <= 0) {
+    throw new Error(`Invalid league ID: ${leagueId}`);
+  }
+
+  const data = await iRacingFetch(
+    `/data/league/roster?league_id=${leagueId}&include_licenses=false`
+  );
+  if (!data || !data.roster || data.roster.length === 0) return null;
+
+  // Return first member with a valid cust_id
+  const member = data.roster.find((m) => m.cust_id > 0);
+  return member ? member.cust_id : null;
+}
+
+/**
+ * Fetch the league owner's cust_id via /data/league/get.
+ * This endpoint is accessible without league membership and returns the owner.
+ * @param {number} leagueId iRacing league ID
+ * @returns {number|null} Owner cust_id, or null if not found
+ */
+async function fetchLeagueOwnerCustId(leagueId) {
+  if (!Number.isInteger(leagueId) || leagueId <= 0) {
+    throw new Error(`Invalid league ID: ${leagueId}`);
+  }
+
+  const data = await iRacingFetch(
+    `/data/league/get?league_id=${leagueId}&include_licenses=false`
+  );
+  if (!data) return null;
+
+  console.log(`[debug] fetchLeagueOwnerCustId raw keys:`, Object.keys(data));
+
+  // The owner field is either top-level or nested under league
+  const league = data.league || data;
+  console.log(`[debug] league keys:`, Object.keys(league), `owner=`, JSON.stringify(league.owner)?.slice(0, 200));
+  if (league.owner && league.owner.cust_id > 0) return league.owner.cust_id;
+  if (league.owner_id > 0) return league.owner_id;
+  return null;
+}
+
+/**
+ * Fetch active seasons for a league by looking through a known member's league membership.
+ * Use this when the oracle account is not a league member but you know the cust_id of
+ * someone who IS in the league.
+ * @param {number} leagueId iRacing league ID
+ * @param {number} custId cust_id of a member who belongs to the league
+ * @returns {Array} Array of { seasonId, seasonName, active }
+ */
+async function fetchLeagueSeasonsViaMember(leagueId, custId) {
+  if (!Number.isInteger(leagueId) || leagueId <= 0) {
+    throw new Error(`Invalid league ID: ${leagueId}`);
+  }
+  if (!Number.isInteger(custId) || custId <= 0) {
+    throw new Error(`Invalid cust_id: ${custId}`);
+  }
+
+  const data = await iRacingFetch(
+    `/data/league/membership?cust_id=${custId}&include_league=true`
+  );
+  if (!data) return [];
+
+  // API returns an array of membership entries: [{league_id, league: {seasons: [...]}}]
+  // (not an object with a .leagues property)
+  const entries = Array.isArray(data) ? data : (data.leagues || []);
+  if (entries.length === 0) return [];
+
+  const entry = entries.find((e) => e.league_id === leagueId);
+  if (!entry) {
+    const ids = entries.map((e) => e.league_id);
+    console.log(`[debug] fetchLeagueSeasonsViaMember: cust_id ${custId} is in leagues [${ids.join(",")}] but not ${leagueId}`);
+    return [];
+  }
+
+  // Seasons live inside the nested .league object when include_league=true
+  const leagueData = entry.league || entry;
+  const seasons = leagueData.seasons || [];
+  return seasons.map((s) => ({
+    seasonId: s.season_id,
+    seasonName: s.season_name,
+    active: s.active,
+  }));
+}
+
 module.exports = {
   iRacingAuth,
   fetchSubsessionResults,
@@ -346,5 +436,8 @@ module.exports = {
   fetchLeagueSeasonSessions,
   fetchLeagueAllSessions,
   fetchLeagueSeasons,
+  fetchLeagueSeasonsViaMember,
+  fetchLeagueRosterMember,
+  fetchLeagueOwnerCustId,
   iRacingFetch,
 };

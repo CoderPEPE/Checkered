@@ -2,7 +2,7 @@ require("dotenv").config();
 const { ethers } = require("ethers");
 const winston = require("winston");
 require("winston-daily-rotate-file");
-const { iRacingAuth, fetchSubsessionResults, fetchMemberInfo, fetchLeagueSeasonSessions, fetchLeagueAllSessions, fetchLeagueSeasons } = require("./iracing-api");
+const { iRacingAuth, fetchSubsessionResults, fetchMemberInfo, fetchLeagueSeasonSessions, fetchLeagueAllSessions, fetchLeagueSeasons, fetchLeagueSeasonsViaMember, fetchLeagueRosterMember, fetchLeagueOwnerCustId } = require("./iracing-api");
 const { createApp } = require("./app");
 
 // ============================================================
@@ -77,6 +77,8 @@ const tournamentContract = new ethers.Contract(
 // ============================================================
 // Tracks tournaments with in-flight submissions to prevent double-submit
 const submittingTournaments = new Set();
+// Cached cust_id of a league member used for season lookups (auto-discovered from roster)
+let cachedLeagueMemberCustId = parseInt(process.env.AUTO_CREATE_MEMBER_CUST_ID || "0");
 // Tracks subsession IDs that have already been successfully submitted (prevents re-submission on restart)
 const processedSubsessions = new Set();
 // Tracks tournaments that failed due to insufficient finishers, with retry count
@@ -256,11 +258,13 @@ function generateMockResults(tournamentId) {
 //  AUTO-CREATE TOURNAMENTS FROM IRACING LEAGUE
 // ============================================================
 // Reads env vars:
-//   AUTO_CREATE_LEAGUE_ID    — iRacing league ID to watch (default: 132296)
-//   AUTO_CREATE_SEASON_ID    — pin to a specific season ID (0 = auto-discover active seasons)
-//   AUTO_CREATE_ENTRY_FEE    — entry fee in CHEX whole tokens (default: 100)
-//   AUTO_CREATE_MAX_PLAYERS  — max players per tournament (default: 50)
-//   AUTO_CREATE_INTERVAL     — polling interval in ms (default: 3600000 = 1 hour)
+//   AUTO_CREATE_LEAGUE_ID      — iRacing league ID to watch (default: 132296)
+//   AUTO_CREATE_SEASON_ID      — pin to a specific season ID (0 = auto-discover active seasons)
+//   AUTO_CREATE_MEMBER_CUST_ID — cust_id of a league member to use for season lookups when
+//                                the oracle account is not in the league (e.g. 1450841)
+//   AUTO_CREATE_ENTRY_FEE      — entry fee in CHEX whole tokens (default: 100)
+//   AUTO_CREATE_MAX_PLAYERS    — max players per tournament (default: 50)
+//   AUTO_CREATE_INTERVAL       — polling interval in ms (default: 3600000 = 1 hour)
 async function pollLeagueTournaments() {
   const leagueId = parseInt(process.env.AUTO_CREATE_LEAGUE_ID || "132296");
   if (!leagueId || MOCK_MODE) return;
@@ -283,11 +287,52 @@ async function pollLeagueTournaments() {
     if (configuredSeasonId > 0) {
       seasons = [{ seasonId: configuredSeasonId, seasonName: `season-${configuredSeasonId}` }];
     } else {
-      const all = await fetchLeagueSeasons(leagueId);
-      seasons = all.filter((s) => s.active);
+      // Try direct seasons endpoint first (works if oracle is a league member)
+      let direct = await fetchLeagueSeasons(leagueId);
+      seasons = direct.filter((s) => s.active);
+
       if (seasons.length === 0) {
-        logger.info(`Auto-create: no active seasons for league ${leagueId}`);
-        return;
+        // Oracle isn't subscribed — try to find a member via the membership endpoint
+        if (cachedLeagueMemberCustId > 0) {
+          logger.info(`Auto-create: direct seasons returned empty, trying via member cust_id ${cachedLeagueMemberCustId}`);
+          const viaMember = await fetchLeagueSeasonsViaMember(leagueId, cachedLeagueMemberCustId);
+          seasons = viaMember.filter((s) => s.active);
+
+          if (seasons.length === 0) {
+            // cust_id isn't in the league either — reset and try roster
+            logger.info(`Auto-create: cust_id ${cachedLeagueMemberCustId} is not in league ${leagueId}, fetching roster`);
+            cachedLeagueMemberCustId = 0;
+          }
+        }
+
+        if (seasons.length === 0) {
+          // Try fetching any member from the league roster
+          logger.info(`Auto-create: fetching league ${leagueId} roster to find a member cust_id`);
+          const rosterMember = await fetchLeagueRosterMember(leagueId);
+          if (rosterMember) {
+            cachedLeagueMemberCustId = rosterMember;
+            logger.info(`Auto-create: discovered member cust_id ${cachedLeagueMemberCustId} from roster`);
+            const viaMember = await fetchLeagueSeasonsViaMember(leagueId, cachedLeagueMemberCustId);
+            seasons = viaMember.filter((s) => s.active);
+          }
+        }
+
+        if (seasons.length === 0) {
+          // Last resort: try /data/league/get which exposes the owner cust_id
+          logger.info(`Auto-create: trying league/get to find owner cust_id for league ${leagueId}`);
+          const ownerCustId = await fetchLeagueOwnerCustId(leagueId);
+          if (ownerCustId) {
+            cachedLeagueMemberCustId = ownerCustId;
+            logger.info(`Auto-create: using league owner cust_id ${cachedLeagueMemberCustId}`);
+            const viaMember = await fetchLeagueSeasonsViaMember(leagueId, cachedLeagueMemberCustId);
+            seasons = viaMember.filter((s) => s.active);
+          }
+        }
+
+        if (seasons.length === 0) {
+          logger.info(`Auto-create: no active seasons for league ${leagueId} — oracle not subscribed and all member discovery methods failed`);
+          return;
+        }
       }
     }
 
@@ -313,6 +358,14 @@ async function pollLeagueTournaments() {
         );
 
         try {
+          // Check balance before sending to surface a clear error (estimateGas returns
+          // CALL_EXCEPTION instead of INSUFFICIENT_FUNDS when balance is 0)
+          const balance = await provider.getBalance(oracleWallet.address);
+          if (balance === 0n) {
+            logger.error(`Auto-create: oracle wallet has 0 ETH — fund it at https://faucet.quicknode.com/base/sepolia to create tournaments`);
+            return; // No point trying further sessions
+          }
+
           const tx = await tournamentContract.createTournament(
             name,
             entryFee,
@@ -321,13 +374,17 @@ async function pollLeagueTournaments() {
             session.subsessionId,
             leagueId,
             season.seasonId,
-            true // useChex
+            true, // useChex
+            { gasLimit: 400000 }
           );
           const receipt = await tx.wait();
           logger.info(`Auto-create: tournament created for subsession ${session.subsessionId} — TX: ${receipt.hash}`);
           existingSubsessions.add(session.subsessionId);
         } catch (err) {
-          logger.error(`Auto-create: failed for subsession ${session.subsessionId}: ${err.message}`);
+          const hint = err.code === 'INSUFFICIENT_FUNDS'
+            ? ' — oracle wallet has no ETH, fund it at https://faucet.quicknode.com/base/sepolia'
+            : '';
+          logger.error(`Auto-create: failed for subsession ${session.subsessionId}: ${err.message}${hint}`);
         }
       }
     }
@@ -352,10 +409,23 @@ const app = createApp({
   fetchMemberInfo,
 });
 
-app.listen(PORT, () => {
+app.listen(PORT, async () => {
   logger.info(`Oracle backend running on port ${PORT}`);
   logger.info(`Oracle address: ${oracleWallet.address}`);
   logger.info(`Contract: ${process.env.TOURNAMENT_CONTRACT_ADDRESS}`);
+
+  // Warn if oracle has no ETH to pay for gas
+  try {
+    const balance = await provider.getBalance(oracleWallet.address);
+    const ethBalance = parseFloat(ethers.formatEther(balance));
+    if (ethBalance < 0.001) {
+      logger.warn(`Oracle wallet balance is ${ethBalance} ETH — may not have enough gas to submit transactions. Fund at https://faucet.quicknode.com/base/sepolia`);
+    } else {
+      logger.info(`Oracle wallet balance: ${ethBalance} ETH`);
+    }
+  } catch (err) {
+    logger.warn(`Could not check oracle wallet balance: ${err.message}`);
+  }
   logger.info(`Mock mode: ${MOCK_MODE}`);
 
   // Oracle result polling — runs every POLL_INTERVAL (default 30s)
@@ -367,7 +437,11 @@ app.listen(PORT, () => {
   // Auto-create tournaments from iRacing league — runs every AUTO_CREATE_INTERVAL (default 1h)
   const autoCreateInterval = parseInt(process.env.AUTO_CREATE_INTERVAL || "3600000");
   const autoCreateLeagueId = parseInt(process.env.AUTO_CREATE_LEAGUE_ID || "132296");
+  const autoCreateMemberCustId = parseInt(process.env.AUTO_CREATE_MEMBER_CUST_ID || "0");
   if (!MOCK_MODE && autoCreateLeagueId > 0) {
+    if (autoCreateMemberCustId > 0) {
+      logger.info(`Auto-create: using member cust_id ${autoCreateMemberCustId} for league ${autoCreateLeagueId} lookups (oracle not required to be a league member)`);
+    }
     pollLeagueTournaments();
     setInterval(pollLeagueTournaments, autoCreateInterval);
     logger.info(`Auto-create polling league ${autoCreateLeagueId} every ${autoCreateInterval / 1000} seconds`);
