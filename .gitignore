@@ -40,3 +40,5 @@ wallets/
 
 # Claude Code local settings
 .claude/
+graphify-out/
+graphify-out/*

@@ -56,6 +56,8 @@ const TOURNAMENT_ABI = [
   "function getTournamentExtra(uint256) view returns (uint256 iRacingLeagueId, uint256 iRacingSeasonId, address paymentToken)",
   "function getTournamentPlayers(uint256) view returns (address[])",
   "function getPlayerRegistration(uint256, address) view returns (uint256 iRacingCustomerId, bool registered, bool refundClaimed)",
+  "function closeRegistration(uint256) external",
+  "function startRace(uint256) external",
   "function submitResultsAndDistribute(uint256, address[], bytes32)",
   "function updateSubsessionId(uint256, uint256)",
   "function tournamentCount() view returns (uint256)",
@@ -97,75 +99,20 @@ async function pollTournaments() {
       const t = await tournamentContract.getTournament(i);
       const status = Number(t.status);
 
-      // Status 2 = Racing — check for results
-      if (status === 2) {
-        // Skip if a submission is already in-flight for this tournament
-        if (submittingTournaments.has(i)) {
-          logger.info(`Tournament ${i}: Submission already in-flight, skipping`);
-          continue;
-        }
+      if (submittingTournaments.has(i)) {
+        logger.info(`Tournament ${i}: Submission already in-flight, skipping`);
+        continue;
+      }
 
-        // Get league info from the extra view function
-        const extra = await tournamentContract.getTournamentExtra(i);
-        const leagueId = Number(extra.iRacingLeagueId || 0);
-        const seasonId = Number(extra.iRacingSeasonId || 0);
-        let subsessionId = Number(t.iRacingSubsessionId);
-
-        // League auto-discovery: if leagueId is set and subsessionId is 0, discover from league
-        if (leagueId > 0 && subsessionId === 0 && !MOCK_MODE) {
-          try {
-            logger.info(`Tournament ${i}: Discovering subsession from league ${leagueId} season ${seasonId}`);
-            const sessions = await fetchLeagueSeasonSessions(leagueId, seasonId);
-            if (sessions && sessions.length > 0) {
-              subsessionId = sessions[0].subsessionId;
-
-              // Skip if this subsession was already processed (prevents double-submit on restart)
-              if (processedSubsessions.has(subsessionId)) {
-                logger.info(`Tournament ${i}: Subsession ${subsessionId} already processed, skipping`);
-                continue;
-              }
-
-              logger.info(`Tournament ${i}: Discovered subsession ${subsessionId} (${sessions[0].trackName})`);
-
-              const updateTx = await tournamentContract.updateSubsessionId(i, subsessionId);
-              await updateTx.wait();
-              logger.info(`Tournament ${i}: Updated on-chain subsessionId to ${subsessionId}`);
-            } else {
-              logger.info(`Tournament ${i}: No completed sessions found for league ${leagueId}`);
-              continue;
-            }
-          } catch (err) {
-            logger.error(`Tournament ${i} league discovery error: ${err.message}`);
-            continue;
-          }
-        }
-
-        // Skip if this subsession was already successfully processed
-        if (subsessionId > 0 && processedSubsessions.has(subsessionId)) {
-          logger.info(`Tournament ${i}: Subsession ${subsessionId} already processed, skipping`);
-          continue;
-        }
-
-        logger.info(`Tournament ${i} (${t.name}) is Racing — checking iRacing API for subsession ${subsessionId}`);
-
+      // Handle all active statuses: Created(0), RegistrationClosed(1), Racing(2)
+      if (status <= 2) {
         try {
-          let results;
-          if (MOCK_MODE) {
-            results = generateMockResults(i);
-          } else {
-            results = await fetchSubsessionResults(subsessionId);
-          }
-
-          if (results && results.length > 0) {
-            await submitResults(i, results, t);
-          } else {
-            logger.info(`Tournament ${i}: Race not yet complete`);
-          }
+          await processTournament(i, t, status);
         } catch (err) {
-          logger.error(`Tournament ${i} poll error: ${err.message}`);
+          logger.error(`Tournament ${i} error: ${err.message}`);
         }
       } else {
-        // Tournament is no longer Racing — clean up tracking state
+        // Terminal status — clean up tracking state
         submittingTournaments.delete(i);
         insufficientFinisherRetries.delete(i);
       }
@@ -175,10 +122,96 @@ async function pollTournaments() {
   }
 }
 
-async function submitResults(tournamentId, raceResults, tournamentData) {
-  // Mark as in-flight to prevent double-submission
+// Handles full lifecycle for a single tournament:
+// resolves subsessionId → fetches results → advances state → submits
+async function processTournament(tournamentId, tournamentData, status) {
   submittingTournaments.add(tournamentId);
 
+  try {
+    const extra = await tournamentContract.getTournamentExtra(tournamentId);
+    const leagueId = Number(extra.iRacingLeagueId || 0);
+    const seasonId = Number(extra.iRacingSeasonId || 0);
+    let subsessionId = Number(tournamentData.iRacingSubsessionId);
+
+    // League auto-discovery: if leagueId is set and subsessionId is 0, discover from league
+    if (leagueId > 0 && subsessionId === 0 && !MOCK_MODE) {
+      try {
+        logger.info(`Tournament ${tournamentId}: Discovering subsession from league ${leagueId} season ${seasonId}`);
+        const sessions = await fetchLeagueSeasonSessions(leagueId, seasonId);
+        if (sessions && sessions.length > 0) {
+          subsessionId = sessions[0].subsessionId;
+
+          if (processedSubsessions.has(subsessionId)) {
+            logger.info(`Tournament ${tournamentId}: Subsession ${subsessionId} already processed, skipping`);
+            return;
+          }
+
+          logger.info(`Tournament ${tournamentId}: Discovered subsession ${subsessionId} (${sessions[0].trackName})`);
+          const updateTx = await tournamentContract.updateSubsessionId(tournamentId, subsessionId);
+          await updateTx.wait();
+          logger.info(`Tournament ${tournamentId}: Updated on-chain subsessionId to ${subsessionId}`);
+        } else {
+          logger.info(`Tournament ${tournamentId}: No completed sessions found for league ${leagueId}`);
+          return;
+        }
+      } catch (err) {
+        logger.error(`Tournament ${tournamentId} league discovery error: ${err.message}`);
+        return;
+      }
+    }
+
+    if (subsessionId > 0 && processedSubsessions.has(subsessionId)) {
+      logger.info(`Tournament ${tournamentId}: Subsession ${subsessionId} already processed, skipping`);
+      return;
+    }
+
+    if (subsessionId === 0 && !MOCK_MODE) {
+      logger.info(`Tournament ${tournamentId}: No subsession ID yet, skipping`);
+      return;
+    }
+
+    const statusLabel = ["Created", "RegistrationClosed", "Racing"][status] || status;
+    logger.info(`Tournament ${tournamentId} (${tournamentData.name}) [${statusLabel}] — checking iRacing for results`);
+
+    // Fetch results from iRacing API (or mock)
+    let results;
+    if (MOCK_MODE) {
+      results = generateMockResults(tournamentId);
+    } else {
+      results = await fetchSubsessionResults(subsessionId);
+    }
+
+    if (!results || results.length === 0) {
+      logger.info(`Tournament ${tournamentId}: Race not yet complete, will retry next poll`);
+      return;
+    }
+
+    // Advance status to Racing if the tournament hasn't reached it yet
+    if (status === 0) {
+      logger.info(`Tournament ${tournamentId}: Closing registration...`);
+      const tx1 = await tournamentContract.closeRegistration(tournamentId, { gasLimit: 100000 });
+      await tx1.wait();
+      logger.info(`Tournament ${tournamentId}: Registration closed`);
+    }
+    if (status <= 1) {
+      logger.info(`Tournament ${tournamentId}: Starting race...`);
+      const tx2 = await tournamentContract.startRace(tournamentId, { gasLimit: 100000 });
+      await tx2.wait();
+      logger.info(`Tournament ${tournamentId}: Race started`);
+    }
+
+    // Re-fetch tournament data so prizeSplits etc. reflect current on-chain state
+    const currentData = await tournamentContract.getTournament(tournamentId);
+    await submitResults(tournamentId, results, currentData);
+
+  } catch (err) {
+    logger.error(`Tournament ${tournamentId} process error: ${err.message}`);
+  } finally {
+    submittingTournaments.delete(tournamentId);
+  }
+}
+
+async function submitResults(tournamentId, raceResults, tournamentData) {
   try {
     const players = await tournamentContract.getTournamentPlayers(tournamentId);
     const playerMap = new Map();
@@ -240,9 +273,6 @@ async function submitResults(tournamentId, raceResults, tournamentData) {
     insufficientFinisherRetries.delete(tournamentId);
   } catch (err) {
     logger.error(`Submit results error for tournament ${tournamentId}: ${err.message}`);
-  } finally {
-    // Always clear in-flight flag so next poll can retry if needed
-    submittingTournaments.delete(tournamentId);
   }
 }
 
