@@ -294,7 +294,7 @@ function generateMockResults(tournamentId) {
 //                                the oracle account is not in the league (e.g. 1450841)
 //   AUTO_CREATE_ENTRY_FEE      — entry fee in CHEX whole tokens (default: 100)
 //   AUTO_CREATE_MAX_PLAYERS    — max players per tournament (default: 50)
-//   AUTO_CREATE_INTERVAL       — polling interval in ms (default: 3600000 = 1 hour)
+//   AUTO_CREATE_INTERVAL       — polling interval in ms (default: 300000 = 5 minutes)
 async function pollLeagueTournaments() {
   const leagueId = parseInt(process.env.AUTO_CREATE_LEAGUE_ID || "132296");
   if (!leagueId || MOCK_MODE) return;
@@ -465,7 +465,7 @@ app.listen(PORT, async () => {
   logger.info(`Oracle polling every ${interval / 1000} seconds`);
 
   // Auto-create tournaments from iRacing league — runs every AUTO_CREATE_INTERVAL (default 1h)
-  const autoCreateInterval = parseInt(process.env.AUTO_CREATE_INTERVAL || "3600000");
+  const autoCreateInterval = parseInt(process.env.AUTO_CREATE_INTERVAL || "300000");
   const autoCreateLeagueId = parseInt(process.env.AUTO_CREATE_LEAGUE_ID || "132296");
   const autoCreateMemberCustId = parseInt(process.env.AUTO_CREATE_MEMBER_CUST_ID || "0");
   if (!MOCK_MODE && autoCreateLeagueId > 0) {
