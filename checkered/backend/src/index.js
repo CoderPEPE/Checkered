@@ -296,9 +296,8 @@ function generateMockResults(tournamentId) {
 //   AUTO_CREATE_MAX_PLAYERS    — max players per tournament (default: 50)
 //   AUTO_CREATE_INTERVAL       — polling interval in ms (default: 300000 = 5 minutes)
 async function pollLeagueTournaments() {
-  const leagueId = parseInt(process.env.AUTO_CREATE_LEAGUE_ID || "132296");
+  const leagueId = parseInt(process.env.AUTO_CREATE_LEAGUE_ID || "14250");
   if (!leagueId || MOCK_MODE) return;
-
   try {
     logger.info(`Auto-create: scanning league ${leagueId} for new sessions`);
 
@@ -439,6 +438,11 @@ const app = createApp({
   fetchMemberInfo,
 });
 
+async function pollTournamentsAndLeagueTournaments() {
+  await pollTournaments();
+  await pollLeagueTournaments();
+}
+
 app.listen(PORT, async () => {
   logger.info(`Oracle backend running on port ${PORT}`);
   logger.info(`Oracle address: ${oracleWallet.address}`);
@@ -460,20 +464,21 @@ app.listen(PORT, async () => {
 
   // Oracle result polling — runs every POLL_INTERVAL (default 30s)
   const interval = parseInt(process.env.POLL_INTERVAL || "30000");
-  pollTournaments();
-  setInterval(pollTournaments, interval);
+  await pollTournamentsAndLeagueTournaments(); // Initial immediate poll on startup
+  setInterval(pollTournamentsAndLeagueTournaments, interval);
   logger.info(`Oracle polling every ${interval / 1000} seconds`);
 
   // Auto-create tournaments from iRacing league — runs every AUTO_CREATE_INTERVAL (default 1h)
-  const autoCreateInterval = parseInt(process.env.AUTO_CREATE_INTERVAL || "300000");
-  const autoCreateLeagueId = parseInt(process.env.AUTO_CREATE_LEAGUE_ID || "132296");
-  const autoCreateMemberCustId = parseInt(process.env.AUTO_CREATE_MEMBER_CUST_ID || "0");
-  if (!MOCK_MODE && autoCreateLeagueId > 0) {
-    if (autoCreateMemberCustId > 0) {
-      logger.info(`Auto-create: using member cust_id ${autoCreateMemberCustId} for league ${autoCreateLeagueId} lookups (oracle not required to be a league member)`);
-    }
-    pollLeagueTournaments();
-    setInterval(pollLeagueTournaments, autoCreateInterval);
-    logger.info(`Auto-create polling league ${autoCreateLeagueId} every ${autoCreateInterval / 1000} seconds`);
-  }
+  // const autoCreateInterval = parseInt(process.env.AUTO_CREATE_INTERVAL || "30000");
+  // const autoCreateLeagueId = parseInt(process.env.AUTO_CREATE_LEAGUE_ID || "14250");
+  // const autoCreateMemberCustId = parseInt(process.env.AUTO_CREATE_MEMBER_CUST_ID || "0");
+  // // console.log(`Auto-create league ID: ${autoCreateLeagueId}, member cust_id: ${autoCreateMemberCustId}, interval: ${autoCreateInterval / 1000} seconds`);
+  // if (!MOCK_MODE && autoCreateLeagueId > 0) {
+  //   if (autoCreateMemberCustId > 0) {
+  //     logger.info(`Auto-create: using member cust_id ${autoCreateMemberCustId} for league ${autoCreateLeagueId} lookups (oracle not required to be a league member)`);
+  //   }
+  //   pollLeagueTournaments();
+  //   setInterval(pollLeagueTournaments, autoCreateInterval);
+  //   logger.info(`Auto-create polling league ${autoCreateLeagueId} every ${autoCreateInterval / 1000} seconds`);
+  // }
 });
