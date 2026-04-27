@@ -46,7 +46,15 @@ const MOCK_MODE = process.env.IRACING_MOCK_MODE === "true";
 // ============================================================
 //  BLOCKCHAIN CONNECTION
 // ============================================================
-const provider = new ethers.JsonRpcProvider(process.env.BASE_RPC_URL);
+// Pin chainId explicitly so signing doesn't depend on RPC auto-detection.
+// Why: a Railway/drpc proxy layer can return a stale or wrong chainId,
+// which causes ethers to sign txs with the wrong chainId and the node
+// to reject them with "-32000 invalid chain ID" on eth_sendRawTransaction.
+const CHAIN_ID = parseInt(process.env.CHAIN_ID || "84532"); // Base Sepolia
+const network = new ethers.Network(`chain-${CHAIN_ID}`, CHAIN_ID);
+const provider = new ethers.JsonRpcProvider(process.env.BASE_RPC_URL, network, {
+  staticNetwork: network,
+});
 const oracleWallet = new ethers.Wallet(process.env.ORACLE_PRIVATE_KEY, provider);
 
 // Minimal ABI for the functions we call
