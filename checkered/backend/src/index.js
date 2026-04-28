@@ -51,10 +51,13 @@ const MOCK_MODE = process.env.IRACING_MOCK_MODE === "true";
 // which causes ethers to sign txs with the wrong chainId and the node
 // to reject them with "-32000 invalid chain ID" on eth_sendRawTransaction.
 const CHAIN_ID = parseInt(process.env.CHAIN_ID || "84532"); // Base Sepolia
-const network = new ethers.Network(`chain-${CHAIN_ID}`, CHAIN_ID);
-const provider = new ethers.JsonRpcProvider(process.env.BASE_RPC_URL, network, {
-  staticNetwork: network,
+const provider = new ethers.JsonRpcProvider(process.env.BASE_RPC_URL, {
+  chainId: CHAIN_ID,
+  name: "Base Sepolia",
 });
+const network = await provider.getNetwork();
+console.log("Connected to network:", network.chainId, network.name);
+
 const oracleWallet = new ethers.Wallet(process.env.ORACLE_PRIVATE_KEY, provider);
 
 // Minimal ABI for the functions we call
