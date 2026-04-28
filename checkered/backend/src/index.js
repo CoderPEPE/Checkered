@@ -56,8 +56,12 @@ const provider = new ethers.JsonRpcProvider(process.env.BASE_RPC_URL, {
   chainId: CHAIN_ID,
   name: "Base Sepolia",
 });
-const network = await provider.getNetwork();
-console.log("Connected to network:", network.chainId, network.name);
+provider.getNetwork().then(network => {
+  console.log("Connected to network:", network.chainId, network.name);
+}).catch(err => {
+  console.error("Failed to connect to RPC provider:", err.message);
+  process.exit(1);
+});
 
 const oracleWallet = new ethers.Wallet(process.env.ORACLE_PRIVATE_KEY, provider);
 
