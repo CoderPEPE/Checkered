@@ -1,9 +1,23 @@
-const { ethers } = require("ethers");
-const winston = require("winston");
-require("winston-daily-rotate-file");
-const { iRacingAuth, fetchSubsessionResults, fetchMemberInfo, fetchLeagueSeasonSessions, fetchLeagueAllSessions, fetchLeagueSeasons, fetchLeagueSeasonsViaMember, fetchLeagueRosterMember, fetchLeagueOwnerCustId } = require("./iracing-api");
-const { createApp } = require("./app");
+import winston from "winston";
+import "winston-daily-rotate-file";
+
+import {
+  iRacingAuth,
+  fetchSubsessionResults,
+  fetchMemberInfo,
+  fetchLeagueSeasonSessions,
+  fetchLeagueAllSessions,
+  fetchLeagueSeasons,
+  fetchLeagueSeasonsViaMember,
+  fetchLeagueRosterMember,
+  fetchLeagueOwnerCustId
+} from "./iracing-api.js";
+
+import { createApp } from "./app.js";
+
+import { ethers } from "ethers";
 import dotenv from "dotenv";
+
 dotenv.config();
 
 // ============================================================
