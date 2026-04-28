@@ -1,9 +1,10 @@
-require("dotenv").config();
 const { ethers } = require("ethers");
 const winston = require("winston");
 require("winston-daily-rotate-file");
 const { iRacingAuth, fetchSubsessionResults, fetchMemberInfo, fetchLeagueSeasonSessions, fetchLeagueAllSessions, fetchLeagueSeasons, fetchLeagueSeasonsViaMember, fetchLeagueRosterMember, fetchLeagueOwnerCustId } = require("./iracing-api");
 const { createApp } = require("./app");
+const dotenv = require("dotenv");
+dotenv.config();
 
 // ============================================================
 //  ENV VALIDATION (Milestone 1)
