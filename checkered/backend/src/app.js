@@ -20,8 +20,16 @@ const rateLimit = require("express-rate-limit");
  * @param {object} deps.provider - ethers Provider for event queries
  * @param {function} deps.iRacingAuth - iRacing OAuth auth function (optional)
  * @param {function} deps.fetchMemberInfo - iRacing member info function (optional)
+ * @param {function} deps.fetchMemberGet - iRacing member get function (optional)
+ * @param {function} deps.fetchMemberProfile - iRacing member profile function (optional)
+ * @param {function} deps.fetchMemberCareer - iRacing member career stats function (optional)
+ * @param {function} deps.fetchMemberSummary - iRacing member summary function (optional)
+ * @param {function} deps.fetchDriverLookup - iRacing driver search function (optional)
+ * @param {function} deps.fetchTrackGet - iRacing track metadata function (optional)
+ * @param {function} deps.fetchTrackAssets - iRacing track assets function (optional)
+ * @param {function} deps.fetchLeagueSeasonStandings - iRacing league standings function (optional)
  */
-function createApp({ adminApiKey, tournamentContract, oracleWallet, mockMode, logger, pollTournaments, pollLeagueTournaments, provider, iRacingAuth, fetchMemberInfo }) {
+function createApp({ adminApiKey, tournamentContract, oracleWallet, mockMode, logger, pollTournaments, pollLeagueTournaments, provider, iRacingAuth, fetchMemberInfo, fetchMemberGet, fetchMemberProfile, fetchMemberCareer, fetchMemberSummary, fetchDriverLookup, fetchTrackGet, fetchTrackAssets, fetchLeagueSeasonStandings }) {
   const app = express();
 
   // Security headers — explicit config for readability (Milestone 7)
@@ -271,6 +279,98 @@ function createApp({ adminApiKey, tournamentContract, oracleWallet, mockMode, lo
     } catch (err) {
       logger.error(`GET /api/iracing/status error: ${err.message}`);
       res.json({ connected: false, error: err.message });
+    }
+  });
+
+  // ============================================================
+  //  iRACING DATA ENDPOINTS
+  // ============================================================
+
+  // Get driver profile + career stats by cust_id
+  app.get("/api/iracing/driver/:custId", requireApiKey, async (req, res) => {
+    const custId = parseInt(req.params.custId);
+    if (!custId || custId <= 0) {
+      return res.status(400).json({ error: "Invalid cust_id" });
+    }
+    if (mockMode) {
+      return res.json({ custId, mockMode: true, profile: null, career: null, summary: null });
+    }
+    try {
+      const [profile, career, summary, member] = await Promise.all([
+        fetchMemberProfile ? fetchMemberProfile(custId).catch(() => null) : null,
+        fetchMemberCareer ? fetchMemberCareer(custId).catch(() => null) : null,
+        fetchMemberSummary ? fetchMemberSummary(custId).catch(() => null) : null,
+        fetchMemberGet ? fetchMemberGet(custId).catch(() => null) : null,
+      ]);
+      res.json({ custId, profile, career, summary, member });
+    } catch (err) {
+      logger.error(`GET /api/iracing/driver/${custId} error: ${err.message}`);
+      res.status(500).json({ error: "Failed to fetch driver data" });
+    }
+  });
+
+  // Search drivers by name or cust_id
+  app.get("/api/iracing/drivers/search", requireApiKey, async (req, res) => {
+    const { q, league_id } = req.query;
+    if (!q || typeof q !== "string" || q.trim().length === 0) {
+      return res.status(400).json({ error: "Query parameter 'q' is required" });
+    }
+    if (mockMode) {
+      return res.json({ results: [] });
+    }
+    try {
+      if (!fetchDriverLookup) {
+        return res.status(501).json({ error: "Driver lookup not configured" });
+      }
+      const leagueId = league_id ? parseInt(league_id) : undefined;
+      const data = await fetchDriverLookup(q.trim(), leagueId);
+      res.json({ results: data || [] });
+    } catch (err) {
+      logger.error(`GET /api/iracing/drivers/search error: ${err.message}`);
+      res.status(500).json({ error: "Failed to search drivers" });
+    }
+  });
+
+  // Get all tracks with metadata and assets
+  app.get("/api/iracing/tracks", async (_req, res) => {
+    if (mockMode) {
+      return res.json({ tracks: [], assets: {} });
+    }
+    try {
+      const [tracks, assets] = await Promise.all([
+        fetchTrackGet ? fetchTrackGet().catch(() => null) : null,
+        fetchTrackAssets ? fetchTrackAssets().catch(() => null) : null,
+      ]);
+      res.json({ tracks: tracks || [], assets: assets || {} });
+    } catch (err) {
+      logger.error(`GET /api/iracing/tracks error: ${err.message}`);
+      res.status(500).json({ error: "Failed to fetch tracks" });
+    }
+  });
+
+  // Get league season standings
+  app.get("/api/iracing/league/:leagueId/standings", async (req, res) => {
+    const leagueId = parseInt(req.params.leagueId);
+    const seasonId = parseInt(req.query.season_id);
+    const carClassId = req.query.car_class_id ? parseInt(req.query.car_class_id) : undefined;
+    if (!leagueId || leagueId <= 0) {
+      return res.status(400).json({ error: "Invalid league_id" });
+    }
+    if (!seasonId || seasonId <= 0) {
+      return res.status(400).json({ error: "season_id query parameter is required" });
+    }
+    if (mockMode) {
+      return res.json({ standings: null });
+    }
+    try {
+      if (!fetchLeagueSeasonStandings) {
+        return res.status(501).json({ error: "League standings not configured" });
+      }
+      const data = await fetchLeagueSeasonStandings(leagueId, seasonId, carClassId);
+      res.json({ standings: data });
+    } catch (err) {
+      logger.error(`GET /api/iracing/league/${leagueId}/standings error: ${err.message}`);
+      res.status(500).json({ error: "Failed to fetch standings" });
     }
   });
 

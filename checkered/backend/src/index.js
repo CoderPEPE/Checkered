@@ -4,13 +4,22 @@ import "winston-daily-rotate-file";
 import {
   iRacingAuth,
   fetchSubsessionResults,
+  fetchSearchHostedResults,
   fetchMemberInfo,
+  fetchMemberGet,
+  fetchMemberProfile,
+  fetchMemberCareer,
+  fetchMemberSummary,
+  fetchDriverLookup,
+  fetchTrackGet,
+  fetchTrackAssets,
   fetchLeagueSeasonSessions,
   fetchLeagueAllSessions,
   fetchLeagueSeasons,
   fetchLeagueSeasonsViaMember,
   fetchLeagueRosterMember,
-  fetchLeagueOwnerCustId
+  fetchLeagueOwnerCustId,
+  fetchLeagueSeasonStandings
 } from "./iracing-api.js";
 
 import { createApp } from "./app.js";
@@ -96,6 +105,7 @@ const TOURNAMENT_ABI = [
   "event TournamentCreated(uint256 indexed tournamentId, string name, uint256 entryFee, uint256 maxPlayers)",
   "event PrizesDistributed(uint256 indexed tournamentId, address[] winners, uint256[] amounts)",
   "event SubsessionIdUpdated(uint256 indexed tournamentId, uint256 subsessionId)",
+  "function cancelTournament(uint256) external"
 ];
 
 const tournamentContract = new ethers.Contract(
@@ -209,9 +219,110 @@ async function processTournament(tournamentId, tournamentData, status) {
       results = generateMockResults(tournamentId);
     } else {
       results = await fetchSubsessionResults(subsessionId);
+      console.log(`Fetched ${results} results for subsession ${subsessionId}`);
     }
 
     if (!results || results.length === 0) {
+      // Fast check: query the league session status to detect dead/expired sessions
+      // iRacing session status: 1=pending, 2=ended/expired, 4=cancelled
+      if (leagueId > 0 && seasonId > 0 && !MOCK_MODE) {
+        try {
+          const allSessions = await fetchLeagueAllSessions(leagueId, seasonId);
+          if (allSessions) {
+            const session = allSessions.find(s => s.subsessionId === subsessionId);
+            if (session) {
+              // Session ended (status >= 2) with no results and no entries = dead race
+              if (session.status >= 2 && !session.hasResults) {
+                const reason = session.entryCount === 0
+                  ? `iRacing session expired with 0 entries (status=${session.status})`
+                  : `iRacing session ended with no results (status=${session.status}, entries=${session.entryCount})`;
+                logger.info(`Tournament ${tournamentId}: ${reason}. Auto-cancelling.`);
+                try {
+                  const tx = await tournamentContract.cancelTournament(tournamentId, { gasLimit: 100000 });
+                  await tx.wait();
+                  logger.info(`Tournament ${tournamentId}: Cancelled successfully`);
+                } catch (err) {
+                  logger.error(`Tournament ${tournamentId}: Failed to cancel: ${err.message}`);
+                }
+                return;
+              }
+              logger.info(`Tournament ${tournamentId}: iRacing session status=${session.status}, entries=${session.entryCount}, hasResults=${session.hasResults}`);
+            }
+          }
+        } catch (sessErr) {
+          logger.warn(`Tournament ${tournamentId}: League session status check failed: ${sessErr.message}`);
+        }
+      }
+
+      // Fallback: search_hosted to verify if the race actually ran (for non-league or if above didn't resolve)
+      let raceConfirmedMissing = false;
+      if (leagueId > 0 && !MOCK_MODE) {
+        try {
+          const searchBegin = new Date(Date.now() - 90 * 86400 * 1000).toISOString().replace(/\.\d{3}Z$/, 'Z');
+          const searchResults = await fetchSearchHostedResults({
+            league_id: leagueId,
+            finish_range_begin: searchBegin,
+          });
+          if (searchResults && searchResults.data && searchResults.data.chunk_info) {
+            const chunkFiles = searchResults.data.chunk_info.chunk_file_names || [];
+            const baseUrl = searchResults.data.chunk_info.base_download_url || '';
+            let foundSubsession = false;
+            for (const chunkFile of chunkFiles) {
+              try {
+                const chunkResp = await fetch(baseUrl + chunkFile);
+                if (chunkResp.ok) {
+                  const chunkJson = await chunkResp.json();
+                  if (Array.isArray(chunkJson) && chunkJson.some(r => r.subsession_id === subsessionId)) {
+                    foundSubsession = true;
+                    break;
+                  }
+                }
+              } catch (_) { /* skip chunk errors */ }
+            }
+            if (!foundSubsession) {
+              logger.info(`Tournament ${tournamentId}: Subsession ${subsessionId} not found in search_hosted for league ${leagueId} — race may not have been run`);
+              raceConfirmedMissing = true;
+            }
+          }
+        } catch (searchErr) {
+          logger.warn(`Tournament ${tournamentId}: search_hosted fallback failed: ${searchErr.message}`);
+        }
+      }
+
+      // Auto-cancel if the race is older than 3 days (or 1 day if search_hosted confirmed missing)
+      const cancelThresholdDays = raceConfirmedMissing ? 1 : 3;
+      const nameParts = tournamentData.name.split(" — ");
+      let isOld = false;
+      if (nameParts.length > 1) {
+        const dateStr = nameParts[nameParts.length - 1];
+        const raceDate = new Date(dateStr);
+        if (!isNaN(raceDate.getTime())) {
+          if (Date.now() > raceDate.getTime() + cancelThresholdDays * 86400 * 1000) {
+            isOld = true;
+          }
+        }
+      } else {
+        const createdAt = Number(tournamentData.createdAt);
+        if (Date.now() / 1000 > createdAt + 7 * 86400) {
+          isOld = true;
+        }
+      }
+      
+      if (isOld) {
+        const reason = raceConfirmedMissing
+          ? `Race not found in league search results (> ${cancelThresholdDays} day)`
+          : `Race is old (> ${cancelThresholdDays} days) and has no results`;
+        logger.info(`Tournament ${tournamentId}: ${reason}. Canceling to prevent infinite polling.`);
+        try {
+          const tx = await tournamentContract.cancelTournament(tournamentId, { gasLimit: 100000 });
+          await tx.wait();
+          logger.info(`Tournament ${tournamentId}: Cancelled successfully`);
+        } catch (err) {
+          logger.error(`Tournament ${tournamentId}: Failed to cancel old race: ${err.message}`);
+        }
+        return;
+      }
+
       logger.info(`Tournament ${tournamentId}: Race not yet complete, will retry next poll`);
       return;
     }
@@ -399,6 +510,8 @@ async function pollLeagueTournaments() {
     const maxPlayers = parseInt(process.env.AUTO_CREATE_MAX_PLAYERS || "50");
     const prizeSplits = [6000, 3000, 1000]; // 60/30/10
 
+    let newCount = 0;
+
     for (const season of seasons) {
       const sessions = await fetchLeagueAllSessions(leagueId, season.seasonId);
       if (!sessions || sessions.length === 0) continue;
@@ -439,6 +552,7 @@ async function pollLeagueTournaments() {
           const receipt = await tx.wait();
           logger.info(`Auto-create: tournament created for subsession ${session.subsessionId} — TX: ${receipt.hash}`);
           existingSubsessions.add(session.subsessionId);
+          newCount++;
         } catch (err) {
           const hint = err.code === 'INSUFFICIENT_FUNDS'
             ? ' — oracle wallet has no ETH, fund it at https://faucet.quicknode.com/base/sepolia'
@@ -446,6 +560,10 @@ async function pollLeagueTournaments() {
           logger.error(`Auto-create: failed for subsession ${session.subsessionId}: ${err.message}${hint}`);
         }
       }
+    }
+    
+    if (newCount === 0) {
+      logger.info(`Auto-create: 0 new sessions found for league ${leagueId} (all existing on-chain)`);
     }
   } catch (err) {
     logger.error(`Auto-create poll error: ${err.message}`);
@@ -466,6 +584,14 @@ const app = createApp({
   provider,
   iRacingAuth,
   fetchMemberInfo,
+  fetchMemberGet,
+  fetchMemberProfile,
+  fetchMemberCareer,
+  fetchMemberSummary,
+  fetchDriverLookup,
+  fetchTrackGet,
+  fetchTrackAssets,
+  fetchLeagueSeasonStandings,
 });
 
 async function pollTournamentsAndLeagueTournaments() {

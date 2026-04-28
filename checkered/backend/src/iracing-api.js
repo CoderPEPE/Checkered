@@ -158,42 +158,55 @@ async function refreshAccessToken() {
  * Handles the two-step link-then-fetch pattern iRacing uses.
  */
 async function iRacingFetch(path) {
-  const token = await iRacingAuth();
+   const token = await iRacingAuth();
+   // console.log(`[debug] token acquired: ${token}`);
 
-  // Step 1: Get the redirect link from the /data endpoint
-  const linkResponse = await fetch(`https://members-ng.iracing.com${path}`, {
-    headers: { Authorization: `Bearer ${token}` },
-  });
+   // Step 1: Get the redirect link from the /data endpoint
+   const linkResponse = await fetch(`https://members-ng.iracing.com${path}`, {
+     headers: { Authorization: `Bearer ${token}` },
+   });
+  //  console.log({
+  //    linkResponse
+  //  })
 
-  if (!linkResponse.ok) {
-    if (linkResponse.status === 401) {
-      // Token may have expired — clear cache and retry once
-      accessToken = null;
-      tokenExpiry = null;
-      const newToken = await iRacingAuth();
-      const retryResponse = await fetch(`https://members-ng.iracing.com${path}`, {
-        headers: { Authorization: `Bearer ${newToken}` },
-      });
-      if (!retryResponse.ok) {
-        throw new Error(`iRacing API failed after retry: ${retryResponse.status}`);
-      }
-      const retryLink = await retryResponse.json();
-      const retryData = await fetch(retryLink.link);
-      return retryData.json();
-    }
-    return null; // 404 = not found, etc.
-  }
+   if (!linkResponse.ok) {
+     if (linkResponse.status === 401) {
+       // Token may have expired — clear cache and retry once
+       accessToken = null;
+       tokenExpiry = null;
+       const newToken = await iRacingAuth();
+       const retryResponse = await fetch(`https://members-ng.iracing.com${path}`, {
+         headers: { Authorization: `Bearer ${newToken}` },
+       });
+       if (!retryResponse.ok) {
+         throw new Error(`iRacing API failed after retry: ${retryResponse.status}`);
+       }
+       const retryLink = await retryResponse.json();
+       const retryData = await fetch(retryLink.link);
+       console.log({
+         retryData
+       })
+       return retryData.json();
+     }
+     return null; // 404 = not found, etc.
+   }
 
-  const linkData = await linkResponse.json();
+   const linkData = await linkResponse.json();
+   if (!linkData || !linkData.link) {
+     console.error('iRacing API response missing link:', linkData);
+     return null;
+   }
 
-  // Step 2: Fetch actual data from the S3/CDN link
-  const dataResponse = await fetch(linkData.link);
-  if (!dataResponse.ok) {
-    throw new Error(`iRacing data fetch failed: ${dataResponse.status}`);
-  }
-
-  return dataResponse.json();
-}
+   // Step 2: Fetch actual data from the S3/CDN link
+   const dataResponse = await fetch(linkData.link);
+  //  console.log({
+  //    dataResponse
+  //  })
+   if (!dataResponse.ok) {
+     throw new Error(`iRacing data fetch failed: ${dataResponse.status}`);
+   }
+   return dataResponse.json();
+ }
 
 /**
  * Fetch race results for a specific subsession.
@@ -207,6 +220,7 @@ async function fetchSubsessionResults(subsessionId) {
   }
 
   const data = await iRacingFetch(`/data/results/get?subsession_id=${subsessionId}`);
+  console.log(`[debug] fetchSubsessionResults raw data:`, JSON.stringify(data)?.slice(0, 500));
   if (!data) return null;
 
   // Extract driver results from session results
@@ -236,13 +250,33 @@ async function fetchSubsessionResults(subsessionId) {
 }
 
 /**
- * Fetch member info for the authenticated user (or a specific cust_id).
- * @param {number} [custId] Optional customer ID
+ * Fetch member info for the authenticated user.
+ * NOTE: /data/member/info takes NO parameters — always returns the authenticated member.
+ * To look up other members by cust_id, use fetchMemberGet() instead.
  */
-async function fetchMemberInfo(custId) {
+async function fetchMemberInfo() {
+  return iRacingFetch("/data/member/info");
+}
+
+/**
+ * Fetch member data for one or more cust_ids.
+ * @param {number|number[]} custIds One or more customer IDs
+ * @returns {Object|null} Member data object
+ */
+async function fetchMemberGet(custIds) {
+  const ids = Array.isArray(custIds) ? custIds.join(",") : custIds;
+  if (!ids) throw new Error("fetchMemberGet requires at least one cust_id");
+  return iRacingFetch(`/data/member/get?cust_ids=${ids}`);
+}
+
+/**
+ * Fetch a member's profile (stats, iRating, recent activity).
+ * @param {number} [custId] Optional — defaults to authenticated member
+ */
+async function fetchMemberProfile(custId) {
   const path = custId
-    ? `/data/member/info?cust_ids=${custId}`
-    : "/data/member/info";
+    ? `/data/member/profile?cust_id=${custId}`
+    : "/data/member/profile";
   return iRacingFetch(path);
 }
 
@@ -254,6 +288,103 @@ async function fetchRecentRaces(custId) {
   const path = custId
     ? `/data/stats/member_recent_races?cust_id=${custId}`
     : "/data/stats/member_recent_races";
+  return iRacingFetch(path);
+}
+
+/**
+ * Fetch career stats for a member.
+ * @param {number} [custId] Optional — defaults to authenticated member
+ */
+async function fetchMemberCareer(custId) {
+  const path = custId
+    ? `/data/stats/member_career?cust_id=${custId}`
+    : "/data/stats/member_career";
+  return iRacingFetch(path);
+}
+
+/**
+ * Fetch summary stats for a member.
+ * @param {number} [custId] Optional — defaults to authenticated member
+ */
+async function fetchMemberSummary(custId) {
+  const path = custId
+    ? `/data/stats/member_summary?cust_id=${custId}`
+    : "/data/stats/member_summary";
+  return iRacingFetch(path);
+}
+
+/**
+ * Search for hosted/league race results.
+ * Use this as a fallback when /data/results/get returns 404 for a subsession.
+ * Can confirm whether a race actually happened in a league.
+ * @param {Object} params Search parameters
+ * @param {number} [params.league_id] League ID to filter by
+ * @param {number} [params.league_season_id] League season ID
+ * @param {number} [params.cust_id] Participant cust_id
+ * @param {string} [params.finish_range_begin] ISO-8601 UTC (e.g. "2026-04-01T00:00Z")
+ * @param {string} [params.finish_range_end] ISO-8601 UTC
+ * @param {string} [params.start_range_begin] ISO-8601 UTC
+ * @param {string} [params.start_range_end] ISO-8601 UTC
+ * @returns {Object|null} Search results with chunked data
+ */
+async function fetchSearchHostedResults(params = {}) {
+  const query = new URLSearchParams();
+  for (const [key, value] of Object.entries(params)) {
+    if (value !== undefined && value !== null) {
+      query.set(key, String(value));
+    }
+  }
+  const qs = query.toString();
+  if (!qs) throw new Error("fetchSearchHostedResults requires at least one parameter");
+  return iRacingFetch(`/data/results/search_hosted?${qs}`);
+}
+
+/**
+ * Search drivers by name or cust_id.
+ * @param {string} searchTerm A cust_id or partial name
+ * @param {number} [leagueId] Narrow search to a league's roster
+ * @returns {Array|null} Matching drivers
+ */
+async function fetchDriverLookup(searchTerm, leagueId) {
+  if (!searchTerm) throw new Error("fetchDriverLookup requires a search_term");
+  let path = `/data/lookup/drivers?search_term=${encodeURIComponent(searchTerm)}`;
+  if (leagueId) path += `&league_id=${leagueId}`;
+  return iRacingFetch(path);
+}
+
+/**
+ * Fetch all tracks (metadata: name, config, category, etc.).
+ * @returns {Array|null} Array of track objects
+ */
+async function fetchTrackGet() {
+  return iRacingFetch("/data/track/get");
+}
+
+/**
+ * Fetch track assets (images, logos).
+ * Image paths are relative to https://images-static.iracing.com/
+ * @returns {Object|null} Map of track_id → asset info
+ */
+async function fetchTrackAssets() {
+  return iRacingFetch("/data/track/assets");
+}
+
+/**
+ * Fetch league season standings.
+ * @param {number} leagueId iRacing league ID
+ * @param {number} seasonId League season ID
+ * @param {number} [carClassId] Optional car class filter
+ * @returns {Object|null} Standings data
+ */
+async function fetchLeagueSeasonStandings(leagueId, seasonId, carClassId) {
+  if (!Number.isInteger(leagueId) || leagueId <= 0) {
+    throw new Error(`Invalid league ID: ${leagueId}`);
+  }
+  if (!Number.isInteger(seasonId) || seasonId <= 0) {
+    throw new Error(`Invalid season ID: ${seasonId}`);
+  }
+  let path = `/data/league/season_standings?league_id=${leagueId}&season_id=${seasonId}`;
+  if (carClassId) path += `&car_class_id=${carClassId}`;
   return iRacingFetch(path);
 }
 
@@ -314,6 +445,8 @@ async function fetchLeagueAllSessions(leagueId, seasonId) {
       launchAt: s.launch_at,
       trackName: s.track?.track_name || "Unknown",
       hasResults: s.has_results || false,
+      status: s.status,         // 1=pending, 2=ended/expired, 3=?, 4=cancelled
+      entryCount: s.entry_count || 0,
     }))
     .sort((a, b) => new Date(a.launchAt) - new Date(b.launchAt));
 }
@@ -430,14 +563,27 @@ async function fetchLeagueSeasonsViaMember(leagueId, custId) {
 
 module.exports = {
   iRacingAuth,
+  iRacingFetch,
+  // Results
   fetchSubsessionResults,
+  fetchSearchHostedResults,
+  // Member
   fetchMemberInfo,
+  fetchMemberGet,
+  fetchMemberProfile,
+  fetchMemberCareer,
+  fetchMemberSummary,
   fetchRecentRaces,
+  // League
   fetchLeagueSeasonSessions,
   fetchLeagueAllSessions,
   fetchLeagueSeasons,
   fetchLeagueSeasonsViaMember,
   fetchLeagueRosterMember,
   fetchLeagueOwnerCustId,
-  iRacingFetch,
+  fetchLeagueSeasonStandings,
+  // Lookup & Track
+  fetchDriverLookup,
+  fetchTrackGet,
+  fetchTrackAssets,
 };
