@@ -103,6 +103,8 @@ const TOURNAMENT_ABI = [
   "function usdc() view returns (address)",
   "function chex() view returns (address)",
   "event TournamentCreated(uint256 indexed tournamentId, string name, uint256 entryFee, uint256 maxPlayers)",
+  "event TournamentCancelled(uint256 indexed tournamentId)",
+  "event ResultsSubmitted(uint256 indexed tournamentId, bytes32 resultHash)",
   "event PrizesDistributed(uint256 indexed tournamentId, address[] winners, uint256[] amounts)",
   "event SubsessionIdUpdated(uint256 indexed tournamentId, uint256 subsessionId)",
   "function cancelTournament(uint256) external"
