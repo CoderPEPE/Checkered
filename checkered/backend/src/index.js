@@ -1,7 +1,7 @@
-import winston from "winston";
-import "winston-daily-rotate-file";
+const winston = require("winston");
+require("winston-daily-rotate-file");
 
-import {
+const {
   iRacingAuth,
   fetchSubsessionResults,
   fetchSearchHostedResults,
@@ -19,13 +19,13 @@ import {
   fetchLeagueSeasonsViaMember,
   fetchLeagueRosterMember,
   fetchLeagueOwnerCustId,
-  fetchLeagueSeasonStandings
-} from "./iracing-api.js";
+  fetchLeagueSeasonStandings,
+} = require("./iracing-api.js");
 
-import { createApp } from "./app.js";
+const { createApp } = require("./app.js");
 
-import { ethers } from "ethers";
-import dotenv from "dotenv";
+const { ethers } = require("ethers");
+const dotenv = require("dotenv");
 
 dotenv.config();
 
@@ -179,21 +179,43 @@ async function processTournament(tournamentId, tournamentData, status) {
     if (leagueId > 0 && subsessionId === 0 && !MOCK_MODE) {
       try {
         logger.info(`Tournament ${tournamentId}: Discovering subsession from league ${leagueId} season ${seasonId}`);
-        const sessions = await fetchLeagueSeasonSessions(leagueId, seasonId);
+        const sessions = await fetchLeagueAllSessions(leagueId, seasonId);
         if (sessions && sessions.length > 0) {
-          subsessionId = sessions[0].subsessionId;
+          // Match by track name and date extracted from tournament name (format: "TrackName — Date")
+          const nameParts = tournamentData.name.split(" — ");
+          const tournamentTrack = nameParts[0];
+          const tournamentDate = nameParts.length > 1 ? nameParts[nameParts.length - 1] : null;
+
+          const match = sessions.find((s) => {
+            if (s.subsessionId <= 0) return false;
+            if (s.trackName !== tournamentTrack) return false;
+            if (tournamentDate) {
+              const sessionDate = new Date(s.launchAt).toLocaleDateString("en-US", {
+                month: "short", day: "numeric", year: "numeric",
+              });
+              if (sessionDate !== tournamentDate) return false;
+            }
+            return true;
+          });
+
+          if (!match) {
+            logger.info(`Tournament ${tournamentId}: No assigned subsession yet for track "${tournamentTrack}"`);
+            return;
+          }
+
+          subsessionId = match.subsessionId;
 
           if (processedSubsessions.has(subsessionId)) {
             logger.info(`Tournament ${tournamentId}: Subsession ${subsessionId} already processed, skipping`);
             return;
           }
 
-          logger.info(`Tournament ${tournamentId}: Discovered subsession ${subsessionId} (${sessions[0].trackName})`);
+          logger.info(`Tournament ${tournamentId}: Discovered subsession ${subsessionId} (${match.trackName})`);
           const updateTx = await tournamentContract.updateSubsessionId(tournamentId, subsessionId);
           await updateTx.wait();
           logger.info(`Tournament ${tournamentId}: Updated on-chain subsessionId to ${subsessionId}`);
         } else {
-          logger.info(`Tournament ${tournamentId}: No completed sessions found for league ${leagueId}`);
+          logger.info(`Tournament ${tournamentId}: No sessions found for league ${leagueId}`);
           return;
         }
       } catch (err) {
@@ -444,13 +466,15 @@ async function pollLeagueTournaments() {
   try {
     logger.info(`Auto-create: scanning league ${leagueId} for new sessions`);
 
-    // Build a set of subsession IDs that already have a tournament on-chain
+    // Build sets of existing tournaments for dedup (by subsession ID and by name)
     const count = await tournamentContract.tournamentCount();
     const existingSubsessions = new Set();
+    const existingNames = new Set();
     for (let i = 0; i < count; i++) {
       const t = await tournamentContract.getTournament(i);
       const sid = Number(t.iRacingSubsessionId);
       if (sid > 0) existingSubsessions.add(sid);
+      existingNames.add(t.name);
     }
 
     // Determine which seasons to scan
@@ -519,7 +543,8 @@ async function pollLeagueTournaments() {
       if (!sessions || sessions.length === 0) continue;
 
       for (const session of sessions) {
-        if (existingSubsessions.has(session.subsessionId)) continue;
+        // Dedup by subsession ID (if known) or by tournament name (for upcoming races)
+        if (session.subsessionId > 0 && existingSubsessions.has(session.subsessionId)) continue;
 
         const raceDate = new Date(session.launchAt);
         const dateStr = raceDate.toLocaleDateString("en-US", {
@@ -527,17 +552,21 @@ async function pollLeagueTournaments() {
         });
         const name = `${session.trackName} — ${dateStr}`;
 
+        if (existingNames.has(name)) continue;
+
+        const sessionLabel = session.subsessionId > 0
+          ? `subsession ${session.subsessionId}`
+          : `scheduled session ${session.scheduledSessionId || "unknown"} (subsessionId pending)`;
+
         logger.info(
-          `Auto-create: new session ${session.subsessionId} at "${session.trackName}" on ${dateStr} — creating tournament`
+          `Auto-create: new ${sessionLabel} at "${session.trackName}" on ${dateStr} — creating tournament`
         );
 
         try {
-          // Check balance before sending to surface a clear error (estimateGas returns
-          // CALL_EXCEPTION instead of INSUFFICIENT_FUNDS when balance is 0)
           const balance = await provider.getBalance(oracleWallet.address);
           if (balance === 0n) {
             logger.error(`Auto-create: oracle wallet has 0 ETH — fund it at https://faucet.quicknode.com/base/sepolia to create tournaments`);
-            return; // No point trying further sessions
+            return;
           }
 
           const tx = await tournamentContract.createTournament(
@@ -552,14 +581,15 @@ async function pollLeagueTournaments() {
             { gasLimit: 400000 }
           );
           const receipt = await tx.wait();
-          logger.info(`Auto-create: tournament created for subsession ${session.subsessionId} — TX: ${receipt.hash}`);
-          existingSubsessions.add(session.subsessionId);
+          logger.info(`Auto-create: tournament created for ${sessionLabel} — TX: ${receipt.hash}`);
+          if (session.subsessionId > 0) existingSubsessions.add(session.subsessionId);
+          existingNames.add(name);
           newCount++;
         } catch (err) {
           const hint = err.code === 'INSUFFICIENT_FUNDS'
             ? ' — oracle wallet has no ETH, fund it at https://faucet.quicknode.com/base/sepolia'
             : '';
-          logger.error(`Auto-create: failed for subsession ${session.subsessionId}: ${err.message}${hint}`);
+          logger.error(`Auto-create: failed for ${sessionLabel}: ${err.message}${hint}`);
         }
       }
     }

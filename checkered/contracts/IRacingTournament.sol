@@ -72,6 +72,7 @@ contract IRacingTournament is AccessControl, ReentrancyGuard, Pausable {
     mapping(uint256 => mapping(address => PlayerRegistration)) public registrations;
     mapping(uint256 => address[]) public tournamentPlayers;
     mapping(uint256 => uint256) public emergencyWithdrawRequests; // tournamentId → request timestamp
+    mapping(uint256 => mapping(uint256 => bool)) public custIdRegistered; // tournamentId → iRacingCustId → registered
 
     // ============================================================
     //  EVENTS
@@ -106,6 +107,7 @@ contract IRacingTournament is AccessControl, ReentrancyGuard, Pausable {
     error InsufficientAllowance();
     error InvalidName();
     error InvalidIRacingId();
+    error DuplicateIRacingId();
     error DuplicateWinner();
     error EmergencyNotRequested();
     error EmergencyDelayNotMet();
@@ -207,7 +209,9 @@ contract IRacingTournament is AccessControl, ReentrancyGuard, Pausable {
     /**
      * @notice Close registration for a tournament
      */
-    function closeRegistration(uint256 _tournamentId) external onlyRole(ADMIN_ROLE) {
+    function closeRegistration(uint256 _tournamentId) external {
+        if (!hasRole(ORACLE_ROLE, msg.sender) && !hasRole(ADMIN_ROLE, msg.sender))
+            revert AccessControlUnauthorizedAccount(msg.sender, ORACLE_ROLE);
         Tournament storage t = tournaments[_tournamentId];
         if (t.status != TournamentStatus.Created)
             revert InvalidStatus(TournamentStatus.Created, t.status);
@@ -219,7 +223,9 @@ contract IRacingTournament is AccessControl, ReentrancyGuard, Pausable {
     /**
      * @notice Mark tournament as racing (race has started on iRacing)
      */
-    function startRace(uint256 _tournamentId) external onlyRole(ADMIN_ROLE) {
+    function startRace(uint256 _tournamentId) external {
+        if (!hasRole(ORACLE_ROLE, msg.sender) && !hasRole(ADMIN_ROLE, msg.sender))
+            revert AccessControlUnauthorizedAccount(msg.sender, ORACLE_ROLE);
         Tournament storage t = tournaments[_tournamentId];
         if (t.status != TournamentStatus.RegistrationClosed)
             revert InvalidStatus(TournamentStatus.RegistrationClosed, t.status);
@@ -231,7 +237,9 @@ contract IRacingTournament is AccessControl, ReentrancyGuard, Pausable {
     /**
      * @notice Cancel a tournament and enable refunds
      */
-    function cancelTournament(uint256 _tournamentId) external onlyRole(ADMIN_ROLE) {
+    function cancelTournament(uint256 _tournamentId) external {
+        if (!hasRole(ORACLE_ROLE, msg.sender) && !hasRole(ADMIN_ROLE, msg.sender))
+            revert AccessControlUnauthorizedAccount(msg.sender, ORACLE_ROLE);
         Tournament storage t = tournaments[_tournamentId];
         // Cannot cancel tournaments that are already Completed or Cancelled
         if (t.status == TournamentStatus.Completed || t.status == TournamentStatus.Cancelled)
@@ -341,11 +349,13 @@ contract IRacingTournament is AccessControl, ReentrancyGuard, Pausable {
         if (registrations[_tournamentId][msg.sender].registered) revert AlreadyRegistered();
         // Validate iRacing customer ID is not zero
         if (_iRacingCustomerId == 0) revert InvalidIRacingId();
+        if (custIdRegistered[_tournamentId][_iRacingCustomerId]) revert DuplicateIRacingId();
 
         // Transfer entry fee (USDC or CHEX) from player to contract
         t.paymentToken.safeTransferFrom(msg.sender, address(this), t.entryFee);
 
         // Record registration
+        custIdRegistered[_tournamentId][_iRacingCustomerId] = true;
         registrations[_tournamentId][msg.sender] = PlayerRegistration({
             wallet: msg.sender,
             iRacingCustomerId: _iRacingCustomerId,

@@ -30,6 +30,9 @@ function mockTournamentData(overrides = {}) {
   };
 }
 
+const MOCK_USDC_ADDR = "0x0000000000000000000000000000000000000001";
+const MOCK_CHEX_ADDR = "0x0000000000000000000000000000000000000002";
+
 // Create a mock contract with configurable behavior
 function mockContract({ tournamentCount = 1, tournaments = null, players = [], playerRegs = {} } = {}) {
   const defaultTournament = mockTournamentData();
@@ -39,10 +42,19 @@ function mockContract({ tournamentCount = 1, tournaments = null, players = [], p
       if (tournaments && tournaments[Number(id)]) return Promise.resolve(tournaments[Number(id)]);
       return Promise.resolve(defaultTournament);
     }),
+    getTournamentExtra: jest.fn().mockResolvedValue({
+      iRacingLeagueId: 0n,
+      iRacingSeasonId: 0n,
+      paymentToken: MOCK_USDC_ADDR,
+    }),
     getTournamentPlayers: jest.fn().mockResolvedValue(players),
     getPlayerRegistration: jest.fn().mockImplementation((_tid, addr) => {
       return Promise.resolve(playerRegs[addr] || { iRacingCustomerId: 0n, registered: false, refundClaimed: false });
     }),
+    usdc: jest.fn().mockResolvedValue(MOCK_USDC_ADDR),
+    chex: jest.fn().mockResolvedValue(MOCK_CHEX_ADDR),
+    filters: { PrizesDistributed: jest.fn().mockReturnValue({}) },
+    queryFilter: jest.fn().mockResolvedValue([]),
   };
 }
 

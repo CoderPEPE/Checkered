@@ -1037,4 +1037,84 @@ describe("IRacingTournament", function () {
       expect(extra1.paymentToken).to.equal(await chex.getAddress());
     });
   });
+
+  // ============================================================
+  //  DUPLICATE iRACING CUSTOMER ID GUARD
+  // ============================================================
+  describe("Duplicate iRacing Customer ID", function () {
+    it("Should reject two wallets registering with the same iRacing customer ID", async function () {
+      const { tournament, admin, player1, player2, usdc } = await loadFixture(deployFixture);
+      const entryFee = ethers.parseUnits("5", 6);
+      await tournament.connect(admin).createTournament("Race", entryFee, 10, [10000], 0, 0, 0, false);
+
+      await tournament.connect(player1).register(0, 100001);
+      await expect(
+        tournament.connect(player2).register(0, 100001)
+      ).to.be.revertedWithCustomError(tournament, "DuplicateIRacingId");
+    });
+
+    it("Should allow same iRacing customer ID in different tournaments", async function () {
+      const { tournament, admin, player1 } = await loadFixture(deployFixture);
+      const entryFee = ethers.parseUnits("5", 6);
+      await tournament.connect(admin).createTournament("Race 1", entryFee, 10, [10000], 0, 0, 0, false);
+      await tournament.connect(admin).createTournament("Race 2", entryFee, 10, [10000], 0, 0, 0, false);
+
+      await tournament.connect(player1).register(0, 100001);
+      await tournament.connect(player1).register(1, 100001);
+
+      expect((await tournament.getTournament(0)).registeredCount).to.equal(1);
+      expect((await tournament.getTournament(1)).registeredCount).to.equal(1);
+    });
+  });
+
+  // ============================================================
+  //  ORACLE LIFECYCLE ACCESS
+  // ============================================================
+  describe("Oracle Lifecycle Access", function () {
+    it("Should allow oracle to close registration", async function () {
+      const { tournament, admin, oracle } = await loadFixture(deployFixture);
+      await tournament.connect(admin).createTournament("Race", 1000000, 10, [10000], 0, 0, 0, false);
+
+      await expect(tournament.connect(oracle).closeRegistration(0))
+        .to.emit(tournament, "RegistrationClosed").withArgs(0);
+      expect((await tournament.getTournament(0)).status).to.equal(1);
+    });
+
+    it("Should allow oracle to start race", async function () {
+      const { tournament, admin, oracle } = await loadFixture(deployFixture);
+      await tournament.connect(admin).createTournament("Race", 1000000, 10, [10000], 0, 0, 0, false);
+      await tournament.connect(admin).closeRegistration(0);
+
+      await expect(tournament.connect(oracle).startRace(0))
+        .to.emit(tournament, "RaceStarted").withArgs(0);
+      expect((await tournament.getTournament(0)).status).to.equal(2);
+    });
+
+    it("Should allow oracle to cancel tournament", async function () {
+      const { tournament, admin, oracle } = await loadFixture(deployFixture);
+      await tournament.connect(admin).createTournament("Race", 1000000, 10, [10000], 0, 0, 0, false);
+
+      await expect(tournament.connect(oracle).cancelTournament(0))
+        .to.emit(tournament, "TournamentCancelled").withArgs(0);
+      expect((await tournament.getTournament(0)).status).to.equal(5);
+    });
+
+    it("Should reject non-admin non-oracle from lifecycle actions", async function () {
+      const { tournament, admin, nonAdmin } = await loadFixture(deployFixture);
+      await tournament.connect(admin).createTournament("Race", 1000000, 10, [10000], 0, 0, 0, false);
+
+      await expect(
+        tournament.connect(nonAdmin).closeRegistration(0)
+      ).to.be.reverted;
+
+      await tournament.connect(admin).closeRegistration(0);
+      await expect(
+        tournament.connect(nonAdmin).startRace(0)
+      ).to.be.reverted;
+
+      await expect(
+        tournament.connect(nonAdmin).cancelTournament(0)
+      ).to.be.reverted;
+    });
+  });
 });

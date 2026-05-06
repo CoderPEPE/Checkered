@@ -5,7 +5,7 @@ async function main() {
   console.log("Sending from:", deployer.address);
 
   // CHEX token address
-  const chexAddress = "0x475fa1c8934F40Ad55804CD998C422e8b624F35c";
+  const chexAddress = "0xB53FF45C2E4157f251d0eeD0baEEA202f3052b7D";
   // Recipient address
   const recipient = "0xCE3dF6cfBf94b40d87e49A0379b0B213c6D3cB11";
   // Half of 1,000,000 supply = 500,000 CHEX (18 decimals)

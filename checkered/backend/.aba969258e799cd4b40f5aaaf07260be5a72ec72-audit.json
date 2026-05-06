@@ -6,21 +6,6 @@
     "auditLog": ".aba969258e799cd4b40f5aaaf07260be5a72ec72-audit.json",
     "files": [
         {
-            "date": 1776168014533,
-            "name": "oracle-2026-04-14.log",
-            "hash": "c79f5ce1499c556a55e7c6bccf1b905c90158ec29b0b51baf8d311d522a04e9f"
-        },
-        {
-            "date": 1776719439641,
-            "name": "oracle-2026-04-20.log",
-            "hash": "d8bf02b570f636075c315dac1661463a50f65cb059ddf30fdd1d9ad27e0481da"
-        },
-        {
-            "date": 1776722425342,
-            "name": "oracle-2026-04-21.log",
-            "hash": "69ed82d96294bf6804c4bc417ce31c9b4ead4d87e346388bfeb9b417640775ec"
-        },
-        {
             "date": 1776872558972,
             "name": "oracle-2026-04-22.log",
             "hash": "7cedbc695282ccf3ae925ebaae061e9483578e42a9c7f08805cca6c6d190855c"
@@ -44,6 +29,11 @@
             "date": 1777331858197,
             "name": "oracle-2026-04-28.log",
             "hash": "95684a8faa529683652e55a8bdf35a27bc62dd410e97569d93cdf8af8f44d24d"
+        },
+        {
+            "date": 1778026676269,
+            "name": "oracle-2026-05-06.log",
+            "hash": "9b6d152dce4809ffb9f4af7fe7cf259365e6ea8131c5b24c7ef3b97f718fa65e"
         }
     ],
     "hashType": "sha256"

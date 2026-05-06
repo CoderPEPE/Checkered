@@ -439,9 +439,10 @@ async function fetchLeagueAllSessions(leagueId, seasonId) {
   if (!data || !data.sessions) return null;
 
   return data.sessions
-    .filter((s) => s.subsession_id > 0)
+    .filter((s) => s.launch_at)
     .map((s) => ({
-      subsessionId: s.subsession_id,
+      subsessionId: Number(s.subsession_id || 0),
+      scheduledSessionId: Number(s.private_session_id || s.session_id || 0),
       launchAt: s.launch_at,
       trackName: s.track?.track_name || "Unknown",
       hasResults: s.has_results || false,

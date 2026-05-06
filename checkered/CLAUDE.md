@@ -49,8 +49,9 @@ trustless USDC escrow and automated prize distribution for tournaments.
 
 ## Key Addresses & Config
 - USDC on Base Mainnet: 0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913
-- USDC on Base Sepolia: 0x77905c2eDa81D18449015d979D670c29948A31F8 (MockUSDC)
-- Tournament Contract (Base Sepolia): 0x44cB744685c5591ac19E3b04d10569F735e5E263
+- USDC on Base Sepolia: 0x857cFa7518f35cc472f5C956C9161E3780dd0016 (MockUSDC)
+- CHEX on Base Sepolia: 0xB53FF45C2E4157f251d0eeD0baEEA202f3052b7D (CheckeredCredits)
+- Tournament Contract (Base Sepolia): 0x9Bd4d688822fa29ad32D2c5c5d2Bd2a072C50030
 - Base Sepolia Chain ID: 84532
 - Base Mainnet Chain ID: 8453
 - Base Sepolia RPC: https://sepolia.base.org
