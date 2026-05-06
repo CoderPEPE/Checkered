@@ -19,6 +19,31 @@
             "date": 1776722425342,
             "name": "oracle-2026-04-21.log",
             "hash": "69ed82d96294bf6804c4bc417ce31c9b4ead4d87e346388bfeb9b417640775ec"
+        },
+        {
+            "date": 1776872558972,
+            "name": "oracle-2026-04-22.log",
+            "hash": "7cedbc695282ccf3ae925ebaae061e9483578e42a9c7f08805cca6c6d190855c"
+        },
+        {
+            "date": 1776976555823,
+            "name": "oracle-2026-04-23.log",
+            "hash": "ba31bd5ae892649b946b7ea88f019cb4e13b7cdf45dc80d523fcba4edfee5c3e"
+        },
+        {
+            "date": 1776988478372,
+            "name": "oracle-2026-04-24.log",
+            "hash": "37884b8ef2a0ab5dda86b535f56a0c8ce74f6d2b9ac26d87f19606bfeab938d9"
+        },
+        {
+            "date": 1777314971856,
+            "name": "oracle-2026-04-27.log",
+            "hash": "94b4c269764c1203b5a6b6a0c60ba1cc89ee2e7a269f90dcb9eb1bbdef68acb0"
+        },
+        {
+            "date": 1777331858197,
+            "name": "oracle-2026-04-28.log",
+            "hash": "95684a8faa529683652e55a8bdf35a27bc62dd410e97569d93cdf8af8f44d24d"
         }
     ],
     "hashType": "sha256"

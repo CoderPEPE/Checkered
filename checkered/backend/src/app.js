@@ -3,10 +3,30 @@
  * Accepts dependencies so tests can inject mocks.
  */
 const crypto = require("crypto");
+const fs = require("fs");
+const path = require("path");
 const express = require("express");
 const cors = require("cors");
 const helmet = require("helmet");
 const rateLimit = require("express-rate-limit");
+
+// Auto-hide tournaments 24h after they reach a terminal state
+const TERMINAL_STATES_FILE = path.join(__dirname, ".terminal-states.json");
+const TERMINAL_STATUSES = new Set(["Completed", "Cancelled", "ResultsSubmitted"]);
+const HIDE_AFTER_MS = 24 * 60 * 60 * 1000;
+
+let terminalStateTimestamps = {};
+try {
+  terminalStateTimestamps = JSON.parse(fs.readFileSync(TERMINAL_STATES_FILE, "utf8"));
+} catch {
+  // File doesn't exist yet
+}
+
+function saveTerminalStates() {
+  try {
+    fs.writeFileSync(TERMINAL_STATES_FILE, JSON.stringify(terminalStateTimestamps, null, 2));
+  } catch { /* best-effort persistence */ }
+}
 
 /**
  * Creates the Express app with all middleware and routes.
@@ -128,7 +148,26 @@ function createApp({ adminApiKey, tournamentContract, oracleWallet, mockMode, lo
         });
       }
 
-      res.json(tournaments);
+      // Hide tournaments that have been finished/cancelled for more than 24h
+      const now = Date.now();
+      let stateChanged = false;
+      const visible = tournaments.filter(t => {
+        if (!TERMINAL_STATUSES.has(t.statusName)) {
+          if (terminalStateTimestamps[t.id]) {
+            delete terminalStateTimestamps[t.id];
+            stateChanged = true;
+          }
+          return true;
+        }
+        if (!terminalStateTimestamps[t.id]) {
+          terminalStateTimestamps[t.id] = now;
+          stateChanged = true;
+        }
+        return (now - terminalStateTimestamps[t.id]) < HIDE_AFTER_MS;
+      });
+      if (stateChanged) saveTerminalStates();
+
+      res.json(visible);
     } catch (err) {
       logger.error(`GET /api/tournaments error: ${err.message}`);
       res.status(500).json({ error: "Internal server error" });
