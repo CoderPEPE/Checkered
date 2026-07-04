@@ -7,6 +7,7 @@ import Button from "@mui/material/Button";
 import Typography from "@mui/material/Typography";
 import Divider from "@mui/material/Divider";
 import Tooltip from "@mui/material/Tooltip";
+import Link from "next/link";
 import AddIcon from "@mui/icons-material/Add";
 import AccountBalanceWalletIcon from "@mui/icons-material/AccountBalanceWallet";
 import {
@@ -100,6 +101,23 @@ export default function Header({ onNewTournament, showNewTournament }: Props) {
 
         {/* Right side */}
         <Box sx={{ display: "flex", alignItems: "center", gap: 1.5 }}>
+          {/* Alpha signup — always visible */}
+          <Button
+            component={Link}
+            href="/alpha"
+            variant="contained"
+            size="small"
+            sx={{
+              background: "linear-gradient(135deg, #6366f1, #7c3aed)",
+              "&:hover": { background: "linear-gradient(135deg, #818cf8, #8b5cf6)" },
+              boxShadow: "0 4px 14px rgba(99, 102, 241, 0.25)",
+              fontSize: "0.8rem",
+              height: 36,
+            }}
+          >
+            Join the Alpha
+          </Button>
+
           {/* New Tournament button (admin only) */}
           {showNewTournament && (
             <Button

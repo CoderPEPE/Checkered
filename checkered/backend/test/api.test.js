@@ -6,6 +6,9 @@
  * health endpoint, tournament listing, and oracle status.
  */
 const request = require("supertest");
+const fs = require("fs");
+const os = require("os");
+const path = require("path");
 const { createApp } = require("../src/app");
 
 // ============================================================
@@ -304,6 +307,74 @@ describe("Backend API", () => {
         .set("X-API-Key", TEST_API_KEY);
       expect(res.status).toBe(500);
       expect(res.body).toEqual({ error: "Internal server error" });
+    });
+  });
+
+  // ── Alpha signups ──────────────────────────────────────────
+  describe("Alpha signups", () => {
+    const tmpFile = path.join(os.tmpdir(), `alpha-test-${process.pid}.json`);
+    const valid = {
+      name: "Ada Lovelace",
+      iracingName: "AdaL",
+      iracingCustomerId: 123456,
+      irating: 2500,
+      email: "ada@example.com",
+      availability: "both",
+    };
+
+    beforeEach(() => {
+      process.env.SIGNUPS_FILE = tmpFile; // buildApp() reads this at construction
+      try { fs.unlinkSync(tmpFile); } catch {}
+    });
+    afterAll(() => {
+      try { fs.unlinkSync(tmpFile); } catch {}
+      delete process.env.SIGNUPS_FILE;
+    });
+
+    it("accepts a valid signup and returns position 1", async () => {
+      const res = await request(buildApp()).post("/api/alpha-signup").send(valid);
+      expect(res.status).toBe(201);
+      expect(res.body.success).toBe(true);
+      expect(res.body.position).toBe(1);
+    });
+
+    it("rejects missing/invalid fields with 400 and a list", async () => {
+      const res = await request(buildApp())
+        .post("/api/alpha-signup")
+        .send({ name: "", email: "nope" });
+      expect(res.status).toBe(400);
+      expect(res.body.invalid).toEqual(
+        expect.arrayContaining([
+          "name",
+          "iracingName",
+          "iracingCustomerId",
+          "irating",
+          "email",
+          "availability",
+        ])
+      );
+    });
+
+    it("rejects a duplicate email or customer ID with 409", async () => {
+      const app = buildApp();
+      await request(app).post("/api/alpha-signup").send(valid);
+      const res = await request(app)
+        .post("/api/alpha-signup")
+        .send({ ...valid, iracingName: "Someone Else" });
+      expect(res.status).toBe(409);
+    });
+
+    it("requires an API key to list signups", async () => {
+      const app = buildApp();
+      await request(app).post("/api/alpha-signup").send(valid);
+      const noauth = await request(app).get("/api/alpha-signups");
+      expect(noauth.status).toBe(401);
+      const ok = await request(app)
+        .get("/api/alpha-signups")
+        .set("X-API-Key", TEST_API_KEY);
+      expect(ok.status).toBe(200);
+      expect(ok.body.count).toBe(1);
+      expect(ok.body.signups[0].email).toBe("ada@example.com");
     });
   });
 });

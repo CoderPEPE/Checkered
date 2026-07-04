@@ -3,6 +3,8 @@
  * Accepts dependencies so tests can inject mocks.
  */
 const crypto = require("crypto");
+const fs = require("fs");
+const path = require("path");
 const express = require("express");
 const cors = require("cors");
 const helmet = require("helmet");
@@ -377,6 +379,112 @@ function createApp({ adminApiKey, tournamentContract, oracleWallet, mockMode, lo
       logger.error(`GET /api/iracing/league/${leagueId}/standings error: ${err.message}`);
       res.status(500).json({ error: "Failed to fetch standings" });
     }
+  });
+
+  // ============================================================
+  //  Alpha tester signups
+  //  Public POST to join, admin GET to list. Stored as a JSON file
+  //  so point SIGNUPS_FILE at a Railway *persistent volume* in prod —
+  //  the default disk is wiped on every redeploy.
+  // ============================================================
+  const SIGNUPS_FILE =
+    process.env.SIGNUPS_FILE || path.join(__dirname, "..", "data", "alpha-signups.json");
+  const ALPHA_CAP = 100; // safety valve; marketing promises ~20 spots
+
+  // ponytail: naive read-modify-write. Single process + 5/hr limit + 100 cap
+  // means concurrent writes can't realistically collide. Add a lock only if
+  // this ever runs multi-instance.
+  function readSignups() {
+    try {
+      return JSON.parse(fs.readFileSync(SIGNUPS_FILE, "utf8"));
+    } catch {
+      return []; // not created yet (first signup) or unreadable → start empty
+    }
+  }
+  function writeSignups(list) {
+    fs.mkdirSync(path.dirname(SIGNUPS_FILE), { recursive: true });
+    fs.writeFileSync(SIGNUPS_FILE, JSON.stringify(list, null, 2));
+  }
+
+  // Strip HTML tags + trim. React escapes on render; this is belt-and-suspenders.
+  const clean = (s) => String(s).replace(/<[^>]*>/g, "").trim();
+
+  function validateSignup(body) {
+    const b = body || {};
+    const entry = {
+      name: clean(b.name || ""),
+      iracingName: clean(b.iracingName || ""),
+      iracingCustomerId: Number(b.iracingCustomerId),
+      irating: Number(b.irating),
+      email: clean(b.email || "").toLowerCase(),
+      discord: clean(b.discord || ""),
+      availability: clean(b.availability || "").toLowerCase(),
+      walletExperience: clean(b.walletExperience || ""),
+    };
+    const errors = [];
+    if (!entry.name || entry.name.length > 100) errors.push("name");
+    if (!entry.iracingName || entry.iracingName.length > 100) errors.push("iracingName");
+    if (!Number.isInteger(entry.iracingCustomerId) || entry.iracingCustomerId <= 0)
+      errors.push("iracingCustomerId");
+    if (!Number.isInteger(entry.irating) || entry.irating < 0 || entry.irating > 15000)
+      errors.push("irating");
+    if (!entry.email || entry.email.length > 200 || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(entry.email))
+      errors.push("email");
+    if (entry.discord.length > 100) errors.push("discord");
+    if (!["tuesday", "thursday", "both"].includes(entry.availability)) errors.push("availability");
+    if (entry.walletExperience.length > 500) errors.push("walletExperience");
+    return { errors, entry };
+  }
+
+  // Dedicated limiter — 5 signups per IP per hour (separate from the global 60/min).
+  // ponytail: behind the Next proxy all requests may share one IP → this becomes
+  // ~5/hr globally. dedup + the 100 cap are the real abuse ceiling; bump this
+  // number (or fix `trust proxy`) if real users get 429s on launch day.
+  const alphaLimiter = rateLimit({
+    windowMs: 60 * 60 * 1000,
+    max: 5,
+    standardHeaders: true,
+    legacyHeaders: false,
+    message: { error: "Too many signup attempts, please try again later" },
+  });
+
+  // Public: submit an alpha signup
+  app.post("/api/alpha-signup", alphaLimiter, (req, res) => {
+    const { errors, entry } = validateSignup(req.body);
+    if (errors.length > 0) {
+      return res.status(400).json({ error: "Some fields need fixing", invalid: errors });
+    }
+
+    const signups = readSignups();
+    if (signups.length >= ALPHA_CAP) {
+      return res.status(403).json({ error: "Alpha signups are closed" });
+    }
+    const duplicate = signups.some(
+      (s) => s.email === entry.email || s.iracingCustomerId === entry.iracingCustomerId
+    );
+    if (duplicate) {
+      return res.status(409).json({ error: "Already signed up" });
+    }
+
+    signups.push({ id: crypto.randomUUID(), ...entry, timestamp: new Date().toISOString() });
+    try {
+      writeSignups(signups);
+    } catch (err) {
+      logger.error(`POST /api/alpha-signup write failed: ${err.message}`);
+      return res.status(500).json({ error: "Could not save signup, please try again" });
+    }
+
+    res.status(201).json({
+      success: true,
+      message: "You're in! Check your email for next steps.",
+      position: signups.length,
+    });
+  });
+
+  // Admin: list all signups, newest first
+  app.get("/api/alpha-signups", requireApiKey, (_req, res) => {
+    const signups = readSignups().reverse();
+    res.json({ count: signups.length, signups });
   });
 
   return app;
