@@ -17,8 +17,7 @@ import Radio from "@mui/material/Radio";
 import CircularProgress from "@mui/material/CircularProgress";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 
-// TODO: replace with the real Discord invite before launch.
-const DISCORD_INVITE = "[DISCORD_INVITE_LINK]";
+const DISCORD_INVITE = "https://discord.gg/hC33XJEYS";
 const SUPPORT_EMAIL = "lvluplabsrace@gmail.com";
 
 type Form = {
